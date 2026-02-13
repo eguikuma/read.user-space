@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: プロセスに通知する
+---
 
-# 03-signal：プロセスに通知する
+# [03-signal：プロセスに通知する](#notifying-processes) {#notifying-processes}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-前のトピック（[02-fork-exec](./02-fork-exec.md)）で、<strong>ゾンビプロセス</strong>について学びました
+前のトピック（[02-fork-exec](../02-fork-exec/)）で、<strong>ゾンビプロセス</strong>について学びました
 
 <strong>ゾンビプロセス</strong>とは、終了したが親プロセスがまだ回収していないプロセスのことです
 
@@ -30,7 +31,7 @@ SIGCHLD は「子プロセスの状態が変化した」ことを通知するシ
 
 親はこのシグナルを「待ち受け」て、シグナルが届いたら wait() を呼ぶことで、効率的にゾンビを防げます
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 シグナルは、「誰かに肩を叩かれる」ようなものです
 
@@ -42,7 +43,7 @@ SIGCHLD は「子プロセスの状態が変化した」ことを通知するシ
 
 軽く叩けば「確認してほしい」、強く叩けば「すぐ止まれ」、激しく揺さぶれば「強制終了」といった具合です
 
-### このページで学ぶこと
+### [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 <strong>システムコール</strong>とは、プログラムが OS に「これをやって」とお願いする仕組みです
 
@@ -61,26 +62,27 @@ SIGCHLD は「子プロセスの状態が変化した」ことを通知するシ
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [シグナルとは何か](#シグナルとは何か)
-2. [よく使うシグナル](#よく使うシグナル)
-3. [シグナルのデフォルト動作](#シグナルのデフォルト動作)
-4. [シグナルハンドラとは](#シグナルハンドラとは)
-5. [signal() によるハンドラ登録](#signal-によるハンドラ登録)
-6. [sigaction() によるハンドラ登録](#sigaction-によるハンドラ登録)
-7. [シグナルを送る方法](#シグナルを送る方法)
-8. [シグナルを待つ方法](#シグナルを待つ方法)
-9. [SIGCHLD と子プロセス管理](#sigchld-と子プロセス管理)
-10. [シグナルの制限事項](#シグナルの制限事項)
-11. [用語集](#用語集)
-12. [参考資料](#参考資料)
+1. [シグナルとは何か](#what-is-a-signal)
+2. [よく使うシグナル](#commonly-used-signals)
+3. [シグナルのデフォルト動作](#default-signal-behavior)
+4. [シグナルハンドラとは](#what-is-signal-handler)
+5. [signal() によるハンドラ登録](#registering-handler-with-signal)
+6. [sigaction() によるハンドラ登録](#registering-handler-with-sigaction)
+7. [シグナルを送る方法](#how-to-send-signals)
+8. [シグナルを待つ方法](#how-to-wait-for-signals)
+9. [SIGCHLD と子プロセス管理](#sigchld-and-child-process-management)
+10. [シグナルの制限事項](#signal-limitations)
+11. [次のステップ](#next-steps)
+12. [用語集](#glossary)
+13. [参考資料](#references)
 
 ---
 
-## シグナルとは何か
+## [シグナルとは何か](#what-is-a-signal) {#what-is-a-signal}
 
-### なぜシグナルが必要なのか
+### [なぜシグナルが必要なのか](#why-signals-are-needed) {#why-signals-are-needed}
 
 <strong>もしシグナルがなかったら？</strong>
 
@@ -100,11 +102,12 @@ while (1) {
 
 <strong>ポーリングの問題点</strong>
 
-| 問題     | 説明                                           |
+{: .labeled}
+| 問題 | 説明 |
 | -------- | ---------------------------------------------- |
-| CPU 消費 | 何も起きていなくても繰り返しチェックする       |
-| 応答遅延 | sleep() の間隔だけ反応が遅れる                 |
-| 複雑化   | すべてのイベントを自分でチェックする必要がある |
+| CPU 消費 | 何も起きていなくても繰り返しチェックする |
+| 応答遅延 | sleep() の間隔だけ反応が遅れる |
+| 複雑化 | すべてのイベントを自分でチェックする必要がある |
 
 <strong>シグナルによる解決</strong>
 
@@ -114,7 +117,7 @@ while (1) {
 
 これにより、CPU を無駄に消費せず、即座に反応できます
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>シグナル</strong>は、プロセスに送られる<strong>非同期の通知</strong>です
 
@@ -126,9 +129,9 @@ Linux の公式マニュアルには、こう書かれています
 
 <strong>プロセス間通信（IPC：Inter-Process Communication）</strong>とは、複数のプロセスがデータをやり取りする仕組みの総称です
 
-詳しくは [07-ipc](./07-ipc.md) で学びます
+詳しくは [07-ipc](../07-ipc/) で学びます
 
-### シグナルで何ができるか
+### [シグナルで何ができるか](#what-can-signals-do) {#what-can-signals-do}
 
 シグナルは以下のような用途で使われます
 
@@ -137,7 +140,7 @@ Linux の公式マニュアルには、こう書かれています
 - 子プロセスの状態変化を親に通知する（SIGCHLD）
 - ユーザーの割り込み操作を伝える（SIGINT = Ctrl+C）
 
-### 非同期とは
+### [非同期とは](#what-is-asynchronous) {#what-is-asynchronous}
 
 <strong>非同期</strong>とは、「いつ発生するか予測できない」という意味です
 
@@ -149,24 +152,25 @@ Linux の公式マニュアルには、こう書かれています
 
 ---
 
-## よく使うシグナル
+## [よく使うシグナル](#commonly-used-signals) {#commonly-used-signals}
 
 シグナルには番号と名前があります
 
 よく使うシグナルを表にまとめます
 
-| シグナル | 番号 | デフォルト動作 | 説明                                  |
+{: .labeled}
+| シグナル | 番号 | デフォルト動作 | 説明 |
 | -------- | ---- | -------------- | ------------------------------------- |
-| SIGINT   | 2    | 終了           | Ctrl+C で送られる割り込みシグナル     |
-| SIGTERM  | 15   | 終了           | 終了要求（kill コマンドのデフォルト） |
-| SIGKILL  | 9    | 終了           | 強制終了（ハンドル不可）              |
-| SIGCHLD  | 17   | 無視           | 子プロセスの状態変化                  |
-| SIGSTOP  | 19   | 停止           | プロセスを一時停止（ハンドル不可）    |
-| SIGCONT  | 18   | 再開           | 停止したプロセスを再開                |
-| SIGUSR1  | 10   | 終了           | ユーザー定義シグナル 1                |
-| SIGUSR2  | 12   | 終了           | ユーザー定義シグナル 2                |
-| SIGTSTP  | 20   | 停止           | Ctrl+Z で送られる停止シグナル         |
-| SIGSEGV  | 11   | コアダンプ     | 不正なメモリアクセス                  |
+| SIGINT | 2 | 終了 | Ctrl+C で送られる割り込みシグナル |
+| SIGTERM | 15 | 終了 | 終了要求（kill コマンドのデフォルト） |
+| SIGKILL | 9 | 終了 | 強制終了（ハンドル不可） |
+| SIGCHLD | 17 | 無視 | 子プロセスの状態変化 |
+| SIGSTOP | 19 | 停止 | プロセスを一時停止（ハンドル不可） |
+| SIGCONT | 18 | 再開 | 停止したプロセスを再開 |
+| SIGUSR1 | 10 | 終了 | ユーザー定義シグナル 1 |
+| SIGUSR2 | 12 | 終了 | ユーザー定義シグナル 2 |
+| SIGTSTP | 20 | 停止 | Ctrl+Z で送られる停止シグナル |
+| SIGSEGV | 11 | コアダンプ | 不正なメモリアクセス |
 
 ※ 上記の番号は x86/ARM 系アーキテクチャの値であるため、他のアーキテクチャでは異なる場合があります
 
@@ -176,7 +180,7 @@ Ctrl+C や Ctrl+Z は、フォアグラウンドで動いているプロセス�
 
 反対に、<strong>バックグラウンド</strong>はターミナルから切り離されて動作するプロセスです
 
-### シグナル番号について
+### [シグナル番号について](#about-signal-numbers) {#about-signal-numbers}
 
 シグナル番号は OS や<strong>アーキテクチャ</strong>によって異なる場合があります
 
@@ -186,32 +190,34 @@ Ctrl+C や Ctrl+Z は、フォアグラウンドで動いているプロセス�
 
 以下は signal(7) man page からの抜粋です
 
+{: .labeled}
 | シグナル | x86/ARM | Alpha/SPARC | MIPS | PARISC |
 | -------- | ------- | ----------- | ---- | ------ |
-| SIGCHLD  | 17      | 20          | 18   | 18     |
-| SIGCONT  | 18      | 19          | 25   | 26     |
-| SIGSTOP  | 19      | 17          | 23   | 24     |
-| SIGTSTP  | 20      | 18          | 24   | 25     |
+| SIGCHLD | 17 | 20 | 18 | 18 |
+| SIGCONT | 18 | 19 | 25 | 26 |
+| SIGSTOP | 19 | 17 | 23 | 24 |
+| SIGTSTP | 20 | 18 | 24 | 25 |
 
 そのため、コードでは番号ではなく名前（SIGINT、SIGTERM など）を使います
 
 ---
 
-## シグナルのデフォルト動作
+## [シグナルのデフォルト動作](#default-signal-behavior) {#default-signal-behavior}
 
 シグナルを受け取ったとき、ハンドラを登録していなければ<strong>デフォルト動作</strong>が実行されます
 
-### デフォルト動作の種類
+### [デフォルト動作の種類](#types-of-default-actions) {#types-of-default-actions}
 
-| 動作               | 説明                             |
+{: .labeled}
+| 動作 | 説明 |
 | ------------------ | -------------------------------- |
-| Term（終了）       | プロセスを終了する               |
+| Term（終了） | プロセスを終了する |
 | Core（コアダンプ） | コアダンプを生成してから終了する |
-| Stop（停止）       | プロセスを一時停止する           |
-| Cont（再開）       | 停止中のプロセスを再開する       |
-| Ign（無視）        | シグナルを無視する（何もしない） |
+| Stop（停止） | プロセスを一時停止する |
+| Cont（再開） | 停止中のプロセスを再開する |
+| Ign（無視） | シグナルを無視する（何もしない） |
 
-### コアダンプとは
+### [コアダンプとは](#what-is-core-dump) {#what-is-core-dump}
 
 <strong>コアダンプ</strong>とは、プロセスが異常終了したときにメモリの内容をファイルに保存したものです
 
@@ -221,15 +227,15 @@ SIGSEGV（不正なメモリアクセス）などで発生します
 
 ---
 
-## シグナルハンドラとは
+## [シグナルハンドラとは](#what-is-signal-handler) {#what-is-signal-handler}
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>シグナルハンドラ</strong>は、シグナルを受け取ったときに実行される関数です
 
 デフォルト動作を上書きできます
 
-### ハンドラ関数の形式
+### [ハンドラ関数の形式](#handler-function-format) {#handler-function-format}
 
 ```c
 void handler(int signum) {
@@ -240,7 +246,7 @@ void handler(int signum) {
 - 引数：受け取ったシグナル番号
 - 戻り値：なし（void）
 
-### 複数のシグナルで同じハンドラを使う
+### [複数のシグナルで同じハンドラを使う](#using-same-handler-for-multiple-signals) {#using-same-handler-for-multiple-signals}
 
 引数のシグナル番号を見て、処理を分岐できます
 
@@ -256,9 +262,9 @@ void handler(int signum) {
 
 ---
 
-## signal() によるハンドラ登録
+## [signal() によるハンドラ登録](#registering-handler-with-signal) {#registering-handler-with-signal}
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage) {#basic-usage}
 
 signal() は、シグナルハンドラを登録する最も簡単な方法です
 
@@ -268,19 +274,20 @@ signal() は、シグナルハンドラを登録する最も簡単な方法で�
 signal(SIGINT, handler);  /* SIGINT のハンドラを登録 */
 ```
 
-### 特別な値
+### [特別な値](#special-values) {#special-values}
 
-| 値      | 意味                 |
+{: .labeled}
+| 値 | 意味 |
 | ------- | -------------------- |
 | SIG_DFL | デフォルト動作に戻す |
-| SIG_IGN | シグナルを無視する   |
+| SIG_IGN | シグナルを無視する |
 
 ```c
 signal(SIGINT, SIG_IGN);  /* SIGINT を無視 */
 signal(SIGINT, SIG_DFL);  /* SIGINT をデフォルト動作に戻す */
 ```
 
-### signal() の問題点
+### [signal() の問題点](#problems-with-signal) {#problems-with-signal}
 
 signal() にはいくつかの問題があります
 
@@ -296,9 +303,9 @@ signal() は OS によって動作が異なるため、移植性が低いとさ�
 
 ---
 
-## sigaction() によるハンドラ登録
+## [sigaction() によるハンドラ登録](#registering-handler-with-sigaction) {#registering-handler-with-sigaction}
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage-sigaction) {#basic-usage-sigaction}
 
 sigaction() は、signal() より堅牢なハンドラ登録関数です
 
@@ -323,13 +330,14 @@ sigaction(SIGINT, &sa, NULL);
 
 <strong>sigset_t</strong> 型は、シグナルの集合（どのシグナルを含むか）を表す型です
 
-### struct sigaction の主なメンバー
+### [struct sigaction の主なメンバー](#main-members-of-sigaction) {#main-members-of-sigaction}
 
-| メンバー   | 説明                                       |
+{: .labeled}
+| メンバー | 説明 |
 | ---------- | ------------------------------------------ |
-| sa_handler | ハンドラ関数へのポインタ                   |
-| sa_mask    | ハンドラ実行中にブロックするシグナルの集合 |
-| sa_flags   | 動作を変更するフラグ                       |
+| sa_handler | ハンドラ関数へのポインタ |
+| sa_mask | ハンドラ実行中にブロックするシグナルの集合 |
+| sa_flags | 動作を変更するフラグ |
 
 シグナルを<strong>ブロック</strong>するとは、そのシグナルを一時的に受け取らないようにすることです
 
@@ -337,14 +345,15 @@ sigaction(SIGINT, &sa, NULL);
 
 sa_mask を設定すると、ハンドラ実行中に他のシグナルが割り込むのを防げます
 
-### よく使うフラグ
+### [よく使うフラグ](#commonly-used-flags) {#commonly-used-flags}
 
-| フラグ       | 説明                                                 |
+{: .labeled}
+| フラグ | 説明 |
 | ------------ | ---------------------------------------------------- |
-| SA_RESTART   | シグナルで中断されたシステムコールを自動的に再開する |
-| SA_NOCLDSTOP | 子プロセスが停止したときには SIGCHLD を送らない      |
+| SA_RESTART | シグナルで中断されたシステムコールを自動的に再開する |
+| SA_NOCLDSTOP | 子プロセスが停止したときには SIGCHLD を送らない |
 
-### signal() との違い
+### [signal() との違い](#differences-from-signal) {#differences-from-signal}
 
 - ハンドラ実行後に自動リセットされない
 - 動作が POSIX で明確に定義されている
@@ -354,7 +363,7 @@ sa_mask を設定すると、ハンドラ実行中に他のシグナルが割り
 
 Linux、macOS、FreeBSD など、異なる OS 間で互換性を保つためのルールを定めています
 
-### なぜ signal() と sigaction() の2つが存在するのか
+### [なぜ signal() と sigaction() の2つが存在するのか](#why-two-functions-exist) {#why-two-functions-exist}
 
 <strong>歴史的経緯</strong>があります
 
@@ -374,14 +383,15 @@ signal() は UNIX の初期から存在する古い<strong>API</strong>です
 
 sigaction() は動作が明確に定義されており、すべての POSIX 準拠システムで同じ動作が保証されています
 
-### どちらを使うべきか
+### [どちらを使うべきか](#which-to-use) {#which-to-use}
 
-| 場面                     | 推奨                 |
+{: .labeled}
+| 場面 | 推奨 |
 | ------------------------ | -------------------- |
-| 新規開発                 | sigaction()          |
+| 新規開発 | sigaction() |
 | 既存コードのメンテナンス | 既存の方式に合わせる |
-| 学習目的の簡単なデモ     | signal() でも可      |
-| 移植性が必要なコード     | sigaction()          |
+| 学習目的の簡単なデモ | signal() でも可 |
+| 移植性が必要なコード | sigaction() |
 
 signal() は以下の場合にのみ使用を検討してください
 
@@ -390,9 +400,9 @@ signal() は以下の場合にのみ使用を検討してください
 
 ---
 
-## シグナルを送る方法
+## [シグナルを送る方法](#how-to-send-signals) {#how-to-send-signals}
 
-### kill() 関数
+### [kill() 関数](#kill-function) {#kill-function}
 
 kill() は、任意のプロセスにシグナルを送る関数です
 
@@ -406,7 +416,7 @@ kill(pid, SIGTERM);  /* pid のプロセスに SIGTERM を送る */
 
 任意のシグナルを送れます
 
-### raise() 関数
+### [raise() 関数](#raise-function) {#raise-function}
 
 raise() は、自分自身にシグナルを送る関数です
 
@@ -425,7 +435,7 @@ raise() の動作は、プログラムがシングルスレッドかマルチス
 
 一方、`kill(getpid(), sig)` はプロセス全体にシグナルを送り、ブロックしていない任意のスレッドがシグナルを受け取る可能性があります
 
-### コマンドラインからシグナルを送る
+### [コマンドラインからシグナルを送る](#sending-signals-from-command-line) {#sending-signals-from-command-line}
 
 シェルの kill コマンドでシグナルを送れます
 
@@ -438,9 +448,9 @@ kill -9 1234          # SIGKILL（強制終了）を送る
 
 ---
 
-## シグナルを待つ方法
+## [シグナルを待つ方法](#how-to-wait-for-signals) {#how-to-wait-for-signals}
 
-### pause() 関数
+### [pause() 関数](#pause-function) {#pause-function}
 
 pause() は、シグナルが届くまでプロセスを眠らせます
 
@@ -452,7 +462,7 @@ pause();  /* シグナルが届くまで待機 */
 
 CPU を使わずに待機できるので、効率的です
 
-### 無限ループ + sleep() との違い
+### [無限ループ + sleep() との違い](#difference-from-infinite-loop-sleep) {#difference-from-infinite-loop-sleep}
 
 ```c
 /* 非効率な方法 */
@@ -470,7 +480,7 @@ sleep() の場合、指定した秒数ごとにしかシグナルを検知でき
 
 pause() は、シグナルが届いた瞬間に反応できます
 
-### pause() の注意点
+### [pause() の注意点](#notes-on-pause) {#notes-on-pause}
 
 pause() には<strong>競合状態（レースコンディション）</strong>の問題があります
 
@@ -528,9 +538,9 @@ pause() は学習目的のシンプルな例です
 
 ---
 
-## SIGCHLD と子プロセス管理
+## [SIGCHLD と子プロセス管理](#sigchld-and-child-process-management) {#sigchld-and-child-process-management}
 
-### ゾンビ問題の解決策
+### [ゾンビ問題の解決策](#solution-to-zombie-problem) {#solution-to-zombie-problem}
 
 02-fork-exec で学んだゾンビ問題を、SIGCHLD で解決できます
 
@@ -538,7 +548,7 @@ pause() は学習目的のシンプルな例です
 
 このシグナルをハンドルして waitpid() を呼べば、ゾンビを防げます
 
-### 実装パターン
+### [実装パターン](#implementation-pattern) {#implementation-pattern}
 
 ```c
 void sigchld_handler(int signum) {
@@ -556,10 +566,11 @@ void sigchld_handler(int signum) {
 
 <strong>waitpid() の引数</strong>
 
-| 引数      | 値      | 説明                                     |
+{: .labeled}
+| 引数 | 値 | 説明 |
 | --------- | ------- | ---------------------------------------- |
-| 第 1 引数 | -1      | すべての子プロセスを対象にする           |
-| 第 2 引数 | &status | 終了ステータスを格納する変数のアドレス   |
+| 第 1 引数 | -1 | すべての子プロセスを対象にする |
+| 第 2 引数 | &status | 終了ステータスを格納する変数のアドレス |
 | 第 3 引数 | WNOHANG | 終了した子がいなければすぐに戻る（後述） |
 
 第 1 引数に特定の PID を指定すると、その子プロセスだけを対象にできます
@@ -570,13 +581,13 @@ void sigchld_handler(int signum) {
 
 ただし、本来はシグナルハンドラ内で printf() を呼ぶことは推奨されません（詳細は「シグナルの制限事項」を参照）
 
-### WNOHANG フラグ
+### [WNOHANG フラグ](#wnohang-flag) {#wnohang-flag}
 
 WNOHANG を指定すると、waitpid() がブロックしません
 
 終了した子がいなければ、すぐに 0 を返します
 
-### なぜループが必要か
+### [なぜループが必要か](#why-loop-is-needed) {#why-loop-is-needed}
 
 複数の子が同時に終了した場合、SIGCHLD は 1 回しか届かないことがあります
 
@@ -584,20 +595,21 @@ WNOHANG を指定すると、waitpid() がブロックしません
 
 ---
 
-## シグナルの制限事項
+## [シグナルの制限事項](#signal-limitations) {#signal-limitations}
 
-### ハンドルできないシグナル
+### [ハンドルできないシグナル](#unhandleable-signals) {#unhandleable-signals}
 
 以下のシグナルは、ハンドラを登録できません
 
-| シグナル | 理由                               |
+{: .labeled}
+| シグナル | 理由 |
 | -------- | ---------------------------------- |
-| SIGKILL  | 暴走プロセスを確実に終了させるため |
-| SIGSTOP  | プロセスを確実に停止させるため     |
+| SIGKILL | 暴走プロセスを確実に終了させるため |
+| SIGSTOP | プロセスを確実に停止させるため |
 
 これらは OS によって強制的に処理されます
 
-### なぜ SIGKILL は捕捉できないのか
+### [なぜ SIGKILL は捕捉できないのか](#why-sigkill-cannot-be-caught) {#why-sigkill-cannot-be-caught}
 
 <strong>もし SIGKILL をハンドルできたら？</strong>
 
@@ -627,7 +639,7 @@ SIGTERM は捕捉できるため、プロセスはクリーンアップ処理（
 
 同様に、SIGSTOP は<strong>絶対に停止させる手段</strong>として存在します
 
-### 非同期シグナル安全
+### [非同期シグナル安全](#async-signal-safety) {#async-signal-safety}
 
 シグナルハンドラ内で呼べる関数には制限があります
 
@@ -637,7 +649,7 @@ SIGTERM は捕捉できるため、プロセスはクリーンアップ処理（
 - printf() は安全ではない
 - malloc() は安全ではない
 
-### なぜ特定の関数が危険なのか
+### [なぜ特定の関数が危険なのか](#why-certain-functions-are-dangerous) {#why-certain-functions-are-dangerous}
 
 シグナルは「いつでも」届く可能性があります
 
@@ -682,7 +694,7 @@ printf() は内部でロック（排他制御）を使用している場合が�
 
 学習目的では printf() を使った例もありますが、実際のプログラムでは write() システムコールを使うか、フラグを設定してハンドラ外で処理してください
 
-### シグナルはキューされない
+### [シグナルはキューされない](#signals-are-not-queued) {#signals-are-not-queued}
 
 同じシグナルが連続して送られた場合、まとめて 1 回として扱われることがあります
 
@@ -696,60 +708,7 @@ printf() は内部でロック（排他制御）を使用している場合が�
 
 ---
 
-## 用語集
-
-| 用語                 | 英語              | 説明                                               |
-| -------------------- | ----------------- | -------------------------------------------------- |
-| シグナル             | Signal            | プロセスに送られる非同期の通知                     |
-| シグナルハンドラ     | Signal Handler    | シグナルを受け取ったときに実行される関数           |
-| シグナルマスク       | Signal Mask       | 現在ブロックしているシグナルの一覧                 |
-| デフォルト動作       | Default Action    | ハンドラを登録していないときのシグナルへの応答     |
-| 非同期               | Asynchronous      | いつ発生するか予測できないこと                     |
-| 割り込み             | Interrupt         | 実行中の処理を中断させるイベント                   |
-| ブロック             | Block             | シグナルを一時的に受け取らないようにすること       |
-| マスク               | Mask              | シグナルを一時的にブロックする仕組み               |
-| 保留                 | Pending           | マスクされたシグナルが配送を待っている状態         |
-| 非同期シグナル安全   | Async-Signal-Safe | シグナルハンドラ内で安全に呼べる関数               |
-| コアダンプ           | Core Dump         | プロセス終了時のメモリ内容を保存したファイル       |
-| ジョブ制御           | Job Control       | シェルがプロセスを一時停止・再開する機能           |
-| 競合状態             | Race Condition    | タイミングによって結果が変わってしまう状況         |
-| アトミック           | Atomic            | 途中で中断されずに一度に実行される操作             |
-| ゾンビプロセス       | Zombie Process    | 終了したが親プロセスが回収していないプロセス       |
-| プロセス間通信       | IPC               | 複数のプロセスがデータをやり取りする仕組みの総称   |
-| システムコール       | System Call       | プログラムが OS に処理を依頼する仕組み             |
-| POSIX                | POSIX             | Unix 系 OS の標準仕様                              |
-| API                  | API               | プログラムから機能を呼び出すための取り決め         |
-| アーキテクチャ       | Architecture      | CPU の種類や設計                                   |
-| 移植性               | Portability       | 異なる環境でも同じように動作すること               |
-| フォアグラウンド     | Foreground        | ターミナルと対話中のプロセス                       |
-| バックグラウンド     | Background        | ターミナルから切り離されて動作するプロセス         |
-| デッドロック         | Deadlock          | 複数の処理が互いに待ち合って永遠に進まなくなる状態 |
-| リアルタイムシグナル | Realtime Signal   | キューされる特別なシグナル（SIGRTMIN 以上）        |
-
----
-
-## 参考資料
-
-このページの内容は、以下のソースに基づいています
-
-- [signal(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal.7.html)
-  - シグナルの概要、シグナル番号のアーキテクチャ別一覧
-- [signal(2) - Linux manual page](https://man7.org/linux/man-pages/man2/signal.2.html)
-  - signal() システムコール
-- [sigaction(2) - Linux manual page](https://man7.org/linux/man-pages/man2/sigaction.2.html)
-  - sigaction() システムコール
-- [kill(2) - Linux manual page](https://man7.org/linux/man-pages/man2/kill.2.html)
-  - シグナルの送信
-- [raise(3) - Linux manual page](https://man7.org/linux/man-pages/man3/raise.3.html)
-  - 自分自身へのシグナル送信、シングルスレッド/マルチスレッドでの動作の違い
-- [pause(2) - Linux manual page](https://man7.org/linux/man-pages/man2/pause.2.html)
-  - シグナルを待つ
-- [signal-safety(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal-safety.7.html)
-  - 非同期シグナル安全な関数の一覧と、シグナルハンドラ内で安全に呼べる関数についての詳細な解説
-
----
-
-## 次のステップ
+## [次のステップ](#next-steps) {#next-steps}
 
 このトピックでは、「シグナルでプロセスに通知する方法」を学びました
 
@@ -758,10 +717,64 @@ printf() は内部でロック（排他制御）を使用している場合が�
 - SIGCHLD でゾンビを防ぐ方法
 - プロセス間でシグナルを送り合う方法
 
-次の [04-thread](./04-thread.md) では、プロセスの中で複数の処理を同時に行う方法を学びます
+次の [04-thread](../04-thread/) では、プロセスの中で複数の処理を同時に行う方法を学びます
 
 - 1 つのプロセスの中で複数の流れを持つとは？
 - スレッドとプロセスの違い
 - スレッドでシグナルを扱うときの注意点
 
 これらの疑問に答えます
+
+---
+
+## [用語集](#glossary) {#glossary}
+
+{: .labeled}
+| 用語 | 英語 | 説明 |
+| -------------------- | ----------------- | -------------------------------------------------- |
+| シグナル | Signal | プロセスに送られる非同期の通知 |
+| シグナルハンドラ | Signal Handler | シグナルを受け取ったときに実行される関数 |
+| シグナルマスク | Signal Mask | 現在ブロックしているシグナルの一覧 |
+| デフォルト動作 | Default Action | ハンドラを登録していないときのシグナルへの応答 |
+| 非同期 | Asynchronous | いつ発生するか予測できないこと |
+| 割り込み | Interrupt | 実行中の処理を中断させるイベント |
+| ブロック | Block | シグナルを一時的に受け取らないようにすること |
+| マスク | Mask | シグナルを一時的にブロックする仕組み |
+| 保留 | Pending | マスクされたシグナルが配送を待っている状態 |
+| 非同期シグナル安全 | Async-Signal-Safe | シグナルハンドラ内で安全に呼べる関数 |
+| コアダンプ | Core Dump | プロセス終了時のメモリ内容を保存したファイル |
+| ジョブ制御 | Job Control | シェルがプロセスを一時停止・再開する機能 |
+| 競合状態 | Race Condition | タイミングによって結果が変わってしまう状況 |
+| アトミック | Atomic | 途中で中断されずに一度に実行される操作 |
+| ゾンビプロセス | Zombie Process | 終了したが親プロセスが回収していないプロセス |
+| プロセス間通信 | IPC | 複数のプロセスがデータをやり取りする仕組みの総称 |
+| システムコール | System Call | プログラムが OS に処理を依頼する仕組み |
+| POSIX | POSIX | Unix 系 OS の標準仕様 |
+| API | API | プログラムから機能を呼び出すための取り決め |
+| アーキテクチャ | Architecture | CPU の種類や設計 |
+| 移植性 | Portability | 異なる環境でも同じように動作すること |
+| フォアグラウンド | Foreground | ターミナルと対話中のプロセス |
+| バックグラウンド | Background | ターミナルから切り離されて動作するプロセス |
+| デッドロック | Deadlock | 複数の処理が互いに待ち合って永遠に進まなくなる状態 |
+| リアルタイムシグナル | Realtime Signal | キューされる特別なシグナル（SIGRTMIN 以上） |
+
+---
+
+## [参考資料](#references) {#references}
+
+このページの内容は、以下のソースに基づいています
+
+- [signal(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal.7.html){:target="\_blank"}
+  - シグナルの概要、シグナル番号のアーキテクチャ別一覧
+- [signal(2) - Linux manual page](https://man7.org/linux/man-pages/man2/signal.2.html){:target="\_blank"}
+  - signal() システムコール
+- [sigaction(2) - Linux manual page](https://man7.org/linux/man-pages/man2/sigaction.2.html){:target="\_blank"}
+  - sigaction() システムコール
+- [kill(2) - Linux manual page](https://man7.org/linux/man-pages/man2/kill.2.html){:target="\_blank"}
+  - シグナルの送信
+- [raise(3) - Linux manual page](https://man7.org/linux/man-pages/man3/raise.3.html){:target="\_blank"}
+  - 自分自身へのシグナル送信、シングルスレッド/マルチスレッドでの動作の違い
+- [pause(2) - Linux manual page](https://man7.org/linux/man-pages/man2/pause.2.html){:target="\_blank"}
+  - シグナルを待つ
+- [signal-safety(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal-safety.7.html){:target="\_blank"}
+  - 非同期シグナル安全な関数の一覧と、シグナルハンドラ内で安全に呼べる関数についての詳細な解説

@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜ8と16なのか
+---
 
-# なぜ8と16なのか
+# [なぜ8と16なのか](#why-8-and-16) {#why-8-and-16}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[05-file-descriptor](../05-file-descriptor.md) で、こんなコードを見ました
+[05-file-descriptor](../../05-file-descriptor/) で、こんなコードを見ました
 
 ```c
 int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
@@ -24,20 +25,20 @@ int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [なぜ8と16なのか](#なぜ8と16なのか-1)
-- [表記法](#表記法)
-- [読み方・変換](#読み方変換)
-- [実例](#実例)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [なぜ8と16なのか](#why-8-and-16-detail)
+- [表記法](#notation)
+- [読み方・変換](#reading-and-conversion)
+- [実例](#examples)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## なぜ8と16なのか
+## [なぜ8と16なのか](#why-8-and-16-detail) {#why-8-and-16-detail}
 
-### コンピュータは2進数、人間は10進数
+### [コンピュータは2進数、人間は10進数](#binary-vs-decimal) {#binary-vs-decimal}
 
 コンピュータは内部で「0 と 1」だけを使います
 
@@ -52,7 +53,7 @@ int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 2進数:   11111111  ← 8桁も必要
 ```
 
-### 8と16は2進数と相性が良い
+### [8と16は2進数と相性が良い](#octal-hex-compatibility) {#octal-hex-compatibility}
 
 <strong>8 = 2³</strong> です
 
@@ -71,17 +72,18 @@ int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 <strong>もし 10 進数だけを使っていたら？</strong>
 
-| 用途           | 16進数 | 10進数 | 問題                         |
+{: .labeled}
+| 用途 | 16進数 | 10進数 | 問題 |
 | -------------- | ------ | ------ | ---------------------------- |
-| 1バイト        | 0xFF   | 255    | 桁数が揃わない               |
-| 2バイト        | 0xFFFF | 65535  | バイト境界が見えない         |
-| パーミッション | 0644   | 420    | rwx の組み合わせが分からない |
+| 1バイト | 0xFF | 255 | 桁数が揃わない |
+| 2バイト | 0xFFFF | 65535 | バイト境界が見えない |
+| パーミッション | 0644 | 420 | rwx の組み合わせが分からない |
 
 10 進数の「255」を見ても、ビットパターンは分かりません
 
 16 進数の「0xFF」を見れば、「全ビットが 1」と即座に分かります
 
-### 視覚的に理解する
+### [視覚的に理解する](#visual-understanding) {#visual-understanding}
 
 <strong>16進数の場合（4ビットごと）</strong>
 
@@ -103,9 +105,9 @@ int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 ---
 
-## 表記法
+## [表記法](#notation) {#notation}
 
-### なぜ 0x で始まるのか（16進数）
+### [なぜ 0x で始まるのか（16進数）](#why-0x-prefix-hexadecimal) {#why-0x-prefix-hexadecimal}
 
 C 言語では、16進数リテラルは `0x` または `0X` で始まります
 
@@ -132,7 +134,7 @@ int c = 0xDEAD;
 
 `xFF` だと変数名に見えてしまいます
 
-### なぜ 0 で始まるのか（8進数）
+### [なぜ 0 で始まるのか（8進数）](#why-0-prefix-octal) {#why-0-prefix-octal}
 
 C 言語では、8進数リテラルは `0` で始まります
 
@@ -168,7 +170,7 @@ int x = 010;
 
 意図せず8進数になることがあるので、注意が必要です
 
-### 2進数リテラル（C23 以降）
+### [2進数リテラル（C23 以降）](#binary-literal-c23) {#binary-literal-c23}
 
 C23（2024年に策定された C 言語の最新規格）からは `0b` で2進数を書けるようになりました
 
@@ -183,39 +185,41 @@ int a = 0b1111;
 int b = 0b1010;
 ```
 
-| 表記 | 進数   | 例       | 10進数での値 |
+{: .labeled}
+| 表記 | 進数 | 例 | 10進数での値 |
 | ---- | ------ | -------- | ------------ |
-| `0x` | 16進数 | `0xFF`   | 255          |
-| `0`  | 8進数  | `0644`   | 420          |
-| `0b` | 2進数  | `0b1111` | 15           |
-| なし | 10進数 | `255`    | 255          |
+| `0x` | 16進数 | `0xFF` | 255 |
+| `0` | 8進数 | `0644` | 420 |
+| `0b` | 2進数 | `0b1111` | 15 |
+| なし | 10進数 | `255` | 255 |
 
 ---
 
-## 読み方・変換
+## [読み方・変換](#reading-and-conversion) {#reading-and-conversion}
 
-### 16進数の読み方
+### [16進数の読み方](#reading-hexadecimal) {#reading-hexadecimal}
 
 16進数は「0 ～ 9」と「A ～ F」を使います
 
+{: .labeled}
 | 16進数 | 10進数 | 2進数 |
 | ------ | ------ | ----- |
-| 0      | 0      | 0000  |
-| 1      | 1      | 0001  |
-| 2      | 2      | 0010  |
-| 3      | 3      | 0011  |
-| 4      | 4      | 0100  |
-| 5      | 5      | 0101  |
-| 6      | 6      | 0110  |
-| 7      | 7      | 0111  |
-| 8      | 8      | 1000  |
-| 9      | 9      | 1001  |
-| A      | 10     | 1010  |
-| B      | 11     | 1011  |
-| C      | 12     | 1100  |
-| D      | 13     | 1101  |
-| E      | 14     | 1110  |
-| F      | 15     | 1111  |
+| 0 | 0 | 0000 |
+| 1 | 1 | 0001 |
+| 2 | 2 | 0010 |
+| 3 | 3 | 0011 |
+| 4 | 4 | 0100 |
+| 5 | 5 | 0101 |
+| 6 | 6 | 0110 |
+| 7 | 7 | 0111 |
+| 8 | 8 | 1000 |
+| 9 | 9 | 1001 |
+| A | 10 | 1010 |
+| B | 11 | 1011 |
+| C | 12 | 1100 |
+| D | 13 | 1101 |
+| E | 14 | 1110 |
+| F | 15 | 1111 |
 
 <strong>例：0x7FFF を読む</strong>
 
@@ -230,20 +234,21 @@ int b = 0b1010;
 10進数: 32767
 ```
 
-### 8進数の読み方
+### [8進数の読み方](#reading-octal) {#reading-octal}
 
 8進数は「0 ～ 7」を使います
 
+{: .labeled}
 | 8進数 | 10進数 | 2進数 |
 | ----- | ------ | ----- |
-| 0     | 0      | 000   |
-| 1     | 1      | 001   |
-| 2     | 2      | 010   |
-| 3     | 3      | 011   |
-| 4     | 4      | 100   |
-| 5     | 5      | 101   |
-| 6     | 6      | 110   |
-| 7     | 7      | 111   |
+| 0 | 0 | 000 |
+| 1 | 1 | 001 |
+| 2 | 2 | 010 |
+| 3 | 3 | 011 |
+| 4 | 4 | 100 |
+| 5 | 5 | 101 |
+| 6 | 6 | 110 |
+| 7 | 7 | 111 |
 
 <strong>例：0644 を読む</strong>
 
@@ -260,9 +265,9 @@ int b = 0b1010;
 
 ---
 
-## 実例
+## [実例](#examples) {#examples}
 
-### パーミッション（0644）── なぜ8進数か
+### [パーミッション（0644）── なぜ8進数か](#permissions-0644-why-octal) {#permissions-0644-why-octal}
 
 UNIX のファイルパーミッションは「所有者・グループ・その他」の3つに分かれています
 
@@ -286,18 +291,19 @@ rwx rwx rwx
  └─── 6 = 110 = rw-  （所有者：読み書き）
 ```
 
+{: .labeled}
 | 数字 | 2進数 | 意味 |
 | ---- | ----- | ---- |
-| 0    | 000   | ---  |
-| 1    | 001   | --x  |
-| 2    | 010   | -w-  |
-| 3    | 011   | -wx  |
-| 4    | 100   | r--  |
-| 5    | 101   | r-x  |
-| 6    | 110   | rw-  |
-| 7    | 111   | rwx  |
+| 0 | 000 | --- |
+| 1 | 001 | --x |
+| 2 | 010 | -w- |
+| 3 | 011 | -wx |
+| 4 | 100 | r-- |
+| 5 | 101 | r-x |
+| 6 | 110 | rw- |
+| 7 | 111 | rwx |
 
-### メモリアドレス（0x7fff...）── なぜ16進数か
+### [メモリアドレス（0x7fff...）── なぜ16進数か](#memory-address-why-hexadecimal) {#memory-address-why-hexadecimal}
 
 メモリアドレスは通常、バイト単位で扱います
 
@@ -329,14 +335,15 @@ rwx rwx rwx
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 進数   | 使われる場面             | 理由                         |
+{: .labeled}
+| 進数 | 使われる場面 | 理由 |
 | ------ | ------------------------ | ---------------------------- |
-| 8進数  | パーミッション           | 3ビット（rwx）が1桁に対応    |
+| 8進数 | パーミッション | 3ビット（rwx）が1桁に対応 |
 | 16進数 | メモリアドレス、バイト値 | 4ビット（ニブル）が1桁に対応 |
-| 2進数  | ビット演算の説明         | 直接ビットが見える           |
-| 10進数 | 一般的な計算             | 人間が読みやすい             |
+| 2進数 | ビット演算の説明 | 直接ビットが見える |
+| 10進数 | 一般的な計算 | 人間が読みやすい |
 
 <strong>覚えておくこと</strong>
 
@@ -347,18 +354,18 @@ rwx rwx rwx
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>C 言語規格</strong>
 
 - ISO/IEC 9899:2024（C23）─ 6.4.4.1 Integer constants
-- [cppreference: Integer literal](https://en.cppreference.com/w/c/language/integer_constant)
+- [cppreference: Integer literal](https://en.cppreference.com/w/c/language/integer_constant){:target="\_blank"}
 
 <strong>UNIX パーミッション</strong>
 
-- [POSIX chmod](https://pubs.opengroup.org/onlinepubs/9699919799/functions/chmod.html)
-- [Man page: chmod(2)](https://man7.org/linux/man-pages/man2/chmod.2.html)
+- [POSIX chmod](https://pubs.opengroup.org/onlinepubs/9699919799/functions/chmod.html){:target="\_blank"}
+- [Man page: chmod(2)](https://man7.org/linux/man-pages/man2/chmod.2.html){:target="\_blank"}
 
 <strong>本編との関連</strong>
 
-- [05-file-descriptor](../05-file-descriptor.md) ─ `open()` の第3引数でパーミッションを指定
+- [05-file-descriptor](../../05-file-descriptor/) ─ `open()` の第3引数でパーミッションを指定

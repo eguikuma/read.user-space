@@ -1,0 +1,16 @@
+{
+  "name": "read.user-space",
+  "short_name": "read.user-space",
+  "description": "「OS がプログラムを動かす仕組み」を、使う側の視点で学びます",
+  "start_url": "/read.user-space/",
+  "scope": "/read.user-space/",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#D97757",
+  "icons": [
+    { "src": "/read.user-space/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/read.user-space/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/read.user-space/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/read.user-space/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

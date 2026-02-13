@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜfork後は\_exitなのか
+---
 
-# なぜfork後は\_exitなのか
+# [なぜfork後は\_exitなのか](#why-exit-after-fork) {#why-exit-after-fork}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[02-fork-exec](../02-fork-exec.md) で、fork() と exec() を使ったプロセス生成を学びました
+[02-fork-exec](../../02-fork-exec/) で、fork() と exec() を使ったプロセス生成を学びました
 
 子プロセスを終了させるとき、`exit()` と `_exit()` のどちらを使うべきでしょうか？
 
@@ -26,20 +27,20 @@ if (pid == 0) {
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [exit()の動作](#exitの動作)
-- [\_exit()の動作](#_exitの動作)
-- [fork後の問題](#fork後の問題)
-- [使い分け](#使い分け)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [exit()の動作](#how-underscore-exit-works)
+- [\_exit()の動作](#how-underscore-exit-works)
+- [fork後の問題](#problems-after-fork)
+- [使い分け](#when-to-use-which)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## exit()の動作
+## [exit()の動作](#how-exit-works) {#how-exit-works}
 
-### exit()とは
+### [exit()とは](#what-is-exit) {#what-is-exit}
 
 `exit()` は、C 標準ライブラリが提供するプロセス終了関数です
 
@@ -49,7 +50,7 @@ if (pid == 0) {
 void exit(int status);
 ```
 
-### 終了処理の流れ
+### [終了処理の流れ](#exit-process-flow) {#exit-process-flow}
 
 `exit()` を呼び出すと、以下の処理が順番に実行されます
 
@@ -62,7 +63,7 @@ exit() の処理
 4. _exit() を呼び出してカーネルに制御を渡す
 ```
 
-### atexit()とは
+### [atexit()とは](#what-is-atexit) {#what-is-atexit}
 
 `atexit()` は、プログラム終了時に呼び出される関数を登録する仕組みです
 
@@ -98,7 +99,7 @@ int main(void)
 クリーンアップ処理を実行
 ```
 
-### stdioバッファのフラッシュ
+### [stdioバッファのフラッシュ](#stdio-buffer-flush) {#stdio-buffer-flush}
 
 `printf()` などの stdio 関数は、出力を<strong>バッファリング</strong>します
 
@@ -128,9 +129,9 @@ exit(0);
 
 ---
 
-## \_exit()の動作
+## [\_exit()の動作](#how-underscore-exit-works) {#how-underscore-exit-works}
 
-### \_exit()とは
+### [\_exit()とは](#what-is-underscore-exit) {#what-is-underscore-exit}
 
 `_exit()` は、システムコールとしてカーネルに直接終了を要求する関数です
 
@@ -142,7 +143,7 @@ void _exit(int status);
 
 C99 以降では `<stdlib.h>` の `_Exit()` も同じ動作をします
 
-### 即座にカーネルへ
+### [即座にカーネルへ](#immediate-kernel-exit) {#immediate-kernel-exit}
 
 `_exit()` は、`exit()` のような終了処理を行いません
 
@@ -155,16 +156,17 @@ _exit() の処理
 4. カーネルがファイルディスクリプタを閉じる
 ```
 
-### exit()との比較
+### [exit()との比較](#comparison-with-exit) {#comparison-with-exit}
 
-| 処理                             | exit() | \_exit()               |
+{: .labeled}
+| 処理 | exit() | \_exit() |
 | -------------------------------- | ------ | ---------------------- |
-| atexit() 登録関数の実行          | する   | しない                 |
-| stdio バッファのフラッシュ       | する   | しない                 |
-| tmpfile() 一時ファイルの削除     | する   | しない                 |
-| ファイルディスクリプタのクローズ | する   | する（カーネルが処理） |
+| atexit() 登録関数の実行 | する | しない |
+| stdio バッファのフラッシュ | する | しない |
+| tmpfile() 一時ファイルの削除 | する | しない |
+| ファイルディスクリプタのクローズ | する | する（カーネルが処理） |
 
-### なぜ 2 つの関数が存在するのか
+### [なぜ 2 つの関数が存在するのか](#why-two-functions-exist) {#why-two-functions-exist}
 
 exit() は C 標準ライブラリの関数で、「便利な後処理」を提供します
 
@@ -172,25 +174,26 @@ exit() は C 標準ライブラリの関数で、「便利な後処理」を提�
 
 <strong>なぜ exit() だけでは不十分なのか？</strong>
 
-| 場面                  | exit() の問題                              |
+{: .labeled}
+| 場面 | exit() の問題 |
 | --------------------- | ------------------------------------------ |
-| fork() 後の子プロセス | 親のクリーンアップ処理が二重実行される     |
-| シグナルハンドラ内    | atexit() が async-signal-safe でない可能性 |
-| 異常終了時            | クリーンアップを飛ばして即座に終了したい   |
+| fork() 後の子プロセス | 親のクリーンアップ処理が二重実行される |
+| シグナルハンドラ内 | atexit() が async-signal-safe でない可能性 |
+| 異常終了時 | クリーンアップを飛ばして即座に終了したい |
 
 \_exit() は「C ライブラリを経由せずに終了したい」場面のために存在します
 
 ---
 
-## fork後の問題
+## [fork後の問題](#problems-after-fork) {#problems-after-fork}
 
-### なぜexit()が危険なのか
+### [なぜexit()が危険なのか](#why-exit-is-dangerous) {#why-exit-is-dangerous}
 
 fork() で子プロセスを作ると、親プロセスのメモリ空間がコピーされます
 
 これには stdio バッファの内容や atexit() の登録情報も含まれます
 
-### 問題1：二重フラッシュ
+### [問題1：二重フラッシュ](#problem-1-double-flush) {#problem-1-double-flush}
 
 親プロセスの stdio バッファに「Hello」が溜まっている状態で fork() すると、子プロセスも同じ「Hello」をバッファに持ちます
 
@@ -244,7 +247,7 @@ HelloHello
 
 「Hello」が二度出力されてしまいます
 
-### 問題2：atexit()ハンドラの二重実行
+### [問題2：atexit()ハンドラの二重実行](#problem-2-double-atexit) {#problem-2-double-atexit}
 
 atexit() で登録した関数も、親子両方で実行されます
 
@@ -291,7 +294,7 @@ int main(void)
 
 データベース接続のクローズやロックファイルの削除などの処理が二重に実行されると、予期しない問題が発生する可能性があります
 
-### 解決策：\_exit()を使う
+### [解決策：\_exit()を使う](#solution-use-underscore-exit) {#solution-use-underscore-exit}
 
 子プロセスで `_exit()` を使えば、これらの問題を回避できます
 
@@ -339,9 +342,9 @@ Hello
 
 ---
 
-## 使い分け
+## [使い分け](#when-to-use-which) {#when-to-use-which}
 
-### \_exit()を使う場面
+### [\_exit()を使う場面](#when-to-use-underscore-exit) {#when-to-use-underscore-exit}
 
 ```
 _exit() を使うべき場面
@@ -351,7 +354,7 @@ _exit() を使うべき場面
 ─── 親プロセスのクリーンアップ処理を実行したくないとき
 ```
 
-### exit()を使う場面
+### [exit()を使う場面](#when-to-use-exit) {#when-to-use-exit}
 
 ```
 exit() を使うべき場面
@@ -361,7 +364,7 @@ exit() を使うべき場面
 ─── クリーンアップ処理を確実に実行したいとき
 ```
 
-### fork() + exec() パターン
+### [fork() + exec() パターン](#fork-exec-pattern) {#fork-exec-pattern}
 
 典型的な fork() + exec() パターンでは、exec() が失敗した場合に `_exit()` を使います
 
@@ -388,7 +391,7 @@ exec() が成功した場合、子プロセスは新しいプログラムに置�
 
 新しいプログラムは独自の atexit() 登録とバッファを持つため、`exit()` を使っても問題ありません
 
-### 判断フローチャート
+### [判断フローチャート](#decision-flowchart) {#decision-flowchart}
 
 ```
 fork() 後に子プロセスを終了する
@@ -402,12 +405,13 @@ exec() を呼ぶか？
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 関数     | 用途                      | 特徴                              |
+{: .labeled}
+| 関数 | 用途 | 特徴 |
 | -------- | ------------------------- | --------------------------------- |
-| exit()   | 通常のプログラム終了      | atexit() 実行、バッファフラッシュ |
-| \_exit() | fork() 後の子プロセス終了 | クリーンアップなし、即座に終了    |
+| exit() | 通常のプログラム終了 | atexit() 実行、バッファフラッシュ |
+| \_exit() | fork() 後の子プロセス終了 | クリーンアップなし、即座に終了 |
 
 <strong>覚えておくこと</strong>
 
@@ -417,20 +421,20 @@ exec() を呼ぶか？
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exit.3.html)
+- [exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exit.3.html){:target="\_blank"}
   - プロセスの正常終了、終了処理の詳細
-- [\_exit(2) - Linux manual page](https://man7.org/linux/man-pages/man2/_exit.2.html)
+- [\_exit(2) - Linux manual page](https://man7.org/linux/man-pages/man2/_exit.2.html){:target="\_blank"}
   - 即座にプロセスを終了するシステムコール
-- [atexit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/atexit.3.html)
+- [atexit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/atexit.3.html){:target="\_blank"}
   - 終了時に呼び出される関数の登録
-- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html)
+- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html){:target="\_blank"}
   - プロセスの複製
 
 <strong>本編との関連</strong>
 
-- [02-fork-exec](../02-fork-exec.md)
+- [02-fork-exec](../../02-fork-exec/)
   - fork() と exec() の基本動作

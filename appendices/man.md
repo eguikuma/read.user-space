@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜman 2 openなのか
+---
 
-# なぜman 2 openなのか
+# [なぜman 2 openなのか](#why-man-2-open) {#why-man-2-open}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 本編の「参考資料」では、こんなリンクを見たことがあるでしょう
 
@@ -21,36 +22,37 @@
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [セクション番号とは](#セクション番号とは)
-- [読み方](#読み方)
-- [実践](#実践)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [セクション番号とは](#what-are-section-numbers)
+- [読み方](#how-to-read)
+- [実践](#practice)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## セクション番号とは
+## [セクション番号とは](#what-are-section-numbers) {#what-are-section-numbers}
 
-### man ページはセクションに分かれている
+### [man ページはセクションに分かれている](#man-pages-are-divided-into-sections) {#man-pages-are-divided-into-sections}
 
 UNIX のマニュアル（man ページ）は、内容の種類によって<strong>セクション</strong>に分類されています
 
 括弧内の数字がセクション番号です
 
-| セクション | 内容                     | 例                             |
+{: .labeled}
+| セクション | 内容 | 例 |
 | ---------- | ------------------------ | ------------------------------ |
-| 1          | ユーザーコマンド         | ls, cat, grep                  |
-| 2          | システムコール           | open, fork, read               |
-| 3          | ライブラリ関数           | printf, malloc, pthread_create |
-| 4          | 特殊ファイル（デバイス） | /dev/null, /dev/tty            |
-| 5          | ファイルフォーマット     | /etc/passwd, /proc             |
-| 6          | ゲーム                   | -                              |
-| 7          | その他・概要             | signal(7), pthreads(7)         |
-| 8          | システム管理コマンド     | mount, ifconfig                |
+| 1 | ユーザーコマンド | ls, cat, grep |
+| 2 | システムコール | open, fork, read |
+| 3 | ライブラリ関数 | printf, malloc, pthread_create |
+| 4 | 特殊ファイル（デバイス） | /dev/null, /dev/tty |
+| 5 | ファイルフォーマット | /etc/passwd, /proc |
+| 6 | ゲーム | - |
+| 7 | その他・概要 | signal(7), pthreads(7) |
+| 8 | システム管理コマンド | mount, ifconfig |
 
-### なぜ 8 つのセクションに分かれているか
+### [なぜ 8 つのセクションに分かれているか](#why-eight-sections) {#why-eight-sections}
 
 <strong>UNIX の設計思想</strong>
 
@@ -58,11 +60,12 @@ UNIX のマニュアル（man ページ）は、内容の種類によって<stro
 
 大量のページを効率よく探すために、内容の種類でセクションを分けました
 
-| セクション    | 対象ユーザー   |
+{: .labeled}
+| セクション | 対象ユーザー |
 | ------------- | -------------- |
 | 1（コマンド） | 全てのユーザー |
-| 2, 3（関数）  | プログラマ     |
-| 8（管理）     | システム管理者 |
+| 2, 3（関数） | プログラマ |
+| 8（管理） | システム管理者 |
 
 <strong>なぜ同じ名前が複数のセクションに存在するか</strong>
 
@@ -82,14 +85,15 @@ man 1 printf   # コマンドの man ページ
 man 3 printf   # C 言語関数の man ページ
 ```
 
-### 本編でよく見るセクション
+### [本編でよく見るセクション](#commonly-used-sections) {#commonly-used-sections}
 
-| セクション | 内容                 | 本編での例                              |
+{: .labeled}
+| セクション | 内容 | 本編での例 |
 | ---------- | -------------------- | --------------------------------------- |
-| 2          | システムコール       | open(2), fork(2), read(2), write(2)     |
-| 3          | ライブラリ関数       | printf(3), malloc(3), pthread_create(3) |
-| 5          | ファイルフォーマット | proc(5)                                 |
-| 7          | 概要                 | signal(7), pthreads(7), unix(7)         |
+| 2 | システムコール | open(2), fork(2), read(2), write(2) |
+| 3 | ライブラリ関数 | printf(3), malloc(3), pthread_create(3) |
+| 5 | ファイルフォーマット | proc(5) |
+| 7 | 概要 | signal(7), pthreads(7), unix(7) |
 
 <strong>セクション 2 と 3 の違い</strong>
 
@@ -102,11 +106,12 @@ man 3 printf   # C 言語関数の man ページ
 
 <strong>なぜこの区別が重要なのか</strong>
 
-| 観点           | システムコール (2)                    | ライブラリ関数 (3)                 |
+{: .labeled}
+| 観点 | システムコール (2) | ライブラリ関数 (3) |
 | -------------- | ------------------------------------- | ---------------------------------- |
 | パフォーマンス | ユーザー/カーネル空間の切り替えコスト | カーネル呼び出しを減らす最適化あり |
-| エラー処理     | errno が直接設定される                | 関数によってエラー通知方法が異なる |
-| シグナル安全性 | 多くが async-signal-safe              | 多くが async-signal-safe でない    |
+| エラー処理 | errno が直接設定される | 関数によってエラー通知方法が異なる |
+| シグナル安全性 | 多くが async-signal-safe | 多くが async-signal-safe でない |
 
 例えば、シグナルハンドラ内で使えるかどうかを判断するとき、この区別が重要になります
 
@@ -114,23 +119,24 @@ man 3 printf   # C 言語関数の man ページ
 
 ---
 
-## 読み方
+## [読み方](#how-to-read) {#how-to-read}
 
-### man ページの構成
+### [man ページの構成](#man-page-structure) {#man-page-structure}
 
 man ページは標準的な構成を持っています
 
-| セクション名 | 内容                                       |
+{: .labeled}
+| セクション名 | 内容 |
 | ------------ | ------------------------------------------ |
-| NAME         | 名前と一行説明                             |
-| SYNOPSIS     | 使い方（関数のプロトタイプ、必要なヘッダ） |
-| DESCRIPTION  | 詳細な説明                                 |
-| RETURN VALUE | 戻り値（成功時・失敗時）                   |
-| ERRORS       | エラー時に設定される errno の値            |
-| EXAMPLES     | 使用例（ある場合）                         |
-| SEE ALSO     | 関連する man ページ                        |
+| NAME | 名前と一行説明 |
+| SYNOPSIS | 使い方（関数のプロトタイプ、必要なヘッダ） |
+| DESCRIPTION | 詳細な説明 |
+| RETURN VALUE | 戻り値（成功時・失敗時） |
+| ERRORS | エラー時に設定される errno の値 |
+| EXAMPLES | 使用例（ある場合） |
+| SEE ALSO | 関連する man ページ |
 
-### SYNOPSIS の読み方
+### [SYNOPSIS の読み方](#reading-synopsis) {#reading-synopsis}
 
 SYNOPSIS は関数の「使い方」を示します
 
@@ -149,7 +155,7 @@ int open(const char *pathname, int flags, mode_t mode);
 - 引数は 2 つまたは 3 つ
 - 戻り値は `int`（ファイルディスクリプタ）
 
-### RETURN VALUE と ERRORS
+### [RETURN VALUE と ERRORS](#return-value-and-errors) {#return-value-and-errors}
 
 <strong>RETURN VALUE</strong>
 
@@ -177,7 +183,7 @@ ERRORS
 
 エラーの原因を特定するときに参照します
 
-### SEE ALSO
+### [SEE ALSO](#see-also) {#see-also}
 
 関連する man ページへのリンクです
 
@@ -190,17 +196,18 @@ SEE ALSO
 
 ---
 
-## 実践
+## [実践](#practice) {#practice}
 
-### よく使うコマンド
+### [よく使うコマンド](#commonly-used-commands) {#commonly-used-commands}
 
-| コマンド         | 説明                                                   |
+{: .labeled}
+| コマンド | 説明 |
 | ---------------- | ------------------------------------------------------ |
-| `man open`       | open の man ページを表示（最初に見つかったセクション） |
-| `man 2 open`     | セクション 2 の open を表示                            |
-| `man 3 printf`   | セクション 3 の printf を表示                          |
-| `man -k keyword` | キーワードで man ページを検索                          |
-| `man -f name`    | 指定した名前の man ページ一覧を表示                    |
+| `man open` | open の man ページを表示（最初に見つかったセクション） |
+| `man 2 open` | セクション 2 の open を表示 |
+| `man 3 printf` | セクション 3 の printf を表示 |
+| `man -k keyword` | キーワードで man ページを検索 |
+| `man -f name` | 指定した名前の man ページ一覧を表示 |
 
 <strong>例：fork に関連する man ページを探す</strong>
 
@@ -218,7 +225,7 @@ printf (1)           - format and print data
 printf (3)           - formatted output conversion
 ```
 
-### オンラインで読む
+### [オンラインで読む](#reading-online) {#reading-online}
 
 man コマンドがなくても、オンラインで読めます
 
@@ -236,17 +243,18 @@ URL の構造がセクション番号に対応しています
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 項目         | 説明                                     |
+{: .labeled}
+| 項目 | 説明 |
 | ------------ | ---------------------------------------- |
-| セクション 2 | システムコール（OS に依頼する機能）      |
-| セクション 3 | ライブラリ関数（C 言語の関数）           |
-| セクション 7 | 概要・その他（signal の概要など）        |
+| セクション 2 | システムコール（OS に依頼する機能） |
+| セクション 3 | ライブラリ関数（C 言語の関数） |
+| セクション 7 | 概要・その他（signal の概要など） |
 | `man 2 open` | open() システムコールの man ページを表示 |
-| SYNOPSIS     | 関数の使い方（ヘッダ、引数、戻り値の型） |
-| RETURN VALUE | 成功/失敗時の戻り値                      |
-| ERRORS       | エラー時の errno 値                      |
+| SYNOPSIS | 関数の使い方（ヘッダ、引数、戻り値の型） |
+| RETURN VALUE | 成功/失敗時の戻り値 |
+| ERRORS | エラー時の errno 値 |
 
 <strong>覚えておくこと</strong>
 
@@ -257,25 +265,25 @@ URL の構造がセクション番号に対応しています
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>man コマンドとマニュアル構成</strong>
 
-- [man(1) - Linux manual page](https://man7.org/linux/man-pages/man1/man.1.html)
+- [man(1) - Linux manual page](https://man7.org/linux/man-pages/man1/man.1.html){:target="\_blank"}
   - man コマンド自体のマニュアル
-- [man-pages(7) - Linux manual page](https://man7.org/linux/man-pages/man7/man-pages.7.html)
+- [man-pages(7) - Linux manual page](https://man7.org/linux/man-pages/man7/man-pages.7.html){:target="\_blank"}
   - man ページの構成と慣習、セクション番号の定義
 
 <strong>本編との関連</strong>
 
 本編の各 README.md の「参考資料」セクションでは、以下の形式で man ページを参照しています
 
-- [01-process](../01-process.md) → getpid(2), fork(2), proc(5) など
-- [02-fork-exec](../02-fork-exec.md) → fork(2), execve(2), wait(2) など
-- [03-signal](../03-signal.md) → signal(2), signal(7), sigaction(2) など
-- [04-thread](../04-thread.md) → pthreads(7), pthread_create(3) など
-- [05-file-descriptor](../05-file-descriptor.md) → open(2), read(2), write(2) など
-- [06-stdio](../06-stdio.md) → stdio(3), fopen(3), printf(3) など
-- [07-ipc](../07-ipc.md) → pipe(2), socket(2), unix(7) など
+- [01-process](../../01-process/) → getpid(2), fork(2), proc(5) など
+- [02-fork-exec](../../02-fork-exec/) → fork(2), execve(2), wait(2) など
+- [03-signal](../../03-signal/) → signal(2), signal(7), sigaction(2) など
+- [04-thread](../../04-thread/) → pthreads(7), pthread_create(3) など
+- [05-file-descriptor](../../05-file-descriptor/) → open(2), read(2), write(2) など
+- [06-stdio](../../06-stdio/) → stdio(3), fopen(3), printf(3) など
+- [07-ipc](../../07-ipc/) → pipe(2), socket(2), unix(7) など
 
 これらのリンクを辿ることで、各関数の詳細な仕様を確認できます

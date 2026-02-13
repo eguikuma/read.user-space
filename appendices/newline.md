@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜ改行コードは複数あるのか
+---
 
-# なぜ改行コードは複数あるのか
+# [なぜ改行コードは複数あるのか](#why-multiple-newline-codes) {#why-multiple-newline-codes}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 テキストファイルを扱っていると、改行コードの違いに遭遇することがあります
 
@@ -20,20 +21,20 @@ Windows:      CRLF（\r\n）
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [CR/LFの由来](#crlfの由来)
-- [各OSの選択](#各osの選択)
-- [C言語での扱い](#c言語での扱い)
-- [実務での注意](#実務での注意)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [CR/LFの由来](#origin-of-cr-lf)
+- [各OSの選択](#choices-by-each-os)
+- [C言語での扱い](#handling-in-c)
+- [実務での注意](#practical-considerations)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## CR/LFの由来
+## [CR/LFの由来](#origin-of-cr-lf) {#origin-of-cr-lf}
 
-### タイプライターの機構
+### [タイプライターの機構](#typewriter-mechanism) {#typewriter-mechanism}
 
 CR（Carriage Return）と LF（Line Feed）は、タイプライターの物理的な動作に由来します
 
@@ -55,7 +56,7 @@ CR（Carriage Return）と LF（Line Feed）は、タイプライターの物理
    紙を1行分上に送る（Y軸の移動）
 ```
 
-### テレタイプへの継承
+### [テレタイプへの継承](#inheritance-by-teletype) {#inheritance-by-teletype}
 
 1900年代初頭、タイプライターの概念は電気通信機器（テレタイプ）に引き継がれました
 
@@ -65,7 +66,7 @@ CR（Carriage Return）と LF（Line Feed）は、タイプライターの物理
 新しい行を始めるには、CAR RET、LINE FEED、LTRS の順にキーを押す
 ```
 
-### なぜ CR の後に LF なのか
+### [なぜ CR の後に LF なのか](#why-lf-after-cr) {#why-lf-after-cr}
 
 テレタイプの印字ヘッドは、右端から左端に戻るのに物理的な時間がかかりました
 
@@ -88,9 +89,9 @@ LF 送信 → 紙が送られる（この間もヘッドは移動中）
 
 ---
 
-## 各OSの選択
+## [各OSの選択](#choices-by-each-os) {#choices-by-each-os}
 
-### Unix/Linux：LF のみ
+### [Unix/Linux：LF のみ](#unix-linux-lf-only) {#unix-linux-lf-only}
 
 Multics（Unix が影響を受けたシステム）の開発者たちは、CR+LF の冗長さに着目しました
 
@@ -112,7 +113,7 @@ printf("Hello\n");
 
 macOS も OS X（2001年）以降、Unix 系として LF を採用しています
 
-### Windows：CRLF
+### [Windows：CRLF](#windows-crlf) {#windows-crlf}
 
 Windows は、CP/M → MS-DOS → Windows という系譜で CRLF を継承しています
 
@@ -126,7 +127,7 @@ Windows は、CP/M → MS-DOS → Windows という系譜で CRLF を継承し�
 
 当時のコンピュータはプリンタやテレタイプと日常的に接続されており、タイプライター互換を維持する実用的な理由がありました
 
-### 旧 Mac（OS 9 以前）：CR のみ
+### [旧 Mac（OS 9 以前）：CR のみ](#old-mac-cr-only) {#old-mac-cr-only}
 
 Apple は独自の選択として CR のみを採用していました
 
@@ -137,22 +138,24 @@ Mac の歴史
 2001年〜（OS X）：LF に移行（Unix ベースになったため）
 ```
 
-### 比較表
+### [比較表](#comparison-table) {#comparison-table}
 
-| OS                  | 改行コード | 16進数    | エスケープ |
+{: .labeled}
+| OS | 改行コード | 16進数 | エスケープ |
 | ------------------- | ---------- | --------- | ---------- |
-| Unix/Linux/macOS    | LF         | 0x0A      | `\n`       |
-| Windows             | CRLF       | 0x0D 0x0A | `\r\n`     |
-| 旧 Mac（OS 9 以前） | CR         | 0x0D      | `\r`       |
+| Unix/Linux/macOS | LF | 0x0A | `\n` |
+| Windows | CRLF | 0x0D 0x0A | `\r\n` |
+| 旧 Mac（OS 9 以前） | CR | 0x0D | `\r` |
 
-### なぜ統一されなかったのか
+### [なぜ統一されなかったのか](#why-not-unified) {#why-not-unified}
 
 <strong>後方互換性の壁</strong>
 
-| OS      | 統一しなかった理由                             |
+{: .labeled}
+| OS | 統一しなかった理由 |
 | ------- | ---------------------------------------------- |
-| Windows | 膨大な既存ソフトウェア・データとの互換性       |
-| Unix    | すでに LF で統一されており、変更する理由がない |
+| Windows | 膨大な既存ソフトウェア・データとの互換性 |
+| Unix | すでに LF で統一されており、変更する理由がない |
 
 Windows が LF のみに移行しようとすると、30 年以上にわたる CRLF のテキストファイルやソフトウェアとの互換性が壊れます
 
@@ -166,9 +169,9 @@ Windows が LF のみに移行しようとすると、30 年以上にわたる C
 
 ---
 
-## C言語での扱い
+## [C言語での扱い](#handling-in-c) {#handling-in-c}
 
-### テキストモードとバイナリモード
+### [テキストモードとバイナリモード](#text-vs-binary-mode) {#text-vs-binary-mode}
 
 C 言語の `fopen()` には、テキストモードとバイナリモードがあります
 
@@ -183,7 +186,7 @@ FILE *fp_text = fopen("file.txt", "r");
 FILE *fp_bin  = fopen("file.bin", "rb");
 ```
 
-### テキストモードの動作
+### [テキストモードの動作](#text-mode-behavior) {#text-mode-behavior}
 
 テキストモードでは、OS に応じて改行コードが<strong>自動変換</strong>されます
 
@@ -214,7 +217,7 @@ fgets(buf, size, fp);
 
 この変換のおかげで、プログラム内では `\n` だけを使えば、OS の違いを意識する必要がありません
 
-### バイナリモードの動作
+### [バイナリモードの動作](#binary-mode-behavior) {#binary-mode-behavior}
 
 バイナリモードでは、変換は一切行われません
 
@@ -234,7 +237,7 @@ Windows：ファイル内の 0x0D 0x0A が 0x0A に変換される
 → ファイルが壊れる
 ```
 
-### Unix 系での 'b' フラグ
+### [Unix 系での 'b' フラグ](#b-flag-on-unix) {#b-flag-on-unix}
 
 POSIX 準拠システム（Linux、macOS など）では、'b' フラグは<strong>効果がありません</strong>
 
@@ -250,9 +253,9 @@ fopen("file.txt", "rb");
 
 ---
 
-## 実務での注意
+## [実務での注意](#practical-considerations) {#practical-considerations}
 
-### Git での改行コード問題
+### [Git での改行コード問題](#git-newline-issues) {#git-newline-issues}
 
 異なる OS の開発者が同じリポジトリで作業すると、改行コードの違いが問題になります
 
@@ -264,15 +267,16 @@ Linux 開発者：LF でコミット
 → 差分に大量の改行変更が表示される
 ```
 
-### core.autocrlf 設定
+### [core.autocrlf 設定](#core-autocrlf-setting) {#core-autocrlf-setting}
 
 Git の `core.autocrlf` 設定で、チェックアウト時の自動変換を制御できます
 
-| 値      | 動作                                                 |
+{: .labeled}
+| 値 | 動作 |
 | ------- | ---------------------------------------------------- |
-| `true`  | チェックアウト時に LF → CRLF、コミット時に CRLF → LF |
+| `true` | チェックアウト時に LF → CRLF、コミット時に CRLF → LF |
 | `input` | コミット時のみ CRLF → LF、チェックアウト時は変換なし |
-| `false` | 変換しない                                           |
+| `false` | 変換しない |
 
 ```bash
 # Windows での推奨設定
@@ -282,7 +286,7 @@ git config --global core.autocrlf true
 git config --global core.autocrlf input
 ```
 
-### .gitattributes（推奨）
+### [.gitattributes（推奨）](#gitattributes) {#gitattributes}
 
 リポジトリ単位で改行コードを制御するには、`.gitattributes` ファイルを使用します
 
@@ -308,7 +312,7 @@ git config --global core.autocrlf input
 
 `.gitattributes` は `core.autocrlf` より優先されるため、リポジトリで統一したルールを適用できます
 
-### エディタの設定
+### [エディタの設定](#editor-settings) {#editor-settings}
 
 多くのエディタは、改行コードの自動検出と変換機能を持っています
 
@@ -327,15 +331,16 @@ VS Code の設定例
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 項目             | 内容                                               |
+{: .labeled}
+| 項目 | 内容 |
 | ---------------- | -------------------------------------------------- |
-| CR/LF の由来     | タイプライターの物理的な動作（復帰と改行）         |
-| Unix/Linux/macOS | LF（`\n`）─ 論理的な改行は1文字で十分              |
-| Windows          | CRLF（`\r\n`）─ タイプライター互換を継承           |
-| C 言語           | テキストモードで自動変換、バイナリモードは変換なし |
-| Git              | `.gitattributes` でリポジトリ単位の統一を推奨      |
+| CR/LF の由来 | タイプライターの物理的な動作（復帰と改行） |
+| Unix/Linux/macOS | LF（`\n`）─ 論理的な改行は1文字で十分 |
+| Windows | CRLF（`\r\n`）─ タイプライター互換を継承 |
+| C 言語 | テキストモードで自動変換、バイナリモードは変換なし |
+| Git | `.gitattributes` でリポジトリ単位の統一を推奨 |
 
 <strong>覚えておくこと</strong>
 
@@ -346,26 +351,26 @@ VS Code の設定例
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [fopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fopen.3.html)
+- [fopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fopen.3.html){:target="\_blank"}
   - ファイルオープン、テキストモードとバイナリモード
 
 <strong>Git ドキュメント</strong>
 
-- [Configuring Git to handle line endings - GitHub Docs](https://docs.github.com/articles/dealing-with-line-endings)
+- [Configuring Git to handle line endings - GitHub Docs](https://docs.github.com/articles/dealing-with-line-endings){:target="\_blank"}
   - Git での改行コード設定ガイド
-- [Git - gitattributes Documentation](https://git-scm.com/docs/gitattributes)
+- [Git - gitattributes Documentation](https://git-scm.com/docs/gitattributes){:target="\_blank"}
   - .gitattributes の text 属性と eol 属性
 
 <strong>歴史的背景</strong>
 
-- [CRLF vs. LF: Normalizing Line Endings in Git](https://www.aleksandrhovhannisyan.com/blog/crlf-vs-lf-normalizing-line-endings-in-git/)
+- [CRLF vs. LF: Normalizing Line Endings in Git](https://www.aleksandrhovhannisyan.com/blog/crlf-vs-lf-normalizing-line-endings-in-git/){:target="\_blank"}
   - 改行コードの歴史と Git での対処法
 
 <strong>本編との関連</strong>
 
-- [06-stdio](../06-stdio.md)
+- [06-stdio](../../06-stdio/)
   - fopen() のテキストモード/バイナリモードの違い

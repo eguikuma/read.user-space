@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: プロセスとは何か
+---
 
-# 01-process：プロセスとは何か
+# [01-process：プロセスとは何か](#what-is-a-process) {#what-is-a-process}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 「プロセス」という言葉を聞いたことはありますか？
 
@@ -18,7 +19,7 @@ Mac を使っている方なら、「アクティビティモニタ」で見ら�
 
 <strong>一言で言うと、プロセスとは「実行中のプログラム」のこと</strong>です
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 プログラムとプロセスの関係は、「料理のレシピ」と「実際に料理を作っている状態」に似ています
 
@@ -30,7 +31,7 @@ Mac を使っている方なら、「アクティビティモニタ」で見ら�
 
 このページでは、「プロセス」とは具体的に何なのかを、基礎から詳しく学びます
 
-### このページで学ぶこと
+### [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 このページでは、以下の概念を学びます
 
@@ -51,31 +52,32 @@ Mac を使っている方なら、「アクティビティモニタ」で見ら�
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [なぜ「プロセス」という概念が必要なのか](#なぜプロセスという概念が必要なのか)
-2. [プログラムとプロセスの違い](#プログラムとプロセスの違い)
-3. [プロセスが持つもの](#プロセスが持つもの)
-4. [プロセス ID（PID）とは](#プロセス-idpidとは)
-5. [プロセスの親子関係](#プロセスの親子関係)
-6. [プロセスの状態](#プロセスの状態)
-7. [プロセスを観察してみよう](#プロセスを観察してみよう)
-8. [/proc ファイルシステム](#proc-ファイルシステム)
-9. [メモリの構造](#メモリの構造)
-10. [環境変数](#環境変数)
-11. [作業ディレクトリ](#作業ディレクトリ)
-12. [用語集](#用語集)
-13. [参考資料](#参考資料)
+1. [なぜ「プロセス」という概念が必要なのか](#why-process-concept-is-needed)
+2. [プログラムとプロセスの違い](#difference-between-program-and-process)
+3. [プロセスが持つもの](#what-a-process-has)
+4. [プロセス ID（PID）とは](#what-is-pid)
+5. [プロセスの親子関係](#parent-child-relationship)
+6. [プロセスの状態](#process-states)
+7. [プロセスを観察してみよう](#observing-processes)
+8. [/proc ファイルシステム](#proc-filesystem)
+9. [メモリの構造](#memory-structure)
+10. [環境変数](#environment-variables)
+11. [作業ディレクトリ](#working-directory)
+12. [次のステップ](#next-steps)
+13. [用語集](#glossary)
+14. [参考資料](#references)
 
 ---
 
-## なぜ「プロセス」という概念が必要なのか
+## [なぜ「プロセス」という概念が必要なのか](#why-process-concept-is-needed) {#why-process-concept-is-needed}
 
 まず根本的な疑問に答えましょう
 
 なぜ OS は「プロセス」という概念を作ったのでしょうか？
 
-### もしプロセスという概念がなかったら？
+### [もしプロセスという概念がなかったら？](#without-process-concept) {#without-process-concept}
 
 すべてのプログラムが<strong>同じメモリ空間</strong>で動くとどうなるでしょうか
 
@@ -97,7 +99,7 @@ Mac を使っている方なら、「アクティビティモニタ」で見ら�
 
 強制終了しようにも、どこからどこまでがそのプログラムなのか区別できません
 
-### プロセスが解決すること
+### [プロセスが解決すること](#what-process-solves) {#what-process-solves}
 
 OS はプログラムを「プロセス」という単位で<strong>隔離</strong>します
 
@@ -111,11 +113,11 @@ OS はプログラムを「プロセス」という単位で<strong>隔離</stro
 
 ---
 
-## プログラムとプロセスの違い
+## [プログラムとプロセスの違い](#difference-between-program-and-process) {#difference-between-program-and-process}
 
 この2つは似ているようで、まったく異なります
 
-### プログラムとは
+### [プログラムとは](#what-is-a-program) {#what-is-a-program}
 
 <strong>プログラム</strong>は、ディスク（SSD や HDD）に保存されている「ファイル」です
 
@@ -131,7 +133,7 @@ OS はプログラムを「プロセス」という単位で<strong>隔離</stro
 
 料理で例えると、<strong>レシピ</strong>（料理本に書かれた手順）に相当します
 
-### プロセスとは
+### [プロセスとは](#what-is-a-process-detail) {#what-is-a-process-detail}
 
 <strong>プロセス</strong>は、プログラムを実行したときに生まれる「実体」です
 
@@ -145,17 +147,18 @@ OS はプログラムを「プロセス」という単位で<strong>隔離</stro
 
 料理で例えると、<strong>実際に料理を作っている状態</strong>に相当します
 
-### 比較表
+### [比較表](#comparison-table) {#comparison-table}
 
-| 項目 | プログラム         | プロセス                   |
+{: .labeled}
+| 項目 | プログラム | プロセス |
 | ---- | ------------------ | -------------------------- |
-| 何か | ファイル（設計図） | 実行中の実体               |
-| 場所 | ディスク上         | メモリ上                   |
-| 状態 | 変化しない         | 常に変化する               |
-| 寿命 | 削除するまで存在   | 終了すると消える           |
-| 例え | 料理のレシピ       | 実際に料理を作っている状態 |
+| 何か | ファイル（設計図） | 実行中の実体 |
+| 場所 | ディスク上 | メモリ上 |
+| 状態 | 変化しない | 常に変化する |
+| 寿命 | 削除するまで存在 | 終了すると消える |
+| 例え | 料理のレシピ | 実際に料理を作っている状態 |
 
-### 重要なポイント
+### [重要なポイント](#key-point) {#key-point}
 
 1つのプログラムから、複数のプロセスを作ることができます
 
@@ -163,33 +166,33 @@ OS はプログラムを「プロセス」という単位で<strong>隔離</stro
 
 ---
 
-## プロセスが持つもの
+## [プロセスが持つもの](#what-a-process-has) {#what-a-process-has}
 
 プロセスは、単に「実行中のコード」だけではありません
 
 OS はプロセスごとに、以下のものを管理しています
 
-### 1. プロセス ID（PID）
+### [1. プロセス ID（PID）](#process-id-pid) {#process-id-pid}
 
 すべてのプロセスには、OS が割り当てる<strong>一意</strong>（唯一無二、他と重複しない）の番号があります
 
 同時に同じ番号を持つプロセスは存在しません
 
-詳しくは[次のセクション](#プロセス-idpidとは)で説明します
+詳しくは[次のセクション](#what-is-pid)で説明します
 
-### 2. メモリ空間
+### [2. メモリ空間](#memory-space) {#memory-space}
 
 プロセスは、自分専用のメモリ領域を持っています
 
 他のプロセスのメモリに直接アクセスすることはできません
 
-詳しくは[メモリの構造](#メモリの構造)で説明します
+詳しくは[メモリの構造](#memory-structure)で説明します
 
-### 3. ファイルディスクリプタ
+### [3. ファイルディスクリプタ](#file-descriptors) {#file-descriptors}
 
 プロセスが開いているファイルを識別する「番号」です
 
-#### 「ファイルを開く」とは
+#### [「ファイルを開く」とは](#what-is-opening-a-file) {#what-is-opening-a-file}
 
 プログラムがファイルを読み書きするとき、まず OS に「このファイルを使いたい」と伝えます
 
@@ -201,15 +204,15 @@ GUI の「開く」は、アプリを起動してファイルを表示するこ�
 
 プログラミングの「開く」は、OS にファイルへのアクセス許可をもらうことです
 
-詳しくは [05-file-descriptor](./05-file-descriptor.md) で学びます
+詳しくは [05-file-descriptor](../05-file-descriptor/) で学びます
 
-#### ファイルディスクリプタとは
+#### [ファイルディスクリプタとは](#what-is-a-file-descriptor) {#what-is-a-file-descriptor}
 
 <strong>ファイルディスクリプタ（fd）</strong>とは、プロセスが開いたファイルに対して OS が割り当てる整数値です
 
 プログラムはこの番号を使って、ファイルの読み書きを行います
 
-「ファイル」には、通常のファイルだけでなく、ネットワーク接続や<strong>パイプ</strong>（プロセス間でデータをやり取りする仕組み、[07-ipc](./07-ipc.md) で学習）なども含まれます
+「ファイル」には、通常のファイルだけでなく、ネットワーク接続や<strong>パイプ</strong>（プロセス間でデータをやり取りする仕組み、[07-ipc](../07-ipc/) で学習）なども含まれます
 
 すべてのプロセスは起動時に、以下の 3 つのファイルディスクリプタを持っています
 
@@ -222,27 +225,27 @@ GUI の「開く」は、アプリを起動してファイルを表示するこ�
 
 新しくファイルを開くと、3 以降の番号が割り当てられます
 
-### 4. 環境変数
+### [4. 環境変数](#environment-variables-ref) {#environment-variables-ref}
 
 プロセスに渡される「設定情報」のようなものです
 
-詳しくは[環境変数](#環境変数)で説明します
+詳しくは[環境変数](#environment-variables)で説明します
 
-### 5. 作業ディレクトリ
+### [5. 作業ディレクトリ](#working-directory-ref) {#working-directory-ref}
 
 プロセスが「今いる場所」です
 
 今いる場所からの位置（./file.txt など）を指定してファイルを開くときの基準になります
 
-詳しくは[作業ディレクトリ](#作業ディレクトリ)で説明します
+詳しくは[作業ディレクトリ](#working-directory)で説明します
 
-### 6. ユーザー ID とグループ ID
+### [6. ユーザー ID とグループ ID](#user-and-group-id) {#user-and-group-id}
 
 プロセスを実行しているユーザーの情報です
 
 ファイルのアクセス権限などに使われます
 
-#### 実ユーザー ID（Real UID）と実効ユーザー ID（Effective UID）
+#### [実ユーザー ID（Real UID）と実効ユーザー ID（Effective UID）](#real-vs-effective-uid) {#real-vs-effective-uid}
 
 プロセスには、実は複数のユーザー ID があります
 
@@ -256,7 +259,7 @@ GUI の「開く」は、アプリを起動してファイルを表示するこ�
 
 同様に、グループ ID にも「実グループ ID」と「実効グループ ID（EGID）」があります
 
-#### EUID が異なる例：setuid プログラム
+#### [EUID が異なる例：setuid プログラム](#setuid-program) {#setuid-program}
 
 `/usr/bin/passwd` コマンドは「setuid プログラム」の代表例です
 
@@ -276,9 +279,9 @@ GUI の「開く」は、アプリを起動してファイルを表示するこ�
 
 ---
 
-## プロセス ID（PID）とは
+## [プロセス ID（PID）とは](#what-is-pid) {#what-is-pid}
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>PID（Process ID）</strong>は、OS がすべてのプロセスに割り当てる一意の番号です
 
@@ -288,7 +291,7 @@ Linux の公式マニュアル（man ページ）には、こう書かれてい�
 
 > getpid() は、呼び出したプロセスのプロセス ID を返します
 
-### なぜ PID が必要なのか
+### [なぜ PID が必要なのか](#why-pid-is-needed) {#why-pid-is-needed}
 
 複数のプロセスが動いているとき、OS は「どのプロセスの話をしているのか」区別する必要があります
 
@@ -297,7 +300,7 @@ Linux の公式マニュアル（man ページ）には、こう書かれてい�
 - 「あのプロセスを止めたい」→ どのプロセス？
 - 「あのプロセスにメモリを割り当てたい」→ どのプロセス？
 
-### もし PID がなかったら？
+### [もし PID がなかったら？](#without-pid) {#without-pid}
 
 <strong>プログラム名で識別する場合</strong>
 
@@ -317,7 +320,7 @@ Linux の公式マニュアル（man ページ）には、こう書かれてい�
 
 正確な時刻の管理も複雑です
 
-### なぜ「番号」なのか
+### [なぜ「番号」なのか](#why-a-number) {#why-a-number}
 
 UNIX が初期に設計されたとき、マルチタスク（複数のプログラムを同時に動かす）のために、各プロセスを一意に識別する必要がありました
 
@@ -329,7 +332,7 @@ UNIX が初期に設計されたとき、マルチタスク（複数のプログ
 
 PID があることで、OS は特定のプロセスを確実に識別できます
 
-### PID の特徴
+### [PID の特徴](#pid-characteristics) {#pid-characteristics}
 
 - <strong>一意である</strong>
   - 同時に2つのプロセスが同じ PID を持つことはない
@@ -338,7 +341,7 @@ PID があることで、OS は特定のプロセスを確実に識別できま�
 - <strong>PID 1 は特別</strong>
   - Linux では、最初に起動するプロセス（init または systemd）は必ず PID 1
 
-### PPID（親プロセス ID）
+### [PPID（親プロセス ID）](#ppid) {#ppid}
 
 すべてのプロセスには「親」がいます
 
@@ -352,19 +355,19 @@ Linux の公式マニュアルには
 
 ---
 
-## プロセスの親子関係
+## [プロセスの親子関係](#parent-child-relationship) {#parent-child-relationship}
 
 先ほど PPID（親プロセス ID）について触れました
 
 ここでは、なぜすべてのプロセスに「親」がいるのか、もう少し詳しく見ていきます
 
-### すべてのプロセスには親がいる
+### [すべてのプロセスには親がいる](#every-process-has-a-parent) {#every-process-has-a-parent}
 
 Linux では、すべてのプロセスは「誰かから生まれた」ものです
 
 唯一の例外は PID 1（init または systemd）で、これは OS が直接起動します
 
-### どうやってプロセスが生まれるか
+### [どうやってプロセスが生まれるか](#how-a-process-is-born) {#how-a-process-is-born}
 
 プロセスは `fork()` という<strong>システムコール</strong>（プログラムが OS に「これをやって」とお願いする命令）で生まれます
 
@@ -376,9 +379,9 @@ Linux の公式マニュアルには
 
 つまり、プロセスは「自分のコピー」を作ることで増えます
 
-fork() の詳しい使い方は [02-fork-exec](./02-fork-exec.md) で学びます
+fork() の詳しい使い方は [02-fork-exec](../02-fork-exec/) で学びます
 
-### 親子関係の例
+### [親子関係の例](#parent-child-example) {#parent-child-example}
 
 ターミナルで `ls` コマンドを実行する場合
 
@@ -389,7 +392,7 @@ fork() の詳しい使い方は [02-fork-exec](./02-fork-exec.md) で学びま�
 5. `ls` が実行され、結果を表示して終了
 6. bash に制御が戻る
 
-### 親が先に死んだ場合
+### [親が先に死んだ場合](#when-parent-dies-first) {#when-parent-dies-first}
 
 親プロセスが先に終了すると、子プロセスは「孤児（orphan）」になります
 
@@ -403,11 +406,11 @@ systemd などのサービスマネージャがこの仕組みを使用してい
 
 ---
 
-## プロセスの状態
+## [プロセスの状態](#process-states) {#process-states}
 
 プロセスは、常に同じ状態ではありません
 
-### なぜ複数の状態が必要なのか
+### [なぜ複数の状態が必要なのか](#why-multiple-states) {#why-multiple-states}
 
 <strong>もし「実行中」と「終了」だけだったら？</strong>
 
@@ -417,33 +420,35 @@ systemd などのサービスマネージャがこの仕組みを使用してい
 
 <strong>状態を分けることで解決する問題</strong>
 
-| 状態     | 解決する問題                                               |
+{: .labeled}
+| 状態 | 解決する問題 |
 | -------- | ---------------------------------------------------------- |
-| Running  | プロセスが実際に CPU を使っていることを示す                |
-| Sleeping | 入力待ちなどのプロセスが CPU を消費しないようにする        |
-| Stopped  | デバッグや一時停止のため、プロセスを保持しつつ実行を止める |
-| Zombie   | 親プロセスが終了状態を確認するまで、終了コードを保持する   |
+| Running | プロセスが実際に CPU を使っていることを示す |
+| Sleeping | 入力待ちなどのプロセスが CPU を消費しないようにする |
+| Stopped | デバッグや一時停止のため、プロセスを保持しつつ実行を止める |
+| Zombie | 親プロセスが終了状態を確認するまで、終了コードを保持する |
 
 各状態があることで、OS は CPU を効率的に割り当てられます
 
-### 主な状態
+### [主な状態](#main-states) {#main-states}
 
-| 状態               | 英語                  | 記号 | 説明                                                    |
+{: .labeled}
+| 状態 | 英語 | 記号 | 説明 |
 | ------------------ | --------------------- | ---- | ------------------------------------------------------- |
-| 実行中/実行可能    | Running/Runnable      | R    | CPU で命令を実行中、または実行待ち                      |
-| 待機中             | Sleeping              | S    | 何かを待っている（入力待ちなど）、シグナルで中断可能    |
-| 待機中（割込不可） | Uninterruptible Sleep | D    | シグナルで中断できない待機状態（主にディスク I/O 待ち） |
-| 停止中             | Stopped               | T    | 一時停止している                                        |
-| ゾンビ             | Zombie                | Z    | 終了したが、親がまだ回収していない                      |
-| アイドル           | Idle                  | I    | OS 内部の特別なプロセスが休止中                         |
+| 実行中/実行可能 | Running/Runnable | R | CPU で命令を実行中、または実行待ち |
+| 待機中 | Sleeping | S | 何かを待っている（入力待ちなど）、シグナルで中断可能 |
+| 待機中（割込不可） | Uninterruptible Sleep | D | シグナルで中断できない待機状態（主にディスク I/O 待ち） |
+| 停止中 | Stopped | T | 一時停止している |
+| ゾンビ | Zombie | Z | 終了したが、親がまだ回収していない |
+| アイドル | Idle | I | OS 内部の特別なプロセスが休止中 |
 
-### Running（実行中/実行可能）
+### [Running（実行中/実行可能）](#running) {#running}
 
 CPU を使って実際にコードを実行している状態です
 
 実際には「実行可能」という意味も含み、CPU の順番を待っている状態も含まれます
 
-### Sleeping（待機中）
+### [Sleeping（待機中）](#sleeping) {#sleeping}
 
 何かのイベントを待っている状態です
 
@@ -457,7 +462,7 @@ CPU を使って実際にコードを実行している状態です
 
 この状態は「Interruptible Sleep（割り込み可能な待機）」とも呼ばれ、シグナルを受け取ると待機を中断できます
 
-### Uninterruptible Sleep（待機中・割込不可）
+### [Uninterruptible Sleep（待機中・割込不可）](#uninterruptible-sleep) {#uninterruptible-sleep}
 
 ディスク I/O などの完了を待っている状態です
 
@@ -477,21 +482,21 @@ CPU を使って実際にコードを実行している状態です
 
 通常のプロセスはこのシグナルで強制終了しますが、Uninterruptible Sleep 状態のプロセスは例外です
 
-シグナルについては [03-signal](./03-signal.md) で詳しく学びます
+シグナルについては [03-signal](../03-signal/) で詳しく学びます
 
-### Stopped（停止中）
+### [Stopped（停止中）](#stopped) {#stopped}
 
 一時停止している状態です
 
 `Ctrl + Z`（キーボードの Ctrl キーと Z キーを同時に押す操作）を押すと、フォアグラウンド（画面に表示されて操作中）のプロセスがこの状態になります
 
-### Zombie（ゾンビ）
+### [Zombie（ゾンビ）](#zombie) {#zombie}
 
 プロセスの実行は終了したが、親プロセスがまだ終了を確認していない状態です
 
 親が `wait()`（子プロセスの終了を待つ命令）で子の終了を確認すると、ゾンビは消えます
 
-### Idle（アイドル）
+### [Idle（アイドル）](#idle) {#idle}
 
 OS 内部で動作する特別なプロセスが休止している状態です
 
@@ -499,11 +504,11 @@ OS 内部で動作する特別なプロセスが休止している状態です
 
 ---
 
-## プロセスを観察してみよう
+## [プロセスを観察してみよう](#observing-processes) {#observing-processes}
 
 実際にプロセスを見てみましょう
 
-### ps コマンド
+### [ps コマンド](#ps-command) {#ps-command}
 
 `ps` は、プロセスの一覧を表示するコマンドです
 
@@ -525,7 +530,7 @@ ps
 ps aux
 ```
 
-### ps aux の出力の読み方
+### [ps aux の出力の読み方](#reading-ps-aux-output) {#reading-ps-aux-output}
 
 ```
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
@@ -541,21 +546,22 @@ user      1234  0.1  0.5 412312 42000 pts/0    Ss   09:05   0:02 bash
 
 <strong>物理メモリ</strong>は、実際にパソコンに搭載されているメモリ（RAM）です
 
-| 列      | 説明                           |
+{: .labeled}
+| 列 | 説明 |
 | ------- | ------------------------------ |
-| USER    | プロセスを実行しているユーザー |
-| PID     | プロセス ID                    |
-| %CPU    | CPU 使用率                     |
-| %MEM    | メモリ使用率                   |
-| VSZ     | 仮想メモリサイズ（キロバイト） |
-| RSS     | 物理メモリ使用量（キロバイト） |
-| TTY     | 接続しているターミナル         |
-| STAT    | プロセスの状態                 |
-| START   | 開始時刻                       |
-| TIME    | CPU 使用時間                   |
-| COMMAND | 実行しているコマンド           |
+| USER | プロセスを実行しているユーザー |
+| PID | プロセス ID |
+| %CPU | CPU 使用率 |
+| %MEM | メモリ使用率 |
+| VSZ | 仮想メモリサイズ（キロバイト） |
+| RSS | 物理メモリ使用量（キロバイト） |
+| TTY | 接続しているターミナル |
+| STAT | プロセスの状態 |
+| START | 開始時刻 |
+| TIME | CPU 使用時間 |
+| COMMAND | 実行しているコマンド |
 
-### pstree コマンド
+### [pstree コマンド](#pstree-command) {#pstree-command}
 
 プロセスの親子関係を木構造で表示します
 
@@ -581,15 +587,15 @@ systemd─┬─sshd───sshd───bash───pstree
 
 ---
 
-## /proc ファイルシステム
+## [/proc ファイルシステム](#proc-filesystem) {#proc-filesystem}
 
 Linux には、プロセスの情報を見るための特別な場所があります
 
-### /proc とは
+### [/proc とは](#what-is-proc) {#what-is-proc}
 
 `/proc` は<strong>疑似ファイルシステム</strong>と呼ばれます
 
-#### 疑似ファイルシステムとは
+#### [疑似ファイルシステムとは](#what-is-pseudo-filesystem) {#what-is-pseudo-filesystem}
 
 通常のファイルシステムでは、ファイルはハードディスクや SSD などの<strong>ストレージ</strong>（記憶装置）に保存されています
 
@@ -604,7 +610,7 @@ Linux には、プロセスの情報を見るための特別な場所があり�
 
 つまり、<strong>ファイルの「ふり」をしているが、実際はカーネルへの窓口</strong>です
 
-### なぜファイルシステムとして実装されているのか
+### [なぜファイルシステムとして実装されているのか](#why-implemented-as-filesystem) {#why-implemented-as-filesystem}
 
 専用のシステムコールを作る方法もありました
 
@@ -637,24 +643,25 @@ Linux の公式マニュアルには
 
 「疑似」というのは、実際のファイルがディスク上にあるわけではなく、カーネルが「ファイルのふり」をして情報を見せているということです
 
-### /proc/[pid] ディレクトリ
+### [/proc/\[pid\] ディレクトリ](#proc-pid-directory) {#proc-pid-directory}
 
 各プロセスには、`/proc/[PID]/` というディレクトリがあります
 
 例えば、PID が 1234 のプロセスの情報は `/proc/1234/` にあります
 
-### よく使うファイル
+### [よく使うファイル](#commonly-used-files) {#commonly-used-files}
 
-| ファイル            | 内容                               |
+{: .labeled}
+| ファイル | 内容 |
 | ------------------- | ---------------------------------- |
-| /proc/[pid]/cmdline | プロセスを起動したコマンドライン   |
-| /proc/[pid]/status  | プロセスの状態（詳細）             |
-| /proc/[pid]/fd/     | 開いているファイルディスクリプタ   |
-| /proc/[pid]/maps    | メモリマップ                       |
-| /proc/[pid]/environ | 環境変数                           |
-| /proc/[pid]/cwd     | 作業ディレクトリへのリンク         |
-| /proc/[pid]/exe     | 実行ファイルへのシンボリックリンク |
-| /proc/[pid]/root    | ルートディレクトリへのリンク       |
+| /proc/[pid]/cmdline | プロセスを起動したコマンドライン |
+| /proc/[pid]/status | プロセスの状態（詳細） |
+| /proc/[pid]/fd/ | 開いているファイルディスクリプタ |
+| /proc/[pid]/maps | メモリマップ |
+| /proc/[pid]/environ | 環境変数 |
+| /proc/[pid]/cwd | 作業ディレクトリへのリンク |
+| /proc/[pid]/exe | 実行ファイルへのシンボリックリンク |
+| /proc/[pid]/root | ルートディレクトリへのリンク |
 
 <strong>シンボリックリンク</strong>とは、別のファイルやディレクトリを指し示す特殊なファイルです
 
@@ -666,7 +673,7 @@ Windows のショートカットや macOS のエイリアスに似ています
 
 すべてのファイルとディレクトリは、ここから始まる階層構造に配置されています
 
-### /proc/self
+### [/proc/self](#proc-self) {#proc-self}
 
 `/proc/self` は特別なリンクで、「自分自身のプロセス」を指します
 
@@ -674,11 +681,11 @@ Windows のショートカットや macOS のエイリアスに似ています
 
 ---
 
-## メモリの構造
+## [メモリの構造](#memory-structure) {#memory-structure}
 
 プロセスには、OS から割り当てられた専用のメモリ空間があります
 
-### なぜメモリを複数の領域に分けるのか
+### [なぜメモリを複数の領域に分けるのか](#why-divide-memory-regions) {#why-divide-memory-regions}
 
 <strong>もし分けなかったら？</strong>
 
@@ -694,29 +701,29 @@ Windows のショートカットや macOS のエイリアスに似ています
 - <strong>共有</strong>：同じプログラムを複数起動したとき、コード領域を共有できる（メモリ節約）
 - <strong>効率</strong>：ヒープとスタックを柔軟に成長させられる
 
-### メモリ領域の種類
+### [メモリ領域の種類](#memory-region-types) {#memory-region-types}
 
 プロセスのメモリは、大きく分けて以下の領域（セグメント）に分かれています
 
-#### <strong>1. テキストセグメント（Text Segment）</strong>
+#### [<strong>1. テキストセグメント（Text Segment）</strong>](#text-segment) {#text-segment}
 
 プログラムのコード（命令）が置かれる場所です
 
 読み取り専用で、実行中に変更されることはありません
 
-#### <strong>2. データセグメント（Data Segment）</strong>
+#### [<strong>2. データセグメント（Data Segment）</strong>](#data-segment) {#data-segment}
 
 初期値を持つグローバル変数（プログラム全体で使える変数）が置かれる場所です
 
 プログラムの開始時に、ファイルから読み込まれます
 
-#### <strong>3. BSS セグメント（BSS Segment）</strong>
+#### [<strong>3. BSS セグメント（BSS Segment）</strong>](#bss-segment) {#bss-segment}
 
 初期値を持たない（ゼロで初期化される）グローバル変数が置かれる場所です
 
 「BSS」は「Block Started by Symbol」の略です
 
-#### <strong>4. ヒープ（Heap）</strong>
+#### [<strong>4. ヒープ（Heap）</strong>](#heap) {#heap}
 
 `malloc()` などで動的に確保（プログラムの実行中に必要に応じて確保）されるメモリの場所です
 
@@ -728,29 +735,30 @@ Linux の公式マニュアルには
 
 > malloc() 関数は、指定されたバイト数を割り当て、割り当てられたメモリへのポインタ（メモリの場所を指し示す値）を返します
 
-#### <strong>5. スタック（Stack）</strong>
+#### [<strong>5. スタック（Stack）</strong>](#stack) {#stack}
 
 ローカル変数（関数の中だけで使える変数）や関数呼び出しの情報が置かれる場所です
 
 関数を呼び出すと増え、関数から戻ると減ります
 
-### メモリ領域の配置
+### [メモリ領域の配置](#memory-region-layout) {#memory-region-layout}
 
 Linux では、メモリは以下のように低いアドレスから順に配置されます
 
-| アドレス | 領域               | 成長方向             |
+{: .labeled}
+| アドレス | 領域 | 成長方向 |
 | -------- | ------------------ | -------------------- |
-| 低       | テキストセグメント | （固定）             |
-| ↓        | データセグメント   | （固定）             |
-| ↓        | BSS セグメント     | （固定）             |
-| ↓        | ヒープ             | ↓ 高いアドレスへ成長 |
-| ↓        | （空き領域）       |                      |
-| ↓        | スタック           | ↑ 低いアドレスへ成長 |
-| 高       |                    |                      |
+| 低 | テキストセグメント | （固定） |
+| ↓ | データセグメント | （固定） |
+| ↓ | BSS セグメント | （固定） |
+| ↓ | ヒープ | ↓ 高いアドレスへ成長 |
+| ↓ | （空き領域） | |
+| ↓ | スタック | ↑ 低いアドレスへ成長 |
+| 高 | | |
 
 ヒープとスタックは互いに向かって成長します
 
-#### なぜ逆方向に成長するのか
+#### [なぜ逆方向に成長するのか](#why-grow-in-opposite-directions) {#why-grow-in-opposite-directions}
 
 ヒープとスタックが逆方向に成長する理由は、<strong>メモリを効率よく使うため</strong>です
 
@@ -779,9 +787,9 @@ Linux では、メモリは以下のように低いアドレスから順に配�
 
 ---
 
-## 環境変数
+## [環境変数](#environment-variables) {#environment-variables}
 
-### 環境変数とは
+### [環境変数とは](#what-are-environment-variables) {#what-are-environment-variables}
 
 <strong>環境変数</strong>は、プロセスに渡される「名前=値」の形式の設定情報です
 
@@ -791,7 +799,7 @@ Linux の公式マニュアルには
 
 > 変数 environ は、「環境」と呼ばれる文字列へのポインタの配列を指します
 
-### なぜコマンドライン引数ではなく環境変数を使うのか
+### [なぜコマンドライン引数ではなく環境変数を使うのか](#why-env-vars-not-args) {#why-env-vars-not-args}
 
 設定情報を渡す方法として、コマンドライン引数（`./program --config=value`）もあります
 
@@ -809,18 +817,19 @@ Linux の公式マニュアルには
 - <strong>多くのプログラムで共有できる</strong>：PATH や LANG など、複数のプログラムが参照する設定に便利
 - <strong>プログラムのコードを変えずに動作を変更できる</strong>：DEBUG=1 などで動作を切り替えられる
 
-### よく使う環境変数
+### [よく使う環境変数](#common-environment-variables) {#common-environment-variables}
 
-| 変数名 | 説明                     |
+{: .labeled}
+| 変数名 | 説明 |
 | ------ | ------------------------ |
-| PATH   | コマンドを探す場所の一覧 |
-| HOME   | ホームディレクトリ       |
-| USER   | ユーザー名               |
-| SHELL  | 使用しているシェル       |
-| PWD    | 現在の作業ディレクトリ   |
-| LANG   | 言語設定                 |
+| PATH | コマンドを探す場所の一覧 |
+| HOME | ホームディレクトリ |
+| USER | ユーザー名 |
+| SHELL | 使用しているシェル |
+| PWD | 現在の作業ディレクトリ |
+| LANG | 言語設定 |
 
-### 環境変数の確認方法
+### [環境変数の確認方法](#how-to-check-env-vars) {#how-to-check-env-vars}
 
 <strong>すべての環境変数を表示</strong>
 
@@ -834,7 +843,7 @@ env
 echo $HOME
 ```
 
-### 環境変数の継承
+### [環境変数の継承](#env-var-inheritance) {#env-var-inheritance}
 
 子プロセスは、親プロセスの環境変数を引き継ぎます
 
@@ -842,9 +851,9 @@ echo $HOME
 
 ---
 
-## 作業ディレクトリ
+## [作業ディレクトリ](#working-directory) {#working-directory}
 
-### 作業ディレクトリとは
+### [作業ディレクトリとは](#what-is-working-directory) {#what-is-working-directory}
 
 <strong>作業ディレクトリ（Current Working Directory）</strong>は、プロセスが「今いる場所」です
 
@@ -856,13 +865,13 @@ Linux の公式マニュアルには
 
 > getcwd() は、現在の作業ディレクトリのルートからの完全な場所をコピーします
 
-### 作業ディレクトリの確認
+### [作業ディレクトリの確認](#checking-working-directory) {#checking-working-directory}
 
 ```bash
 pwd
 ```
 
-### 作業ディレクトリの変更
+### [作業ディレクトリの変更](#changing-working-directory) {#changing-working-directory}
 
 ```bash
 cd /path/to/directory
@@ -870,75 +879,76 @@ cd /path/to/directory
 
 ---
 
-## 用語集
-
-| 用語                   | 英語                 | 説明                                                       |
-| ---------------------- | -------------------- | ---------------------------------------------------------- |
-| プロセス               | Process              | 実行中のプログラム                                         |
-| プログラム             | Program              | ディスク上の実行ファイル                                   |
-| プロセス ID            | Process ID / PID     | プロセスを識別する番号                                     |
-| 一意                   | Unique               | 他と重複しない唯一の値                                     |
-| 親プロセス             | Parent Process       | あるプロセスを生んだプロセス                               |
-| 子プロセス             | Child Process        | あるプロセスから生まれたプロセス                           |
-| 孤児プロセス           | Orphan Process       | 親プロセスが先に終了したプロセス（PID 1 等に引き取られる） |
-| ゾンビプロセス         | Zombie Process       | 終了したが、親が wait() していないプロセス                 |
-| デーモン               | Daemon               | バックグラウンドで動作するサービス用プロセス               |
-| フォアグラウンド       | Foreground           | ターミナルと対話中のプロセス                               |
-| バックグラウンド       | Background           | ターミナルから切り離されて動作するプロセス                 |
-| システムコール         | System Call          | OS の機能を呼び出す仕組み                                  |
-| シグナル               | Signal               | プロセスに送る通知（割り込みや終了要求など）               |
-| ファイルディスクリプタ | File Descriptor      | 開いているファイルを識別する番号                           |
-| パイプ                 | Pipe                 | プロセス間でデータをやり取りする仕組み                     |
-| 環境変数               | Environment Variable | プロセスに渡される設定情報                                 |
-| 作業ディレクトリ       | Working Directory    | プロセスが「今いる場所」                                   |
-| ルートディレクトリ     | Root Directory       | ファイルシステムの最上位（/）                              |
-| シンボリックリンク     | Symbolic Link        | 別のファイルやディレクトリを指し示す特殊なファイル         |
-| 仮想メモリ             | Virtual Memory       | OS がプロセスに見せかけているメモリ空間                    |
-| 物理メモリ             | Physical Memory      | 実際にパソコンに搭載されているメモリ（RAM）                |
-| ヒープ                 | Heap                 | 動的に確保されるメモリ領域                                 |
-| スタック               | Stack                | ローカル変数が置かれるメモリ領域                           |
-| 再帰                   | Recursion            | 関数が自分自身を呼び出すプログラミング技法                 |
-| I/O                    | Input/Output         | データの入力と出力                                         |
-| プロセステーブル       | Process Table        | カーネルが管理するプロセス一覧                             |
-| コンテキストスイッチ   | Context Switch       | CPU が実行するプロセスを切り替えること                     |
-| ドライバ               | Driver               | ハードウェアを制御するソフトウェア                         |
-| シェル                 | Shell                | コマンドを受け付けて実行するプログラム（bash、zsh など）   |
-| ターミナル             | Terminal             | シェルを動かすための画面（ウィンドウ）                     |
-| SSH                    | Secure Shell         | 安全にリモートログインするためのプロトコル                 |
-| setuid                 | Set User ID          | 実行時に特定ユーザーの権限で動作する仕組み                 |
-| subreaper              | Subreaper            | 孤児プロセスを引き取る役割を持つプロセス                   |
-
----
-
-## 参考資料
-
-このページの内容は、以下のソースに基づいています
-
-- [getpid(2) - Linux manual page](https://man7.org/linux/man-pages/man2/getpid.2.html)
-  - PID と PPID の取得
-- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html)
-  - プロセスの生成
-- [proc(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc.5.html)
-  - /proc ファイルシステム
-- [malloc(3) - Linux manual page](https://man7.org/linux/man-pages/man3/malloc.3.html)
-  - メモリの動的割り当て
-- [environ(7) - Linux manual page](https://man7.org/linux/man-pages/man7/environ.7.html)
-  - 環境変数
-- [getcwd(2) - Linux manual page](https://man7.org/linux/man-pages/man2/getcwd.2.html)
-  - 作業ディレクトリ
-- [prctl(2) - Linux manual page](https://man7.org/linux/man-pages/man2/prctl.2.html)
-  - PR_SET_CHILD_SUBREAPER（subreaper の設定）
-
----
-
-## 次のステップ
+## [次のステップ](#next-steps) {#next-steps}
 
 このトピックでは、「プロセスとは何か」を観察を通じて学びました
 
-次の [02-fork-exec](./02-fork-exec.md) では、実際にプロセスを作る方法を学びます
+次の [02-fork-exec](../02-fork-exec/) では、実際にプロセスを作る方法を学びます
 
 - なぜすべてのプロセスに「親」がいるのか
 - 新しいプログラムはどのように起動されるのか
 - シェルがコマンドを実行する仕組み
 
 これらの疑問に答えます
+
+---
+
+## [用語集](#glossary) {#glossary}
+
+{: .labeled}
+| 用語 | 英語 | 説明 |
+| ---------------------- | -------------------- | ---------------------------------------------------------- |
+| プロセス | Process | 実行中のプログラム |
+| プログラム | Program | ディスク上の実行ファイル |
+| プロセス ID | Process ID / PID | プロセスを識別する番号 |
+| 一意 | Unique | 他と重複しない唯一の値 |
+| 親プロセス | Parent Process | あるプロセスを生んだプロセス |
+| 子プロセス | Child Process | あるプロセスから生まれたプロセス |
+| 孤児プロセス | Orphan Process | 親プロセスが先に終了したプロセス（PID 1 等に引き取られる） |
+| ゾンビプロセス | Zombie Process | 終了したが、親が wait() していないプロセス |
+| デーモン | Daemon | バックグラウンドで動作するサービス用プロセス |
+| フォアグラウンド | Foreground | ターミナルと対話中のプロセス |
+| バックグラウンド | Background | ターミナルから切り離されて動作するプロセス |
+| システムコール | System Call | OS の機能を呼び出す仕組み |
+| シグナル | Signal | プロセスに送る通知（割り込みや終了要求など） |
+| ファイルディスクリプタ | File Descriptor | 開いているファイルを識別する番号 |
+| パイプ | Pipe | プロセス間でデータをやり取りする仕組み |
+| 環境変数 | Environment Variable | プロセスに渡される設定情報 |
+| 作業ディレクトリ | Working Directory | プロセスが「今いる場所」 |
+| ルートディレクトリ | Root Directory | ファイルシステムの最上位（/） |
+| シンボリックリンク | Symbolic Link | 別のファイルやディレクトリを指し示す特殊なファイル |
+| 仮想メモリ | Virtual Memory | OS がプロセスに見せかけているメモリ空間 |
+| 物理メモリ | Physical Memory | 実際にパソコンに搭載されているメモリ（RAM） |
+| ヒープ | Heap | 動的に確保されるメモリ領域 |
+| スタック | Stack | ローカル変数が置かれるメモリ領域 |
+| 再帰 | Recursion | 関数が自分自身を呼び出すプログラミング技法 |
+| I/O | Input/Output | データの入力と出力 |
+| プロセステーブル | Process Table | カーネルが管理するプロセス一覧 |
+| コンテキストスイッチ | Context Switch | CPU が実行するプロセスを切り替えること |
+| ドライバ | Driver | ハードウェアを制御するソフトウェア |
+| シェル | Shell | コマンドを受け付けて実行するプログラム（bash、zsh など） |
+| ターミナル | Terminal | シェルを動かすための画面（ウィンドウ） |
+| SSH | Secure Shell | 安全にリモートログインするためのプロトコル |
+| setuid | Set User ID | 実行時に特定ユーザーの権限で動作する仕組み |
+| subreaper | Subreaper | 孤児プロセスを引き取る役割を持つプロセス |
+
+---
+
+## [参考資料](#references) {#references}
+
+このページの内容は、以下のソースに基づいています
+
+- [getpid(2) - Linux manual page](https://man7.org/linux/man-pages/man2/getpid.2.html){:target="\_blank"}
+  - PID と PPID の取得
+- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html){:target="\_blank"}
+  - プロセスの生成
+- [proc(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc.5.html){:target="\_blank"}
+  - /proc ファイルシステム
+- [malloc(3) - Linux manual page](https://man7.org/linux/man-pages/man3/malloc.3.html){:target="\_blank"}
+  - メモリの動的割り当て
+- [environ(7) - Linux manual page](https://man7.org/linux/man-pages/man7/environ.7.html){:target="\_blank"}
+  - 環境変数
+- [getcwd(2) - Linux manual page](https://man7.org/linux/man-pages/man2/getcwd.2.html){:target="\_blank"}
+  - 作業ディレクトリ
+- [prctl(2) - Linux manual page](https://man7.org/linux/man-pages/man2/prctl.2.html){:target="\_blank"}
+  - PR_SET_CHILD_SUBREAPER（subreaper の設定）

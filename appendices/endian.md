@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜhtonl()が必要なのか
+---
 
-# なぜhtonl()が必要なのか
+# [なぜhtonl()が必要なのか](#why-htonl-is-needed) {#why-htonl-is-needed}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[07-ipc](../07-ipc.md) で、UNIX ドメインソケットを学びました
+[07-ipc](../../07-ipc/) で、UNIX ドメインソケットを学びました
 
 UNIX ドメインソケットは「ネットワークプログラミングへの橋渡し」と説明しました
 
@@ -27,20 +28,20 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [エンディアンとは何か](#エンディアンとは何か)
-- [なぜhtonl()が必要なのか](#なぜhtonlが必要なのか)
-- [バイトオーダー変換関数](#バイトオーダー変換関数)
-- [自分の環境のエンディアンを確認する](#自分の環境のエンディアンを確認する)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [エンディアンとは何か](#what-is-endianness)
+- [なぜhtonl()が必要なのか](#why-htonl-is-needed-detail)
+- [バイトオーダー変換関数](#byte-order-conversion-functions)
+- [自分の環境のエンディアンを確認する](#checking-your-endianness)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## エンディアンとは何か
+## [エンディアンとは何か](#what-is-endianness) {#what-is-endianness}
 
-### バイトの並び順
+### [バイトの並び順](#byte-order) {#byte-order}
 
 <strong>エンディアン</strong>とは、複数バイトのデータをメモリに格納するときの「バイトの並び順」のことです
 
@@ -60,7 +61,7 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 <strong>LSB</strong> は Least Significant Byte（最下位バイト）の略です
 
-### ビッグエンディアンとリトルエンディアン
+### [ビッグエンディアンとリトルエンディアン](#endian-big-vs-little) {#endian-big-vs-little}
 
 エンディアンには 2 種類あります
 
@@ -90,17 +91,18 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 人間には読みにくいですが、CPU にとっては処理しやすい場合があります
 
-### 主要な CPU アーキテクチャ
+### [主要な CPU アーキテクチャ](#major-cpu-architectures) {#major-cpu-architectures}
 
 現在使われている主要な CPU は、ほとんどがリトルエンディアンです
 
-| アーキテクチャ    | エンディアン       |
+{: .labeled}
+| アーキテクチャ | エンディアン |
 | ----------------- | ------------------ |
-| x86 / x86-64      | リトルエンディアン |
+| x86 / x86-64 | リトルエンディアン |
 | ARM（デフォルト） | リトルエンディアン |
-| Apple Silicon     | リトルエンディアン |
-| RISC-V            | リトルエンディアン |
-| ネットワーク      | ビッグエンディアン |
+| Apple Silicon | リトルエンディアン |
+| RISC-V | リトルエンディアン |
+| ネットワーク | ビッグエンディアン |
 
 ※ ARM は bi-endian（両方に対応可能）ですが、実用上はリトルエンディアンがデフォルトです
 
@@ -108,17 +110,18 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 これを<strong>ネットワークバイトオーダー</strong>といいます
 
-### なぜ 2 種類のエンディアンが存在するのか
+### [なぜ 2 種類のエンディアンが存在するのか](#why-two-types-of-endianness) {#why-two-types-of-endianness}
 
 <strong>歴史的背景</strong>
 
 1960〜70 年代、各 CPU メーカーは独自の判断でエンディアンを決定しました
 
-| 時代     | メーカー | エンディアン | 理由                               |
+{: .labeled}
+| 時代 | メーカー | エンディアン | 理由 |
 | -------- | -------- | ------------ | ---------------------------------- |
-| 1960年代 | IBM      | ビッグ       | 人間が読みやすい順序               |
-| 1970年代 | Intel    | リトル       | 加算時に下位バイトから処理しやすい |
-| 1980年代 | ARM      | 両対応       | 互換性のため                       |
+| 1960年代 | IBM | ビッグ | 人間が読みやすい順序 |
+| 1970年代 | Intel | リトル | 加算時に下位バイトから処理しやすい |
+| 1980年代 | ARM | 両対応 | 互換性のため |
 
 <strong>リトルエンディアンの技術的利点</strong>
 
@@ -136,7 +139,7 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 また、ビッグエンディアンは人間が読みやすく、プロトコル仕様書の記述と一致するため、標準として採用されました
 
-### 語源
+### [語源](#etymology) {#etymology}
 
 「エンディアン」という名前は、ジョナサン・スウィフトの小説『ガリバー旅行記』に由来します
 
@@ -146,9 +149,9 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 ---
 
-## なぜhtonl()が必要なのか
+## [なぜhtonl()が必要なのか](#why-htonl-is-needed-detail) {#why-htonl-is-needed-detail}
 
-### 問題：CPU によってバイト順が異なる
+### [問題：CPU によってバイト順が異なる](#problem-different-byte-orders) {#problem-different-byte-orders}
 
 異なるエンディアンの CPU 間でデータをやり取りすると、値が正しく解釈されません
 
@@ -165,7 +168,7 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 ─── 本来の 8080 とは全く違う値！
 ```
 
-### 解決策：ネットワークバイトオーダー
+### [解決策：ネットワークバイトオーダー](#solution-network-byte-order) {#solution-network-byte-order}
 
 この問題を解決するため、ネットワーク通信では<strong>ネットワークバイトオーダー（ビッグエンディアン）</strong>を使うことが標準化されています
 
@@ -181,7 +184,7 @@ addr.sin_addr.s_addr = htonl(INADDR_ANY);
 ─── ntohl()、ntohs() を使用
 ```
 
-### 使用例
+### [使用例](#usage-example) {#usage-example}
 
 TCP/IP ソケットプログラミングでは、IP アドレスやポート番号を設定するときに変換が必要です
 
@@ -202,9 +205,9 @@ server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 ---
 
-## バイトオーダー変換関数
+## [バイトオーダー変換関数](#byte-order-conversion-functions) {#byte-order-conversion-functions}
 
-### 4 つの変換関数
+### [4 つの変換関数](#four-conversion-functions) {#four-conversion-functions}
 
 `<arpa/inet.h>` ヘッダで定義されている 4 つの関数があります
 
@@ -217,17 +220,18 @@ uint32_t ntohl(uint32_t netlong);    /* network to host long */
 uint16_t ntohs(uint16_t netshort);   /* network to host short */
 ```
 
-### 関数名の覚え方
+### [関数名の覚え方](#how-to-remember-function-names) {#how-to-remember-function-names}
 
 関数名は略語の組み合わせです
 
-| 略語 | 意味               |
+{: .labeled}
+| 略語 | 意味 |
 | ---- | ------------------ |
-| h    | host（ホスト）     |
-| n    | network            |
-| to   | ～へ変換           |
-| l    | long（32 ビット）  |
-| s    | short（16 ビット） |
+| h | host（ホスト） |
+| n | network |
+| to | ～へ変換 |
+| l | long（32 ビット） |
+| s | short（16 ビット） |
 
 ```
 htonl = host to network long
@@ -237,14 +241,15 @@ ntohs = network to host short
 ─── ネットワークのバイト順 → ホストのバイト順（16 ビット）
 ```
 
-### 使い分け
+### [使い分け](#when-to-use-which) {#when-to-use-which}
 
-| 用途                       | 関数          |
+{: .labeled}
+| 用途 | 関数 |
 | -------------------------- | ------------- |
-| ポート番号（16 ビット）    | htons / ntohs |
+| ポート番号（16 ビット） | htons / ntohs |
 | IPv4 アドレス（32 ビット） | htonl / ntohl |
 
-### ビッグエンディアン環境では何もしない
+### [ビッグエンディアン環境では何もしない](#no-op-on-big-endian) {#no-op-on-big-endian}
 
 すでにビッグエンディアンの環境では、ホストバイトオーダーとネットワークバイトオーダーが同じです
 
@@ -259,9 +264,9 @@ htonl(x) == x  /* 変換不要なのでそのまま返す */
 
 ---
 
-## 自分の環境のエンディアンを確認する
+## [自分の環境のエンディアンを確認する](#checking-your-endianness) {#checking-your-endianness}
 
-### 方法 1：union を使う
+### [方法 1：union を使う](#method-1-using-union) {#method-1-using-union}
 
 C99 以降では、union を使った方法が一般的です
 
@@ -299,7 +304,7 @@ int main(void)
 メモリ配置：0x04 0x03 0x02 0x01
 ```
 
-### 方法 2：ポインタキャストを使う
+### [方法 2：ポインタキャストを使う](#method-2-pointer-cast) {#method-2-pointer-cast}
 
 より簡潔な方法です
 
@@ -325,7 +330,7 @@ int main(void)
 
 リトルエンディアンなら最下位バイトが先頭（低いアドレス）に来るため、`*c == 1` になります
 
-### 方法 3：htonl() を使う
+### [方法 3：htonl() を使う](#method-3-using-htonl) {#method-3-using-htonl}
 
 ネットワーク関数を使った確認方法です
 
@@ -351,16 +356,17 @@ int main(void)
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 用語                       | 意味                                      |
+{: .labeled}
+| 用語 | 意味 |
 | -------------------------- | ----------------------------------------- |
-| エンディアン               | 複数バイトのデータをメモリに格納する順序  |
-| ビッグエンディアン         | 最上位バイトを先に格納する方式            |
-| リトルエンディアン         | 最下位バイトを先に格納する方式            |
-| ネットワークバイトオーダー | ネットワーク通信で使う標準順序（ビッグ）  |
-| htonl() / htons()          | ホスト → ネットワークバイトオーダーに変換 |
-| ntohl() / ntohs()          | ネットワーク → ホストバイトオーダーに変換 |
+| エンディアン | 複数バイトのデータをメモリに格納する順序 |
+| ビッグエンディアン | 最上位バイトを先に格納する方式 |
+| リトルエンディアン | 最下位バイトを先に格納する方式 |
+| ネットワークバイトオーダー | ネットワーク通信で使う標準順序（ビッグ） |
+| htonl() / htons() | ホスト → ネットワークバイトオーダーに変換 |
+| ntohl() / ntohs() | ネットワーク → ホストバイトオーダーに変換 |
 
 <strong>覚えておくこと</strong>
 
@@ -371,22 +377,22 @@ int main(void)
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [htonl(3p) - Linux manual page](https://man7.org/linux/man-pages/man3/htonl.3p.html)
+- [htonl(3p) - Linux manual page](https://man7.org/linux/man-pages/man3/htonl.3p.html){:target="\_blank"}
   - POSIX 準拠のバイトオーダー変換関数
-- [byteorder(3) - Linux manual page](https://man7.org/linux/man-pages/man3/htons.3.html)
+- [byteorder(3) - Linux manual page](https://man7.org/linux/man-pages/man3/htons.3.html){:target="\_blank"}
   - Linux でのバイトオーダー変換関数
 
 <strong>GNU C Library</strong>
 
-- [Byte Order - GNU C Library](https://sourceware.org/glibc/manual/latest/html_node/Byte-Order.html)
+- [Byte Order - GNU C Library](https://sourceware.org/glibc/manual/latest/html_node/Byte-Order.html){:target="\_blank"}
   - バイトオーダー変換関数の公式ドキュメント
 
 <strong>本編との関連</strong>
 
-- [07-ipc](../07-ipc.md)
+- [07-ipc](../../07-ipc/)
   - UNIX ドメインソケットの基礎
   - ネットワークプログラミングへの橋渡し

@@ -1,16 +1,17 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: プロセス間通信
+---
 
-# 07-ipc：プロセス間通信
+# [07-ipc：プロセス間通信](#inter-process-communication) {#inter-process-communication}
 
 プロセス同士が<strong>データをやり取りする仕組み</strong>を学びます
 
 ---
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-前のトピック（[06-stdio](./06-stdio.md)）では、標準入出力ライブラリを学びました
+前のトピック（[06-stdio](../06-stdio/)）では、標準入出力ライブラリを学びました
 
 - FILE 構造体と fd（ファイルディスクリプタ）の関係
 - printf()、fopen() などの便利な関数
@@ -18,13 +19,13 @@
 
 <strong>FILE 構造体</strong>とは、fd にバッファやエラー情報を追加した、より使いやすい形式のことです
 
-詳しくは [06-stdio](./06-stdio.md) を参照してください
+詳しくは [06-stdio](../06-stdio/) を参照してください
 
 ここまでの学習は、すべて「1 つのプロセス内」でのデータの流れでした
 
 では、<strong>別のプロセスにデータを渡したい</strong>ときはどうすればよいでしょうか？
 
-[03-signal](./03-signal.md) で、シグナルは「プロセス間通信の限定的な形式」と説明しました
+[03-signal](../03-signal/) で、シグナルは「プロセス間通信の限定的な形式」と説明しました
 
 シグナルでは「通知」は送れますが、「データ」は送れません
 
@@ -34,7 +35,7 @@
 
 ---
 
-## 日常の例え
+## [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 プロセス間通信を「家族間の連絡」に例えてみましょう
 
@@ -82,7 +83,7 @@
 
 ---
 
-## このページで学ぶこと
+## [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 このトピックでは、以下のシステムコールと関数を学びます
 
@@ -130,31 +131,31 @@
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [プロセス間通信とは何か](#プロセス間通信とは何か)
-2. [IPC の種類と比較](#ipc-の種類と比較)
-3. [パイプとは](#パイプとは)
-4. [pipe() システムコール](#pipe-システムコール)
-5. [親子プロセス間でのパイプ通信](#親子プロセス間でのパイプ通信)
-6. [dup2() によるパイプとコマンドの連携](#dup2-によるパイプとコマンドの連携)
-7. [名前付きパイプ（FIFO）](#名前付きパイプfifo)
-8. [共有メモリの基礎](#共有メモリの基礎)
-9. [UNIX ドメインソケットの基礎](#unix-ドメインソケットの基礎)
-10. [IPC の選び方](#ipc-の選び方)
-11. [まとめ：このリポジトリで学んだこと](#まとめこのリポジトリで学んだこと)
-12. [用語集](#用語集)
-13. [参考資料](#参考資料)
+1. [プロセス間通信とは何か](#what-is-ipc)
+2. [IPC の種類と比較](#ipc-types-and-comparison)
+3. [パイプとは](#what-is-a-pipe)
+4. [pipe() システムコール](#pipe-system-call)
+5. [親子プロセス間でのパイプ通信](#pipe-communication-between-parent-child)
+6. [dup2() によるパイプとコマンドの連携](#pipe-and-command-integration-with-dup2)
+7. [名前付きパイプ（FIFO）](#named-pipe-fifo)
+8. [共有メモリの基礎](#shared-memory-basics)
+9. [UNIX ドメインソケットの基礎](#unix-domain-socket-basics)
+10. [IPC の選び方](#how-to-choose-ipc)
+11. [まとめ：このリポジトリで学んだこと](#summary-what-you-learned)
+12. [用語集](#glossary)
+13. [参考資料](#references)
 
 ---
 
-## プロセス間通信とは何か
+## [プロセス間通信とは何か](#what-is-ipc) {#what-is-ipc}
 
 <strong>プロセス間通信（IPC）</strong>とは、異なるプロセスがデータをやり取りする仕組みです
 
 なぜ必要なのでしょうか？
 
-[01-process](./01-process.md) で学んだように、各プロセスは独立したメモリ空間を持っています
+[01-process](../01-process/) で学んだように、各プロセスは独立したメモリ空間を持っています
 
 あるプロセスが変数に値を書き込んでも、別のプロセスからはその値が見えません
 
@@ -166,27 +167,29 @@
 
 ---
 
-## IPC の種類と比較
+## [IPC の種類と比較](#ipc-types-and-comparison) {#ipc-types-and-comparison}
 
 Linux には複数の IPC 方式があります
 
-| 方式          | 方向   | 速度 | 血縁関係 | 用途                        |
+{: .labeled}
+| 方式 | 方向 | 速度 | 血縁関係 | 用途 |
 | ------------- | ------ | ---- | -------- | --------------------------- |
-| パイプ        | 一方向 | 中   | 必要     | 親子プロセス間の単純な通信  |
-| FIFO          | 一方向 | 中   | 不要     | 無関係なプロセス間の通信    |
-| 共有メモリ    | 双方向 | 高   | 不要     | 大量データの高速共有        |
-| UNIX ソケット | 双方向 | 中   | 不要     | クライアント/サーバー型通信 |
+| パイプ | 一方向 | 中 | 必要 | 親子プロセス間の単純な通信 |
+| FIFO | 一方向 | 中 | 不要 | 無関係なプロセス間の通信 |
+| 共有メモリ | 双方向 | 高 | 不要 | 大量データの高速共有 |
+| UNIX ソケット | 双方向 | 中 | 不要 | クライアント/サーバー型通信 |
 
-### なぜ複数の IPC 方式があるのか
+### [なぜ複数の IPC 方式があるのか](#why-multiple-ipc-methods) {#why-multiple-ipc-methods}
 
 <strong>もし 1 つの IPC で全てをまかなおうとしたら？</strong>
 
-| 要件             | 理想的な IPC    | 理由                         |
+{: .labeled}
+| 要件 | 理想的な IPC | 理由 |
 | ---------------- | --------------- | ---------------------------- |
-| 単純な親子通信   | パイプ          | 設定が最小限、名前解決が不要 |
-| 大量データ転送   | 共有メモリ      | コピーなしで最速             |
-| 双方向通信       | ソケット        | 設計がシンプル               |
-| 無関係なプロセス | FIFO / ソケット | 名前でアクセス可能           |
+| 単純な親子通信 | パイプ | 設定が最小限、名前解決が不要 |
+| 大量データ転送 | 共有メモリ | コピーなしで最速 |
+| 双方向通信 | ソケット | 設計がシンプル |
+| 無関係なプロセス | FIFO / ソケット | 名前でアクセス可能 |
 
 <strong>1 つの方式では、すべての要件を効率よく満たせません</strong>
 
@@ -204,11 +207,11 @@ FIFO、共有メモリ、ソケットは「名前」でアクセスするため�
 
 ---
 
-## パイプとは
+## [パイプとは](#what-is-a-pipe) {#what-is-a-pipe}
 
 <strong>パイプ</strong>は、プロセス間でデータを流すための「管」のようなものです
 
-### パイプの2つの端
+### [パイプの2つの端](#two-ends-of-pipe) {#two-ends-of-pipe}
 
 パイプには2つの端があります
 
@@ -227,7 +230,7 @@ ls | wc -l
 
 ls は stdout に出力しているだけですが、シェルが stdout をパイプに接続しています
 
-### なぜパイプは親子間限定なのか
+### [なぜパイプは親子間限定なのか](#why-pipe-is-parent-child-only) {#why-pipe-is-parent-child-only}
 
 パイプは fork() で作った親子プロセス間でしか使えません
 
@@ -241,17 +244,18 @@ ls は stdout に出力しているだけですが、シェルが stdout をパ�
 
 親子間限定にすることで、これらの複雑さを避けられます
 
-| 特徴 | 親子間限定の利点                  |
+{: .labeled}
+| 特徴 | 親子間限定の利点 |
 | ---- | --------------------------------- |
 | 識別 | fd 番号だけで済む（名前解決不要） |
-| 権限 | 親子なので自動的に信頼関係がある  |
-| 速度 | 設定が最小限で高速                |
+| 権限 | 親子なので自動的に信頼関係がある |
+| 速度 | 設定が最小限で高速 |
 
 「名前でアクセスしたい」場合は、FIFO（名前付きパイプ）やソケットを使います
 
 用途に応じて仕組みを使い分けるのが UNIX の設計思想です
 
-### パイプの特徴
+### [パイプの特徴](#pipe-characteristics) {#pipe-characteristics}
 
 - <strong>一方向（Unidirectional）</strong>
   - データは一方向にしか流れません
@@ -268,7 +272,7 @@ ls は stdout に出力しているだけですが、シェルが stdout をパ�
   - <strong>カーネル</strong>（OS の中核部分）がバッファを用意しています
   - 書き込み側と読み取り側の速度差を吸収します
 
-### パイプのデータフロー
+### [パイプのデータフロー](#pipe-data-flow) {#pipe-data-flow}
 
 パイプを通じてデータがどのように流れるかを見てみましょう
 
@@ -276,24 +280,26 @@ ls は stdout に出力しているだけですが、シェルが stdout をパ�
 
 <strong>親子プロセス間でのパイプ</strong>
 
-| 手順 | 親プロセス           | カーネル     | 子プロセス           |
+{: .labeled}
+| 手順 | 親プロセス | カーネル | 子プロセス |
 | ---- | -------------------- | ------------ | -------------------- |
-| 1    | pipe() でパイプ作成  | パイプ生成   |                      |
-| 2    | fork() で子を生成    |              | 親のコピーとして誕生 |
-| 3    | 書き込み端を close() |              | 読み取り端を close() |
-| 4    |                      |              | write() でデータ送信 |
-| 5    |                      | データを中継 |                      |
-| 6    | read() でデータ受信  |              |                      |
-| 7    | 読み取り端を close() | パイプ消滅   | 書き込み端を close() |
+| 1 | pipe() でパイプ作成 | パイプ生成 | |
+| 2 | fork() で子を生成 | | 親のコピーとして誕生 |
+| 3 | 書き込み端を close() | | 読み取り端を close() |
+| 4 | | | write() でデータ送信 |
+| 5 | | データを中継 | |
+| 6 | read() でデータ受信 | | |
+| 7 | 読み取り端を close() | パイプ消滅 | 書き込み端を close() |
 
 <strong>シェルのパイプ（ls | wc -l）の流れ</strong>
 
-| 手順 | ls プロセス              | パイプ     | wc プロセス            |
+{: .labeled}
+| 手順 | ls プロセス | パイプ | wc プロセス |
 | ---- | ------------------------ | ---------- | ---------------------- |
-| 1    | stdout → パイプに接続    | 作成       | stdin ← パイプに接続   |
-| 2    | printf() で出力          | データ蓄積 |                        |
-| 3    |                          | データ中継 | read() で読み取り      |
-| 4    | 終了（write 端が閉じる） | EOF 発生   | EOF を検知して処理完了 |
+| 1 | stdout → パイプに接続 | 作成 | stdin ← パイプに接続 |
+| 2 | printf() で出力 | データ蓄積 | |
+| 3 | | データ中継 | read() で読み取り |
+| 4 | 終了（write 端が閉じる） | EOF 発生 | EOF を検知して処理完了 |
 
 ls は自分の出力先がパイプであることを知りません
 
@@ -309,7 +315,7 @@ wc も自分の入力元がパイプであることを知りません
 
 <strong>バッファリングとの関係</strong>
 
-[06-stdio](./06-stdio.md) で学んだバッファリングは、パイプ通信でも重要です
+[06-stdio](../06-stdio/) で学んだバッファリングは、パイプ通信でも重要です
 
 printf() は内部でバッファリングを行うため、パイプに書き込んだデータがすぐに相手に届かないことがあります
 
@@ -325,15 +331,15 @@ printf() は内部でバッファリングを行うため、パイプに書き�
 - setlinebuf(stdout) で<strong>行バッファリング</strong>（改行が来るまでデータを溜める方式）に切り替える
 - write() を直接使用する（バッファリングなし）
 
-バッファリングの詳細は [06-stdio](./06-stdio.md) で学びました
+バッファリングの詳細は [06-stdio](../06-stdio/) で学びました
 
 ---
 
-## pipe() システムコール
+## [pipe() システムコール](#pipe-system-call) {#pipe-system-call}
 
 <strong>システムコール</strong>とは、プログラムが OS に処理を依頼する仕組みのことです
 
-詳しくは [01-process](./01-process.md) を参照してください
+詳しくは [01-process](../01-process/) を参照してください
 
 <strong>pipe()</strong> は、パイプを作成するシステムコールです
 
@@ -346,7 +352,8 @@ int result = pipe(pipefd);
 
 pipe() は 2 つのファイルディスクリプタを作成します
 
-| 変数      | 説明          |
+{: .labeled}
+| 変数 | 説明 |
 | --------- | ------------- |
 | pipefd[0] | 読み取り用 fd |
 | pipefd[1] | 書き込み用 fd |
@@ -361,13 +368,13 @@ pipefd[1] に write() したデータは、pipefd[0] から read() できます
 
 パイプと fd の関係を思い出してください
 
-[05-file-descriptor](./05-file-descriptor.md) で学んだように、fd はファイルだけでなく、パイプやソケットなど様々なリソースを表します
+[05-file-descriptor](../05-file-descriptor/) で学んだように、fd はファイルだけでなく、パイプやソケットなど様々なリソースを表します
 
 パイプへの読み書きは、ファイルと同じ read()、write()、close() で行えます
 
 ---
 
-## 親子プロセス間でのパイプ通信
+## [親子プロセス間でのパイプ通信](#pipe-communication-between-parent-child) {#pipe-communication-between-parent-child}
 
 パイプの典型的な使い方は、fork() と組み合わせることです
 
@@ -396,16 +403,17 @@ if (pid == 0) {
 }
 ```
 
-### fork() 後のファイルディスクリプタの状態
+### [fork() 後のファイルディスクリプタの状態](#fd-state-after-fork) {#fd-state-after-fork}
 
 fork() を呼ぶと、子プロセスは親のファイルディスクリプタの<strong>コピー</strong>を持ちます
 
 つまり、fork() 直後は以下の状態になります
 
+{: .labeled}
 | プロセス | pipefd[0]（読み取り端） | pipefd[1]（書き込み端） |
 | -------- | ----------------------- | ----------------------- |
-| 親       | 持っている              | 持っている              |
-| 子       | 持っている              | 持っている              |
+| 親 | 持っている | 持っている |
+| 子 | 持っている | 持っている |
 
 <strong>重要</strong>：親と子の fd は、<strong>同じパイプ</strong>を指しています
 
@@ -419,13 +427,13 @@ fork() 直後の参照カウント
 ─── 書き込み端：2（親 + 子）
 ```
 
-### EOF が発生する条件
+### [EOF が発生する条件](#condition-for-eof) {#condition-for-eof}
 
 read() が EOF（データの終わり）を返すのは、<strong>書き込み端の参照カウントが 0 になったとき</strong>です
 
 つまり、パイプに書き込む可能性のある fd が<strong>すべて閉じられたとき</strong>に、読み取り側は「もうデータは来ない」と判断できます
 
-### 各 close() の役割
+### [各 close() の役割](#role-of-each-close) {#role-of-each-close}
 
 コード中の 4 つの close() には、それぞれ意味があります
 
@@ -444,14 +452,15 @@ if (pid == 0) {
 }
 ```
 
-| 番号 | 場所           | 何を閉じるか | 目的                                       |
+{: .labeled}
+| 番号 | 場所 | 何を閉じるか | 目的 |
 | ---- | -------------- | ------------ | ------------------------------------------ |
-| ①    | 子（書く前）   | 読み取り端   | 使わない fd を閉じてリソースを節約         |
-| ②    | 子（書いた後） | 書き込み端   | 「書き込み完了」を親に伝える（EOF の合図） |
-| ③    | 親（読む前）   | 書き込み端   | EOF を検知可能にする（後述）               |
-| ④    | 親（読んだ後） | 読み取り端   | 使い終わった fd を閉じてリソースを解放     |
+| ① | 子（書く前） | 読み取り端 | 使わない fd を閉じてリソースを節約 |
+| ② | 子（書いた後） | 書き込み端 | 「書き込み完了」を親に伝える（EOF の合図） |
+| ③ | 親（読む前） | 書き込み端 | EOF を検知可能にする（後述） |
+| ④ | 親（読んだ後） | 読み取り端 | 使い終わった fd を閉じてリソースを解放 |
 
-### なぜ ③ が必要なのか（最も重要）
+### [なぜ ③ が必要なのか（最も重要）](#why-third-close-is-needed) {#why-third-close-is-needed}
 
 ③ を忘れると、<strong>親プロセスは永遠に待ち続けます</strong>
 
@@ -495,7 +504,7 @@ if (pid == 0) {
 
 親自身が書き込み端を持っていると、「自分がまだ書くかもしれない」と OS に判断され、EOF が発生しません
 
-### リソースの解放
+### [リソースの解放](#resource-release) {#resource-release}
 
 もう一つの理由は<strong>リソースの解放</strong>です
 
@@ -506,11 +515,11 @@ if (pid == 0) {
 
 ---
 
-## dup2() によるパイプとコマンドの連携
+## [dup2() によるパイプとコマンドの連携](#pipe-and-command-integration-with-dup2) {#pipe-and-command-integration-with-dup2}
 
 シェルの `|` を再現するには、<strong>dup2()</strong> を使います
 
-dup2() は [05-file-descriptor](./05-file-descriptor.md) で学んだ関数です
+dup2() は [05-file-descriptor](../05-file-descriptor/) で学んだ関数です
 
 ```c
 int dup2(int oldfd, int newfd);
@@ -520,25 +529,26 @@ dup2(oldfd, newfd) は、oldfd を newfd にコピーします
 
 これを使うと、stdout をパイプの書き込み端に「すり替える」ことができます
 
-### 標準入出力の定数
+### [標準入出力の定数](#stdio-constants) {#stdio-constants}
 
 以下の定数は `<unistd.h>` で定義されています
 
-| 定数          | 値  | 意味       |
+{: .labeled}
+| 定数 | 値 | 意味 |
 | ------------- | --- | ---------- |
-| STDIN_FILENO  | 0   | 標準入力   |
-| STDOUT_FILENO | 1   | 標準出力   |
-| STDERR_FILENO | 2   | 標準エラー |
+| STDIN_FILENO | 0 | 標準入力 |
+| STDOUT_FILENO | 1 | 標準出力 |
+| STDERR_FILENO | 2 | 標準エラー |
 
-### execlp() とは
+### [execlp() とは](#what-is-execlp) {#what-is-execlp}
 
-<strong>execlp()</strong> は、[02-fork-exec](./02-fork-exec.md) で学んだ exec() ファミリーの一つです
+<strong>execlp()</strong> は、[02-fork-exec](../02-fork-exec/) で学んだ exec() ファミリーの一つです
 
 現在のプロセスを別のプログラムに置き換えます
 
 「p」は PATH 環境変数から実行ファイルを探すことを意味します
 
-### パイプとコマンドの連携例
+### [パイプとコマンドの連携例](#pipe-command-integration-example) {#pipe-command-integration-example}
 
 シェルが `ls | wc -l` を実行するとき、内部では以下のような処理をしています
 
@@ -558,7 +568,7 @@ execlp("wc", "wc", "-l", NULL);
 
 コードだけでは流れが掴みにくいので、各ステップで fd がどう変化するかを追ってみましょう
 
-[05-file-descriptor](./05-file-descriptor.md) の「リダイレクトの仕組み」と同じ考え方です
+[05-file-descriptor](../05-file-descriptor/) の「リダイレクトの仕組み」と同じ考え方です
 
 <strong>子プロセス 1（ls 側）の fd 変化</strong>
 
@@ -661,7 +671,7 @@ ls も wc も、パイプの存在を一切知りません
 
 ---
 
-## 名前付きパイプ（FIFO）
+## [名前付きパイプ（FIFO）](#named-pipe-fifo) {#named-pipe-fifo}
 
 <strong>名前付きパイプ（FIFO）</strong>は、<strong>ファイルシステム</strong>上に存在するパイプです
 
@@ -671,7 +681,7 @@ ls も wc も、パイプの存在を一切知りません
 
 通常のパイプは fork() した親子間でしか使えませんが、FIFO は任意のプロセス間で使えます
 
-### mkfifo() による作成
+### [mkfifo() による作成](#creating-with-mkfifo) {#creating-with-mkfifo}
 
 <strong>mkfifo()</strong> で FIFO を作成します
 
@@ -681,13 +691,13 @@ ls も wc も、パイプの存在を一切知りません
 mkfifo("/tmp/my_fifo", 0666);
 ```
 
-### FIFO の使い方
+### [FIFO の使い方](#how-to-use-fifo) {#how-to-use-fifo}
 
 作成後は通常のファイルと同様に open() で開けます
 
 O_WRONLY は書き込み専用、O_RDONLY は読み取り専用でファイルを開くフラグです
 
-これらのフラグは [05-file-descriptor](./05-file-descriptor.md) で学びました
+これらのフラグは [05-file-descriptor](../05-file-descriptor/) で学びました
 
 ```c
 /* 書き込み側 */
@@ -699,32 +709,33 @@ int fd = open("/tmp/my_fifo", O_RDONLY);
 read(fd, buf, sizeof(buf));
 ```
 
-### FIFO の特徴
+### [FIFO の特徴](#fifo-characteristics) {#fifo-characteristics}
 
 - ファイルシステム上に存在する（ls で見える）
 - 血縁関係のないプロセス間で使える
 - open() で<strong>ブロック</strong>する
 - 不要になったら unlink() で削除する
 
-### 「ブロック」とは
+### [「ブロック」とは](#what-is-blocking) {#what-is-blocking}
 
 <strong>ブロック</strong>とは、ある条件が満たされるまで処理が進まず待機することです
 
 FIFO の open() は、<strong>相手が open() するまで待機</strong>します
 
-| 状況                    | 動作                             |
+{: .labeled}
+| 状況 | 動作 |
 | ----------------------- | -------------------------------- |
 | 読み取り側が先に open() | 書き込み側が open() するまで待機 |
 | 書き込み側が先に open() | 読み取り側が open() するまで待機 |
-| 両方が open()           | 両方とも処理が進む               |
+| 両方が open() | 両方とも処理が進む |
 
-### なぜブロックするのか
+### [なぜブロックするのか](#why-blocking-occurs) {#why-blocking-occurs}
 
 FIFO は「両端が揃ってはじめて通信できる」という設計になっています
 
 片方しかいない状態では通信できないため、OS は「相手が準備できるまで待て」という動作にしています
 
-### unlink() による削除
+### [unlink() による削除](#deletion-with-unlink) {#deletion-with-unlink}
 
 <strong>unlink()</strong> は、ファイルシステムからファイル名を削除する関数です
 
@@ -736,7 +747,7 @@ unlink("/tmp/my_fifo");
 
 ---
 
-## 共有メモリの基礎
+## [共有メモリの基礎](#shared-memory-basics) {#shared-memory-basics}
 
 <strong>共有メモリ</strong>は、複数のプロセスが同じメモリ領域を共有する仕組みです
 
@@ -744,7 +755,7 @@ unlink("/tmp/my_fifo");
 
 そのため、大量のデータを高速にやり取りできます
 
-### POSIX 共有メモリとは
+### [POSIX 共有メモリとは](#what-is-posix-shared-memory) {#what-is-posix-shared-memory}
 
 <strong>POSIX</strong>とは、UNIX 系 OS の標準仕様のことです
 
@@ -754,7 +765,7 @@ POSIX に準拠したプログラムは、Linux、macOS など異なる OS 間�
 
 <strong>POSIX 共有メモリ</strong>は、この標準仕様に基づいた共有メモリの使い方です
 
-### 共有メモリの使い方
+### [共有メモリの使い方](#how-to-use-shared-memory) {#how-to-use-shared-memory}
 
 1. <strong>shm_open()</strong> で共有メモリオブジェクトを作成
 2. <strong>ftruncate()</strong> でサイズを設定
@@ -763,7 +774,7 @@ POSIX に準拠したプログラムは、Linux、macOS など異なる OS 間�
 5. <strong>munmap()</strong> でマッピングを解除
 6. <strong>shm_unlink()</strong> で共有メモリを削除
 
-### 用語の説明
+### [用語の説明](#terminology-explanation) {#terminology-explanation}
 
 <strong>共有メモリオブジェクト</strong>とは、OS が管理する共有メモリの実体のことです
 
@@ -775,19 +786,20 @@ Linux では /dev/shm/ ディレクトリに作成されます
 
 <strong>ftruncate()</strong> は、ファイルやオブジェクトのサイズを設定する関数です
 
-### フラグの説明
+### [フラグの説明](#flag-description) {#flag-description}
 
 コード内で使用するフラグの意味は以下のとおりです
 
-| フラグ     | 意味                         |
+{: .labeled}
+| フラグ | 意味 |
 | ---------- | ---------------------------- |
-| O_CREAT    | 存在しなければ作成する       |
-| O_RDWR     | 読み書き両用で開く           |
-| PROT_READ  | 読み取り可能                 |
-| PROT_WRITE | 書き込み可能                 |
+| O_CREAT | 存在しなければ作成する |
+| O_RDWR | 読み書き両用で開く |
+| PROT_READ | 読み取り可能 |
+| PROT_WRITE | 書き込み可能 |
 | MAP_SHARED | 変更を他のプロセスと共有する |
 
-### コード例
+### [コード例](#code-example) {#code-example}
 
 ```c
 /* 共有メモリを作成 */
@@ -806,7 +818,7 @@ munmap(ptr, 4096);      /* マッピングを解除 */
 shm_unlink("/my_shm");  /* 共有メモリを削除 */
 ```
 
-### 共有メモリの注意点
+### [共有メモリの注意点](#shared-memory-notes) {#shared-memory-notes}
 
 <strong>なぜ共有メモリは別途同期が必要なのか</strong>
 
@@ -838,9 +850,10 @@ shm_unlink("/my_shm");  /* 共有メモリを削除 */
 
 この問題を防ぐには、<strong>セマフォ</strong>や<strong>ミューテックス</strong>という「順番待ち」の仕組みを使います
 
-| 用語           | 意味                                                |
+{: .labeled}
+| 用語 | 意味 |
 | -------------- | --------------------------------------------------- |
-| セマフォ       | 同時にアクセスできる数を制限する仕組み              |
+| セマフォ | 同時にアクセスできる数を制限する仕組み |
 | ミューテックス | 1つだけがアクセスできるようにする仕組み（相互排他） |
 
 これらの詳細は並行プログラミングの範囲となるため、このトピックでは扱いません
@@ -849,31 +862,32 @@ shm_unlink("/my_shm");  /* 共有メモリを削除 */
 
 ---
 
-## UNIX ドメインソケットの基礎
+## [UNIX ドメインソケットの基礎](#unix-domain-socket-basics) {#unix-domain-socket-basics}
 
-### ソケットとは
+### [ソケットとは](#what-is-a-socket) {#what-is-a-socket}
 
 <strong>ソケット</strong>とは、プロセス間やコンピュータ間でデータを送受信するための「接続口」のことです
 
 電気のコンセント（英語で socket）に差し込んで電気を使うように、ソケットに接続してデータをやり取りします
 
-### ネットワークソケットとの違い
+### [ネットワークソケットとの違い](#difference-from-network-sockets) {#difference-from-network-sockets}
 
 インターネットでは<strong>ネットワークソケット</strong>が使われます
 
 <strong>TCP/IP</strong>は、インターネットで使われる通信規約（プロトコル）です
 
-| 項目     | ネットワークソケット     | UNIX ドメインソケット |
+{: .labeled}
+| 項目 | ネットワークソケット | UNIX ドメインソケット |
 | -------- | ------------------------ | --------------------- |
-| 通信範囲 | インターネット全体       | 同じコンピュータ内    |
-| 識別方法 | IP アドレス + ポート番号 | ファイルパス          |
-| 速度     | やや遅い                 | 高速                  |
+| 通信範囲 | インターネット全体 | 同じコンピュータ内 |
+| 識別方法 | IP アドレス + ポート番号 | ファイルパス |
+| 速度 | やや遅い | 高速 |
 
 <strong>UNIX ドメインソケット</strong>は、同じマシン上のプロセス間で通信するソケットです
 
 ネットワークを経由しないため、高速で安全です
 
-### なぜ同じマシン内でも速度差があるのか
+### [なぜ同じマシン内でも速度差があるのか](#why-speed-difference-on-same-machine) {#why-speed-difference-on-same-machine}
 
 同じマシン上でネットワークソケット（TCP/IP）を使うこともできます
 
@@ -881,12 +895,13 @@ shm_unlink("/my_shm");  /* 共有メモリを削除 */
 
 <strong>TCP/IP を使うと発生するオーバーヘッド</strong>
 
-| 処理             | ネットワークソケット     | UNIX ドメインソケット |
+{: .labeled}
+| 処理 | ネットワークソケット | UNIX ドメインソケット |
 | ---------------- | ------------------------ | --------------------- |
-| アドレス解決     | IP アドレス + ポート番号 | ファイルパスのみ      |
-| プロトコル処理   | TCP/IP スタック全体      | なし                  |
-| チェックサム計算 | 毎パケット必要           | 不要                  |
-| ルーティング判断 | ループバックでも経由     | なし                  |
+| アドレス解決 | IP アドレス + ポート番号 | ファイルパスのみ |
+| プロトコル処理 | TCP/IP スタック全体 | なし |
+| チェックサム計算 | 毎パケット必要 | 不要 |
+| ルーティング判断 | ループバックでも経由 | なし |
 
 <strong>UNIX ドメインソケット固有の機能</strong>
 
@@ -902,7 +917,7 @@ UNIX ドメインソケットには、ネットワークソケットにはない
 
 同じマシン上での通信なら、UNIX ドメインソケットを選ぶのが合理的です
 
-### API について
+### [API について](#about-api) {#about-api}
 
 <strong>API</strong>（Application Programming Interface）とは、プログラムが使う関数や仕組みの集まりのことです
 
@@ -910,7 +925,7 @@ UNIX ドメインソケットは、ネットワークソケット（TCP/IP）と
 
 そのため、ここで学んだ知識は、ネットワークプログラミングにそのまま応用できます
 
-### クライアント/サーバーモデル
+### [クライアント/サーバーモデル](#client-server-model) {#client-server-model}
 
 UNIX ドメインソケットは<strong>クライアント/サーバーモデル</strong>で通信します
 
@@ -934,14 +949,15 @@ UNIX ドメインソケットは<strong>クライアント/サーバーモデル
 3. send() / recv() でデータをやり取り
 4. close() でソケットを閉じる
 
-### ストリーム型とデータグラム型
+### [ストリーム型とデータグラム型](#stream-vs-datagram) {#stream-vs-datagram}
 
 UNIX ドメインソケットには 2 つの種類があります
 
-| 種類           | 定数        | 特徴                                         |
+{: .labeled}
+| 種類 | 定数 | 特徴 |
 | -------------- | ----------- | -------------------------------------------- |
-| ストリーム型   | SOCK_STREAM | 接続を確立してから通信する（電話のイメージ） |
-| データグラム型 | SOCK_DGRAM  | 接続なしでメッセージを送る（郵便のイメージ） |
+| ストリーム型 | SOCK_STREAM | 接続を確立してから通信する（電話のイメージ） |
+| データグラム型 | SOCK_DGRAM | 接続なしでメッセージを送る（郵便のイメージ） |
 
 <strong>ストリーム型（SOCK_STREAM）</strong>
 
@@ -960,7 +976,7 @@ UNIX ドメインソケットには 2 つの種類があります
 
 このトピックでは、より一般的なストリーム型を使用します
 
-### UNIX ドメインソケットの特徴まとめ
+### [UNIX ドメインソケットの特徴まとめ](#unix-socket-summary) {#unix-socket-summary}
 
 - ファイルシステム上のパス名（例：/tmp/my_socket）で識別される
 - 双方向通信が可能
@@ -968,7 +984,7 @@ UNIX ドメインソケットには 2 つの種類があります
 
 ---
 
-## IPC の選び方
+## [IPC の選び方](#how-to-choose-ipc) {#how-to-choose-ipc}
 
 どの IPC を使うべきかは、要件によって異なります
 
@@ -998,23 +1014,24 @@ FIFO は一方向、ソケットは双方向です
 
 ---
 
-## まとめ：このリポジトリで学んだこと
+## [まとめ：このリポジトリで学んだこと](#summary-what-you-learned) {#summary-what-you-learned}
 
 このリポジトリでは、「ユーザー空間からプロセスがどう動くか」を学びました
 
-### 学んだトピック
+### [学んだトピック](#topics-learned) {#topics-learned}
 
-| トピック           | 内容                 |
+{: .labeled}
+| トピック | 内容 |
 | ------------------ | -------------------- |
-| 01-process         | プロセスとは何か     |
-| 02-fork-exec       | プロセスを作る       |
-| 03-signal          | プロセスに通知する   |
-| 04-thread          | プロセス内で並行処理 |
-| 05-file-descriptor | OS のファイル管理    |
-| 06-stdio           | 標準入出力ライブラリ |
-| 07-ipc             | プロセス間通信       |
+| 01-process | プロセスとは何か |
+| 02-fork-exec | プロセスを作る |
+| 03-signal | プロセスに通知する |
+| 04-thread | プロセス内で並行処理 |
+| 05-file-descriptor | OS のファイル管理 |
+| 06-stdio | 標準入出力ライブラリ |
+| 07-ipc | プロセス間通信 |
 
-### 全体像
+### [全体像](#overall-picture) {#overall-picture}
 
 ```
 ┌─────────────────────────────────────────┐
@@ -1040,66 +1057,67 @@ FIFO は一方向、ソケットは双方向です
 
 ---
 
-## 用語集
+## [用語集](#glossary) {#glossary}
 
-| 用語                  | 説明                                                             |
+{: .labeled}
+| 用語 | 説明 |
 | --------------------- | ---------------------------------------------------------------- |
-| IPC                   | Inter-Process Communication（プロセス間通信）の略                |
-| パイプ                | プロセス間でデータを流す一方向の管                               |
-| 書き込み端            | パイプの書き込み用 fd（pipefd[1]）のこと                         |
-| 読み取り端            | パイプの読み取り用 fd（pipefd[0]）のこと                         |
-| FIFO                  | 名前付きパイプのこと（First In First Out）                       |
-| 共有メモリ            | 複数プロセスが同じメモリ領域を共有する仕組み                     |
-| ソケット              | プロセス間やコンピュータ間でデータを送受信するための接続口       |
-| UNIX ドメインソケット | 同一マシン上のプロセス間通信用ソケット                           |
-| ストリーム型          | バイト列として連続的にデータを流す方式                           |
-| データグラム型        | メッセージ単位でデータを送受信する方式                           |
-| mmap                  | ファイルやデバイスをメモリ上にマップする（メモリマッピング）     |
-| マッピング            | あるリソースをメモリ空間に対応付けること                         |
-| EOF                   | データの終端を示す（End Of File）                                |
-| 参照カウント          | あるリソースを開いている fd がいくつあるかを OS が数えた値       |
-| デッドロック          | 複数のプロセスが互いに待ち合い、永遠に進まなくなる状態           |
-| ブロック              | ある条件が満たされるまで処理が進まず待機すること                 |
-| 同期                  | 複数のプロセスが正しい順序でアクセスできるように調整すること     |
-| 競合                  | 複数のプロセスが同時に同じデータにアクセスし予期しない結果になる |
-| POSIX                 | UNIX 系 OS の標準仕様（Portable Operating System Interface）     |
-| クライアント          | サービスを利用する側のプロセス                                   |
-| サーバー              | サービスを提供する側のプロセス                                   |
-| TCP/IP                | インターネットで使われる通信規約（プロトコル）                   |
-| セマフォ              | 同時にアクセスできる数を制限する同期の仕組み                     |
-| ミューテックス        | 1つだけがアクセスできるようにする同期の仕組み（相互排他）        |
-| API                   | プログラムが使う関数や仕組みの集まり                             |
+| IPC | Inter-Process Communication（プロセス間通信）の略 |
+| パイプ | プロセス間でデータを流す一方向の管 |
+| 書き込み端 | パイプの書き込み用 fd（pipefd[1]）のこと |
+| 読み取り端 | パイプの読み取り用 fd（pipefd[0]）のこと |
+| FIFO | 名前付きパイプのこと（First In First Out） |
+| 共有メモリ | 複数プロセスが同じメモリ領域を共有する仕組み |
+| ソケット | プロセス間やコンピュータ間でデータを送受信するための接続口 |
+| UNIX ドメインソケット | 同一マシン上のプロセス間通信用ソケット |
+| ストリーム型 | バイト列として連続的にデータを流す方式 |
+| データグラム型 | メッセージ単位でデータを送受信する方式 |
+| mmap | ファイルやデバイスをメモリ上にマップする（メモリマッピング） |
+| マッピング | あるリソースをメモリ空間に対応付けること |
+| EOF | データの終端を示す（End Of File） |
+| 参照カウント | あるリソースを開いている fd がいくつあるかを OS が数えた値 |
+| デッドロック | 複数のプロセスが互いに待ち合い、永遠に進まなくなる状態 |
+| ブロック | ある条件が満たされるまで処理が進まず待機すること |
+| 同期 | 複数のプロセスが正しい順序でアクセスできるように調整すること |
+| 競合 | 複数のプロセスが同時に同じデータにアクセスし予期しない結果になる |
+| POSIX | UNIX 系 OS の標準仕様（Portable Operating System Interface） |
+| クライアント | サービスを利用する側のプロセス |
+| サーバー | サービスを提供する側のプロセス |
+| TCP/IP | インターネットで使われる通信規約（プロトコル） |
+| セマフォ | 同時にアクセスできる数を制限する同期の仕組み |
+| ミューテックス | 1つだけがアクセスできるようにする同期の仕組み（相互排他） |
+| API | プログラムが使う関数や仕組みの集まり |
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 このページの内容は、以下のソースに基づいています
 
 <strong>パイプ関連</strong>
 
-- [pipe(2) - Linux manual page](https://man7.org/linux/man-pages/man2/pipe.2.html)
+- [pipe(2) - Linux manual page](https://man7.org/linux/man-pages/man2/pipe.2.html){:target="\_blank"}
   - パイプを作成するシステムコール
-- [dup2(2) - Linux manual page](https://man7.org/linux/man-pages/man2/dup2.2.html)
+- [dup2(2) - Linux manual page](https://man7.org/linux/man-pages/man2/dup2.2.html){:target="\_blank"}
   - ファイルディスクリプタを複製するシステムコール
 
 <strong>FIFO 関連</strong>
 
-- [mkfifo(3) - Linux manual page](https://man7.org/linux/man-pages/man3/mkfifo.3.html)
+- [mkfifo(3) - Linux manual page](https://man7.org/linux/man-pages/man3/mkfifo.3.html){:target="\_blank"}
   - 名前付きパイプを作成する関数
-- [fifo(7) - Linux manual page](https://man7.org/linux/man-pages/man7/fifo.7.html)
+- [fifo(7) - Linux manual page](https://man7.org/linux/man-pages/man7/fifo.7.html){:target="\_blank"}
   - FIFO の概要
 
 <strong>共有メモリ関連</strong>
 
-- [shm_open(3) - Linux manual page](https://man7.org/linux/man-pages/man3/shm_open.3.html)
+- [shm_open(3) - Linux manual page](https://man7.org/linux/man-pages/man3/shm_open.3.html){:target="\_blank"}
   - POSIX 共有メモリオブジェクトを開く
-- [mmap(2) - Linux manual page](https://man7.org/linux/man-pages/man2/mmap.2.html)
+- [mmap(2) - Linux manual page](https://man7.org/linux/man-pages/man2/mmap.2.html){:target="\_blank"}
   - メモリマッピングを作成する
 
 <strong>ソケット関連</strong>
 
-- [socket(2) - Linux manual page](https://man7.org/linux/man-pages/man2/socket.2.html)
+- [socket(2) - Linux manual page](https://man7.org/linux/man-pages/man2/socket.2.html){:target="\_blank"}
   - ソケットを作成するシステムコール
-- [unix(7) - Linux manual page](https://man7.org/linux/man-pages/man7/unix.7.html)
+- [unix(7) - Linux manual page](https://man7.org/linux/man-pages/man7/unix.7.html){:target="\_blank"}
   - UNIX ドメインソケットの概要
