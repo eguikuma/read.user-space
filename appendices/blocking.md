@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜread()は止まるのか
+---
 
-# なぜread()は止まるのか
+# [なぜread()は止まるのか](#why-read-blocks) {#why-read-blocks}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 `read()` を呼び出すと、プログラムの実行が「止まる」ことがあります
 
@@ -26,21 +27,21 @@ printf("読み取り完了\n");
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [なぜread()は止まるのか](#なぜreadは止まるのか-1)
-- [ブロッキングする関数](#ブロッキングする関数)
-- [ノンブロッキング I/O とは](#ノンブロッキング-io-とは)
-- [実践パターン](#実践パターン)
-- [発展：I/O 多重化への橋渡し](#発展io-多重化への橋渡し)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [なぜread()は止まるのか](#why-read-blocks-detail)
+- [ブロッキングする関数](#blocking-functions)
+- [ノンブロッキング I/O とは](#what-is-nonblocking-io)
+- [実践パターン](#practical-patterns)
+- [発展：I/O 多重化への橋渡し](#advanced-io-multiplexing)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## なぜread()は止まるのか
+## [なぜread()は止まるのか](#why-read-blocks-detail) {#why-read-blocks-detail}
 
-### デフォルト動作は「待つ」
+### [デフォルト動作は「待つ」](#default-behavior-is-to-wait) {#default-behavior-is-to-wait}
 
 `read()` がブロックするのは、<strong>データがないときに待つのがデフォルト動作</strong>だからです
 
@@ -54,7 +55,7 @@ read() の動作
 ─── データが届くまで待機する（ブロック）
 ```
 
-### なぜブロッキングがデフォルトなのか
+### [なぜブロッキングがデフォルトなのか](#why-blocking-is-default) {#why-blocking-is-default}
 
 <strong>もしデフォルトがノンブロッキングだったら？</strong>
 
@@ -77,11 +78,12 @@ while (1) {
 
 <strong>ブロッキングがデフォルトの理由</strong>
 
-| 理由             | 説明                                           |
+{: .labeled}
+| 理由 | 説明 |
 | ---------------- | ---------------------------------------------- |
-| シンプルなコード | 「読む」→「処理する」の直線的な流れで書ける    |
-| CPU 効率         | 待機中はプロセスがスリープし、CPU を消費しない |
-| 80/20 の法則     | 大多数のプログラムはこの動作で十分             |
+| シンプルなコード | 「読む」→「処理する」の直線的な流れで書ける |
+| CPU 効率 | 待機中はプロセスがスリープし、CPU を消費しない |
+| 80/20 の法則 | 大多数のプログラムはこの動作で十分 |
 
 ```c
 /* ブロッキング（デフォルト）：シンプルに書ける */
@@ -92,34 +94,36 @@ int n = read(fd, buf, sizeof(buf));
 
 ノンブロッキングは「本当に必要な場面」でだけ使う設計になっています
 
-### どんなときにブロックするか
+### [どんなときにブロックするか](#when-does-blocking-occur) {#when-does-blocking-occur}
 
 ブロッキングが発生するのは、主に以下のケースです
 
-| 対象                   | ブロック条件                   |
+{: .labeled}
+| 対象 | ブロック条件 |
 | ---------------------- | ------------------------------ |
-| パイプ                 | 書き込み側からデータが来るまで |
-| ソケット               | 相手からデータが届くまで       |
-| 端末（標準入力）       | ユーザーが入力するまで         |
-| FIFO（名前付きパイプ） | 相手側が open() するまで       |
+| パイプ | 書き込み側からデータが来るまで |
+| ソケット | 相手からデータが届くまで |
+| 端末（標準入力） | ユーザーが入力するまで |
+| FIFO（名前付きパイプ） | 相手側が open() するまで |
 
 通常のファイル（ディスク上のファイル）は、データがすぐに読めるため、通常はブロックしません
 
 ---
 
-## ブロッキングする関数
+## [ブロッキングする関数](#blocking-functions) {#blocking-functions}
 
 `read()` 以外にも、ブロッキングする関数があります
 
-| 関数        | ブロック条件                       |
+{: .labeled}
+| 関数 | ブロック条件 |
 | ----------- | ---------------------------------- |
-| `read()`    | 読み取るデータがない               |
-| `write()`   | 書き込み先のバッファが満杯         |
-| `accept()`  | 接続要求がない                     |
-| `recv()`    | 受信データがない                   |
+| `read()` | 読み取るデータがない |
+| `write()` | 書き込み先のバッファが満杯 |
+| `accept()` | 接続要求がない |
+| `recv()` | 受信データがない |
 | `connect()` | TCP 接続確立中（ハンドシェイク中） |
 
-### ブロッキングの共通点
+### [ブロッキングの共通点](#common-aspect-of-blocking) {#common-aspect-of-blocking}
 
 すべて<strong>「相手を待つ」操作</strong>です
 
@@ -133,9 +137,9 @@ connect() ─── 応答を待つ
 
 ---
 
-## ノンブロッキング I/O とは
+## [ノンブロッキング I/O とは](#what-is-nonblocking-io) {#what-is-nonblocking-io}
 
-### 「待たない」モード
+### [「待たない」モード](#non-waiting-mode) {#non-waiting-mode}
 
 <strong>ノンブロッキング I/O</strong> は、データがなくても即座に戻る動作モードです
 
@@ -147,7 +151,7 @@ connect() ─── 応答を待つ
 ─── データがないとき：エラー（EAGAIN）を返して即座に戻る
 ```
 
-### O_NONBLOCK フラグ
+### [O_NONBLOCK フラグ](#o-nonblock-flag) {#o-nonblock-flag}
 
 ノンブロッキングモードを有効にするには、`O_NONBLOCK` フラグを使います
 
@@ -164,7 +168,7 @@ int flags = fcntl(fd, F_GETFL);
 fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 ```
 
-### EAGAIN と EWOULDBLOCK
+### [EAGAIN と EWOULDBLOCK](#eagain-and-ewouldblock) {#eagain-and-ewouldblock}
 
 ノンブロッキングモードでデータがないとき、`read()` は `-1` を返し、`errno` に `EAGAIN`（または `EWOULDBLOCK`）が設定されます
 
@@ -196,9 +200,9 @@ POSIX では `EAGAIN` と `EWOULDBLOCK` のどちらが返るか規定してい�
 
 ---
 
-## 実践パターン
+## [実践パターン](#practical-patterns) {#practical-patterns}
 
-### パターン 1：open() で O_NONBLOCK を指定
+### [パターン 1：open() で O_NONBLOCK を指定](#pattern-1-open-with-nonblock) {#pattern-1-open-with-nonblock}
 
 ```c
 #include <fcntl.h>
@@ -235,7 +239,7 @@ int main(void)
 }
 ```
 
-### パターン 2：fcntl() で後から設定
+### [パターン 2：fcntl() で後から設定](#pattern-2-fcntl-setting) {#pattern-2-fcntl-setting}
 
 ```c
 #include <fcntl.h>
@@ -286,7 +290,7 @@ int main(void)
 }
 ```
 
-### パターン 3：ループで再試行
+### [パターン 3：ループで再試行](#pattern-3-retry-loop) {#pattern-3-retry-loop}
 
 ```c
 #include <fcntl.h>
@@ -348,9 +352,9 @@ int main(void)
 
 ---
 
-## 発展：I/O 多重化への橋渡し
+## [発展：I/O 多重化への橋渡し](#advanced-io-multiplexing) {#advanced-io-multiplexing}
 
-### ノンブロッキングの限界
+### [ノンブロッキングの限界](#limitations-of-nonblocking) {#limitations-of-nonblocking}
 
 ノンブロッキング I/O には限界があります
 
@@ -380,7 +384,7 @@ while (1) {
 
 この方法は CPU を無駄に使い、応答も遅くなります
 
-### I/O 多重化
+### [I/O 多重化](#io-multiplexing) {#io-multiplexing}
 
 <strong>I/O 多重化</strong>（I/O Multiplexing）は、複数のファイルディスクリプタを効率的に監視する仕組みです
 
@@ -390,13 +394,14 @@ select() / poll() / epoll()
 ─── 準備ができた fd だけを処理できる
 ```
 
-| 関数       | 特徴                           |
+{: .labeled}
+| 関数 | 特徴 |
 | ---------- | ------------------------------ |
-| `select()` | 移植性が高い、fd 数に上限あり  |
-| `poll()`   | fd 数の制限がない              |
-| `epoll()`  | Linux 専用、大量の fd に効率的 |
+| `select()` | 移植性が高い、fd 数に上限あり |
+| `poll()` | fd 数の制限がない |
+| `epoll()` | Linux 専用、大量の fd に効率的 |
 
-### 使い分けの目安
+### [使い分けの目安](#when-to-use-each) {#when-to-use-each}
 
 ```
 小規模・移植性重視 ─── select()
@@ -408,24 +413,26 @@ I/O 多重化の詳細は、別途資料で学習することをお勧めしま�
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 項目         | ブロッキング（デフォルト） | ノンブロッキング     |
+{: .labeled}
+| 項目 | ブロッキング（デフォルト） | ノンブロッキング |
 | ------------ | -------------------------- | -------------------- |
-| 動作         | データが来るまで待つ       | 即座に戻る           |
-| フラグ       | なし                       | O_NONBLOCK           |
-| データなし時 | 待機する                   | EAGAIN を返す        |
-| 利点         | コードが簡単               | 他の処理を並行できる |
-| 欠点         | 処理が止まる               | エラー処理が必要     |
+| 動作 | データが来るまで待つ | 即座に戻る |
+| フラグ | なし | O_NONBLOCK |
+| データなし時 | 待機する | EAGAIN を返す |
+| 利点 | コードが簡単 | 他の処理を並行できる |
+| 欠点 | 処理が止まる | エラー処理が必要 |
 
 <strong>ノンブロッキングを選ぶ判断基準</strong>
 
-| 質問                                                   | Yes の場合                    |
+{: .labeled}
+| 質問 | Yes の場合 |
 | ------------------------------------------------------ | ----------------------------- |
 | 複数の入力元（ソケット、パイプ等）を同時に監視したい？ | ノンブロッキング + I/O 多重化 |
-| 待機中にタイマーやアニメーションなど別処理が必要？     | ノンブロッキング              |
-| 単一の入力を待つだけで良い？                           | ブロッキング                  |
-| 応答性より実装の簡単さが重要？                         | ブロッキング                  |
+| 待機中にタイマーやアニメーションなど別処理が必要？ | ノンブロッキング |
+| 単一の入力を待つだけで良い？ | ブロッキング |
+| 応答性より実装の簡単さが重要？ | ブロッキング |
 
 <strong>典型的な使い分け</strong>
 
@@ -442,31 +449,31 @@ I/O 多重化の詳細は、別途資料で学習することをお勧めしま�
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [read(2) - Linux manual page](https://man7.org/linux/man-pages/man2/read.2.html)
+- [read(2) - Linux manual page](https://man7.org/linux/man-pages/man2/read.2.html){:target="\_blank"}
   - read() システムコールの詳細、ブロッキング動作の説明
-- [fcntl(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fcntl.2.html)
+- [fcntl(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fcntl.2.html){:target="\_blank"}
   - F_GETFL/F_SETFL によるフラグ操作、O_NONBLOCK の設定方法
-- [accept(2) - Linux manual page](https://man7.org/linux/man-pages/man2/accept.2.html)
+- [accept(2) - Linux manual page](https://man7.org/linux/man-pages/man2/accept.2.html){:target="\_blank"}
   - ソケット接続受け入れのブロッキング動作
-- [recv(2) - Linux manual page](https://man7.org/linux/man-pages/man2/recv.2.html)
+- [recv(2) - Linux manual page](https://man7.org/linux/man-pages/man2/recv.2.html){:target="\_blank"}
   - ソケットからのデータ受信、EAGAIN/EWOULDBLOCK の説明
 
 <strong>I/O 多重化</strong>
 
-- [select(2) - Linux manual page](https://man7.org/linux/man-pages/man2/select.2.html)
+- [select(2) - Linux manual page](https://man7.org/linux/man-pages/man2/select.2.html){:target="\_blank"}
   - 複数の fd を同期的に監視する
-- [poll(2) - Linux manual page](https://man7.org/linux/man-pages/man2/poll.2.html)
+- [poll(2) - Linux manual page](https://man7.org/linux/man-pages/man2/poll.2.html){:target="\_blank"}
   - select() の改良版
-- [epoll(7) - Linux manual page](https://man7.org/linux/man-pages/man7/epoll.7.html)
+- [epoll(7) - Linux manual page](https://man7.org/linux/man-pages/man7/epoll.7.html){:target="\_blank"}
   - Linux 専用の高効率 I/O イベント通知
 
 <strong>本編との関連</strong>
 
-- [05-file-descriptor](../05-file-descriptor.md)
+- [05-file-descriptor](../../05-file-descriptor/)
   - read()/write() の基本動作
-- [07-ipc](../07-ipc.md)
+- [07-ipc](../../07-ipc/)
   - パイプ、FIFO、ソケットのブロッキング動作

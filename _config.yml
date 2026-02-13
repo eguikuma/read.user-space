@@ -1,0 +1,11 @@
+title: read.user-space
+description: 「OS がプログラムを動かす仕組み」を、使う側の視点で学びます
+baseurl: /read.user-space
+url: https://eguikuma.github.io
+markdown: kramdown
+permalink: pretty
+has_appendices: true
+
+include:
+  - manifest.webmanifest
+  - sw.js

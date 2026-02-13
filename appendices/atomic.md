@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜ i++ は危険なのか
+---
 
-# なぜ i++ は危険なのか
+# [なぜ i++ は危険なのか](#why-increment-is-dangerous) {#why-increment-is-dangerous}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[04-thread](../04-thread.md) で、複数のスレッドが同じ変数にアクセスすると<strong>競合状態</strong>が発生することを学びました
+[04-thread](../../04-thread/) で、複数のスレッドが同じ変数にアクセスすると<strong>競合状態</strong>が発生することを学びました
 
 ```c
 int counter = 0;
@@ -27,18 +28,18 @@ void *increment(void *arg) {
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [i++の正体](#iの正体)
-- [何が起きるか](#何が起きるか)
-- [アトミックとは](#アトミックとは)
-- [対策](#対策)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [i++の正体](#true-nature-of-increment)
+- [何が起きるか](#what-happens)
+- [アトミックとは](#what-is-atomic)
+- [対策](#countermeasures)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## i++の正体
+## [i++の正体](#true-nature-of-increment) {#true-nature-of-increment}
 
 `i++` は 1 行のコードですが、CPU レベルでは<strong>3 つの操作</strong>に分かれます
 
@@ -66,26 +67,27 @@ i++ の内部動作
 
 ---
 
-## 何が起きるか
+## [何が起きるか](#what-happens) {#what-happens}
 
 2 つのスレッドが同時に `counter++` を実行する場合を考えます
 
 counter の初期値は 0 です
 
-| 順番 | スレッド A         | スレッド B         | counter の値 |
+{: .labeled}
+| 順番 | スレッド A | スレッド B | counter の値 |
 | ---- | ------------------ | ------------------ | ------------ |
-| 1    | ロード（0 を読む） |                    | 0            |
-| 2    |                    | ロード（0 を読む） | 0            |
-| 3    | 加算（0 + 1 = 1）  |                    | 0            |
-| 4    |                    | 加算（0 + 1 = 1）  | 0            |
-| 5    | ストア（1 を書く） |                    | 1            |
-| 6    |                    | ストア（1 を書く） | 1            |
+| 1 | ロード（0 を読む） | | 0 |
+| 2 | | ロード（0 を読む） | 0 |
+| 3 | 加算（0 + 1 = 1） | | 0 |
+| 4 | | 加算（0 + 1 = 1） | 0 |
+| 5 | ストア（1 を書く） | | 1 |
+| 6 | | ストア（1 を書く） | 1 |
 
 両方のスレッドが `counter++` を実行したのに、counter は 1 しか増えていません
 
 これが<strong>競合状態</strong>です
 
-### なぜこうなるのか
+### [なぜこうなるのか](#why-this-happens) {#why-this-happens}
 
 スレッド B がロードした時点で、スレッド A はまだストアを完了していません
 
@@ -95,7 +97,7 @@ counter の初期値は 0 です
 
 ---
 
-## アトミックとは
+## [アトミックとは](#what-is-atomic) {#what-is-atomic}
 
 <strong>アトミック（atomic）</strong>とは、「分割不可能」という意味です
 
@@ -103,7 +105,7 @@ counter の初期値は 0 です
 
 <strong>アトミック操作</strong>とは、途中で割り込まれることなく、最初から最後まで一気に実行される操作です
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 ATM での銀行振込を考えてみましょう
 
@@ -122,11 +124,11 @@ ATM での銀行振込を考えてみましょう
 
 これが<strong>アトミック</strong>の考え方です
 
-### i++ をアトミックにする
+### [i++ をアトミックにする](#making-increment-atomic) {#making-increment-atomic}
 
 `i++` の 3 つの操作を、他のスレッドから見て「1 つの操作」に見えるようにすれば、競合状態を防げます
 
-### なぜ CPU のサポートが必要なのか
+### [なぜ CPU のサポートが必要なのか](#why-cpu-support-is-needed) {#why-cpu-support-is-needed}
 
 アトミック操作は、ソフトウェアだけでは実現できません
 
@@ -143,21 +145,22 @@ LOCK プレフィックスを付けると、その命令の実行中は他のコ
 
 <strong>なぜソフトウェアだけでは不十分か？</strong>
 
-| 方法                     | 問題点                                 |
+{: .labeled}
+| 方法 | 問題点 |
 | ------------------------ | -------------------------------------- |
-| 複数の命令で実現         | 命令の間で割り込まれる可能性がある     |
-| OS に依頼                | システムコールのオーバーヘッドが大きい |
-| CPU 命令（ハードウェア） | 高速かつ確実にアトミック性を保証       |
+| 複数の命令で実現 | 命令の間で割り込まれる可能性がある |
+| OS に依頼 | システムコールのオーバーヘッドが大きい |
+| CPU 命令（ハードウェア） | 高速かつ確実にアトミック性を保証 |
 
 atomic 型の関数は、内部でこれらの CPU 命令を使用しています
 
 ---
 
-## 対策
+## [対策](#countermeasures) {#countermeasures}
 
-### mutex（ミューテックス）
+### [mutex（ミューテックス）](#mutex) {#mutex}
 
-[04-thread](../04-thread.md#ミューテックスmutexによる排他制御) で学んだ mutex を使う方法です
+[04-thread](../../04-thread/#ミューテックスmutexによる排他制御) で学んだ mutex を使う方法です
 
 ```c
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -174,9 +177,9 @@ void *increment(void *arg) {
 
 mutex は「一度に 1 つのスレッドだけ」がクリティカルセクションを実行できるようにします
 
-詳細は [04-thread](../04-thread.md) を参照してください
+詳細は [04-thread](../../04-thread/) を参照してください
 
-### atomic 型（C11）
+### [atomic 型（C11）](#atomic-type) {#atomic-type}
 
 C11 から、`<stdatomic.h>` ヘッダで<strong>アトミック型</strong>が導入されました
 
@@ -201,30 +204,32 @@ mutex と比べて軽量で、単純なカウンタの更新に適していま�
 
 <strong>よく使うアトミック型</strong>
 
-| 型          | 説明                 |
+{: .labeled}
+| 型 | 説明 |
 | ----------- | -------------------- |
-| atomic_int  | アトミックな int     |
-| atomic_long | アトミックな long    |
-| atomic_bool | アトミックな bool    |
+| atomic_int | アトミックな int |
+| atomic_long | アトミックな long |
+| atomic_bool | アトミックな bool |
 | atomic_flag | ロックフリーなフラグ |
 
 <strong>よく使うアトミック関数</strong>
 
-| 関数                      | 説明               |
+{: .labeled}
+| 関数 | 説明 |
 | ------------------------- | ------------------ |
-| atomic_load()             | 値を読み取る       |
-| atomic_store()            | 値を書き込む       |
-| atomic_fetch_add()        | 加算して旧値を返す |
-| atomic_fetch_sub()        | 減算して旧値を返す |
-| atomic_compare_exchange() | 条件付き交換       |
+| atomic_load() | 値を読み取る |
+| atomic_store() | 値を書き込む |
+| atomic_fetch_add() | 加算して旧値を返す |
+| atomic_fetch_sub() | 減算して旧値を返す |
+| atomic_compare_exchange() | 条件付き交換 |
 
 ---
 
-### sig_atomic_t
+### [sig_atomic_t](#sig-atomic-t) {#sig-atomic-t}
 
 <strong>sig_atomic_t</strong> は、シグナルハンドラ内で安全に読み書きできる整数型です
 
-[03-signal](../03-signal.md) で学んだように、シグナルハンドラには制限があります
+[03-signal](../../03-signal/) で学んだように、シグナルハンドラには制限があります
 
 ```c
 #include <signal.h>
@@ -256,13 +261,14 @@ sig_atomic_t は、シグナルハンドラとメインプログラム間の通�
 
 スレッド間の共有には、mutex または atomic 型を使ってください
 
-| 用途                   | 適切な選択            |
+{: .labeled}
+| 用途 | 適切な選択 |
 | ---------------------- | --------------------- |
-| シグナルハンドラ       | volatile sig_atomic_t |
-| スレッド間（一般）     | mutex                 |
-| スレッド間（カウンタ） | atomic 型             |
+| シグナルハンドラ | volatile sig_atomic_t |
+| スレッド間（一般） | mutex |
+| スレッド間（カウンタ） | atomic 型 |
 
-### mutex と atomic の選び方
+### [mutex と atomic の選び方](#choosing-mutex-vs-atomic) {#choosing-mutex-vs-atomic}
 
 <strong>atomic を選ぶべき場合</strong>
 
@@ -289,7 +295,7 @@ pthread_mutex_unlock(&mutex);
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
 <strong>i++ が危険な理由</strong>
 
@@ -303,31 +309,32 @@ pthread_mutex_unlock(&mutex);
 
 <strong>対策の使い分け</strong>
 
-| 状況                   | 対策                  |
+{: .labeled}
+| 状況 | 対策 |
 | ---------------------- | --------------------- |
-| 複雑な処理を保護したい | mutex                 |
-| 単純なカウンタを更新   | atomic 型（C11）      |
+| 複雑な処理を保護したい | mutex |
+| 単純なカウンタを更新 | atomic 型（C11） |
 | シグナルハンドラで使う | volatile sig_atomic_t |
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>C 言語規格</strong>
 
-- [Atomic operations library - cppreference](https://en.cppreference.com/w/c/atomic)
+- [Atomic operations library - cppreference](https://en.cppreference.com/w/c/atomic){:target="\_blank"}
   - C11 のアトミック操作ライブラリ
-- [sig_atomic_t - cppreference](https://en.cppreference.com/w/c/program/sig_atomic_t)
+- [sig_atomic_t - cppreference](https://en.cppreference.com/w/c/program/sig_atomic_t){:target="\_blank"}
   - シグナルハンドラで安全に使える整数型
 
 <strong>Linux マニュアル</strong>
 
-- [pthread_mutex_lock(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3.html)
+- [pthread_mutex_lock(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3.html){:target="\_blank"}
   - ミューテックスのロック操作
 
 <strong>本編との関連</strong>
 
-- [04-thread](../04-thread.md)
+- [04-thread](../../04-thread/)
   - 競合状態とミューテックスの詳細
-- [03-signal](../03-signal.md)
+- [03-signal](../../03-signal/)
   - シグナルハンドラの制限と安全な関数

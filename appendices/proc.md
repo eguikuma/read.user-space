@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: /procはなぜファイルなのか
+---
 
-# /procはなぜファイルなのか
+# [/procはなぜファイルなのか](#why-proc-is-a-file) {#why-proc-is-a-file}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[01-process](../01-process.md) の「/proc ファイルシステム」で、プロセスの情報を見るための特別な場所を学びました
+[01-process](../../01-process/) の「/proc ファイルシステム」で、プロセスの情報を見るための特別な場所を学びました
 
 ```bash
 cat /proc/self/status
@@ -24,20 +25,20 @@ cat /proc/self/status
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [仮想ファイルシステムとは](#仮想ファイルシステムとは)
-- [Unix哲学「すべてはファイル」](#unix哲学すべてはファイル)
-- [/proc/[pid] の便利なファイル](#procpid-の便利なファイル)
-- [実用例](#実用例)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [仮想ファイルシステムとは](#what-is-virtual-filesystem)
+- [Unix哲学「すべてはファイル」](#unix-philosophy-everything-is-a-file)
+- [/proc/[pid] の便利なファイル](#useful-files-in-proc-pid)
+- [実用例](#practical-examples)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## 仮想ファイルシステムとは
+## [仮想ファイルシステムとは](#what-is-virtual-filesystem) {#what-is-virtual-filesystem}
 
-### 疑似ファイルシステム
+### [疑似ファイルシステム](#pseudo-filesystem) {#pseudo-filesystem}
 
 <strong>/proc</strong> は<strong>疑似ファイルシステム（pseudo-filesystem）</strong>と呼ばれます
 
@@ -47,20 +48,21 @@ Linux の公式マニュアルには、こう書かれています
 
 > proc ファイルシステムは、カーネルのデータ構造へのインターフェースを提供する疑似ファイルシステムです
 
-### 通常のファイルシステムとの違い
+### [通常のファイルシステムとの違い](#difference-from-regular-filesystem) {#difference-from-regular-filesystem}
 
 通常のファイルシステムでは、ファイルはハードディスクや SSD などの<strong>ストレージ</strong>に保存されています
 
 しかし、/proc は違います
 
-| 項目           | 通常のファイルシステム     | /proc                          |
+{: .labeled}
+| 項目 | 通常のファイルシステム | /proc |
 | -------------- | -------------------------- | ------------------------------ |
-| ファイルの場所 | ディスク上                 | メモリ上（カーネル内）         |
-| データの生成   | ファイル作成時             | 読み取り時にリアルタイムで生成 |
-| 内容の変化     | 明示的に書き換えるまで不変 | 読み取るたびに最新の情報を返す |
-| 容量の消費     | ディスク容量を使う         | ディスク容量を使わない         |
+| ファイルの場所 | ディスク上 | メモリ上（カーネル内） |
+| データの生成 | ファイル作成時 | 読み取り時にリアルタイムで生成 |
+| 内容の変化 | 明示的に書き換えるまで不変 | 読み取るたびに最新の情報を返す |
+| 容量の消費 | ディスク容量を使う | ディスク容量を使わない |
 
-### カーネルへの窓口
+### [カーネルへの窓口](#gateway-to-kernel) {#gateway-to-kernel}
 
 /proc は「ファイルのふりをしているが、実際はカーネルへの窓口」です
 
@@ -74,9 +76,9 @@ Linux の公式マニュアルには、こう書かれています
 
 ---
 
-## Unix哲学「すべてはファイル」
+## [Unix哲学「すべてはファイル」](#unix-philosophy-everything-is-a-file) {#unix-philosophy-everything-is-a-file}
 
-### 設計思想の起源
+### [設計思想の起源](#origin-of-design-philosophy) {#origin-of-design-philosophy}
 
 1970年代初頭、Ken Thompson と Dennis Ritchie が Unix を開発していたとき、ある問題に直面しました
 
@@ -90,7 +92,7 @@ Linux の公式マニュアルには、こう書かれています
 
 ハードドライブも、ターミナルも、プロセス情報も、すべて同じ操作（open、read、write、close）で扱えるようにしたのです
 
-### なぜファイルの形式なのか
+### [なぜファイルの形式なのか](#why-file-format) {#why-file-format}
 
 <strong>もし専用のシステムコールだったら？</strong>
 
@@ -105,12 +107,13 @@ printf("メモリ: %ld\n", status.vm_rss);
 
 しかし、この設計には問題があります
 
-| 問題                       | 説明                                                 |
+{: .labeled}
+| 問題 | 説明 |
 | -------------------------- | ---------------------------------------------------- |
-| 新機能ごとに API 追加      | カーネルに情報が増えるたびに、新しい関数が必要になる |
-| 言語ごとにラッパーが必要   | C、Python、Go、それぞれに専用ライブラリが必要        |
-| シェルからアクセスできない | スクリプトで使うには追加のツールが必要               |
-| 既存ツールが使えない       | grep、diff、watch などが使えない                     |
+| 新機能ごとに API 追加 | カーネルに情報が増えるたびに、新しい関数が必要になる |
+| 言語ごとにラッパーが必要 | C、Python、Go、それぞれに専用ライブラリが必要 |
+| シェルからアクセスできない | スクリプトで使うには追加のツールが必要 |
+| 既存ツールが使えない | grep、diff、watch などが使えない |
 
 ファイルとして公開すれば、これらの問題がすべて解決します
 
@@ -141,28 +144,29 @@ cat、grep、diff などの使い慣れたコマンドで、カーネルの情�
 
 C 言語でも、Python でも、シェルスクリプトでも、ファイルを読み書きできる言語ならどれでもカーネルの情報にアクセスできます
 
-### 他の例
+### [他の例](#other-examples) {#other-examples}
 
 /proc 以外にも、「すべてはファイル」の設計思想に基づいたものがあります
 
-| パス        | 内容                           |
+{: .labeled}
+| パス | 内容 |
 | ----------- | ------------------------------ |
-| /dev/null   | 書き込んだデータをすべて捨てる |
-| /dev/zero   | 読み取ると無限にゼロを返す     |
-| /dev/random | ランダムなデータを返す         |
-| /dev/tty    | 現在のターミナル               |
+| /dev/null | 書き込んだデータをすべて捨てる |
+| /dev/zero | 読み取ると無限にゼロを返す |
+| /dev/random | ランダムなデータを返す |
+| /dev/tty | 現在のターミナル |
 
 これらも「ファイルのふり」をしていますが、実際にはカーネルが提供する特別な機能です
 
 ---
 
-## /proc/[pid] の便利なファイル
+## [/proc/\[pid\] の便利なファイル](#useful-files-in-proc-pid) {#useful-files-in-proc-pid}
 
 各プロセスには `/proc/[pid]/` というディレクトリがあります
 
 ここでは、よく使うファイルを紹介します
 
-### status
+### [status](#status) {#status}
 
 プロセスの状態を人間が読みやすい形式で表示します
 
@@ -172,18 +176,19 @@ cat /proc/self/status
 
 主なフィールド
 
-| フィールド | 内容                               |
+{: .labeled}
+| フィールド | 内容 |
 | ---------- | ---------------------------------- |
-| Name       | プロセス名                         |
-| State      | 状態（R: 実行中、S: 待機中、など） |
-| Pid        | プロセス ID                        |
-| PPid       | 親プロセスの ID                    |
-| Uid        | ユーザー ID                        |
-| VmSize     | 仮想メモリサイズ                   |
-| VmRSS      | 物理メモリ使用量                   |
-| Threads    | スレッド数                         |
+| Name | プロセス名 |
+| State | 状態（R: 実行中、S: 待機中、など） |
+| Pid | プロセス ID |
+| PPid | 親プロセスの ID |
+| Uid | ユーザー ID |
+| VmSize | 仮想メモリサイズ |
+| VmRSS | 物理メモリ使用量 |
+| Threads | スレッド数 |
 
-### cmdline
+### [cmdline](#cmdline) {#cmdline}
 
 プロセス起動時のコマンドラインを表示します
 
@@ -193,7 +198,7 @@ cat /proc/self/cmdline | tr '\0' ' '
 
 引数は NULL 文字（`\0`）で区切られているため、`tr` で空白に置換すると読みやすくなります
 
-### exe
+### [exe](#exe) {#exe}
 
 実行ファイルへの<strong>シンボリックリンク</strong>です
 
@@ -203,7 +208,7 @@ readlink /proc/self/exe
 
 そのプロセスが実行しているプログラムファイルのパスがわかります
 
-### cwd
+### [cwd](#cwd) {#cwd}
 
 <strong>作業ディレクトリ</strong>へのシンボリックリンクです
 
@@ -213,7 +218,7 @@ readlink /proc/self/cwd
 
 プロセスが「今いる場所」がわかります
 
-### environ
+### [environ](#environ) {#environ}
 
 <strong>環境変数</strong>を表示します
 
@@ -223,7 +228,7 @@ cat /proc/self/environ | tr '\0' '\n'
 
 環境変数は NULL 文字で区切られているため、`tr` で改行に置換すると読みやすくなります
 
-### fd/
+### [fd/](#fd) {#fd}
 
 開いているファイルディスクリプタの一覧です
 
@@ -235,13 +240,14 @@ ls -la /proc/self/fd/
 
 標準で開いているファイルディスクリプタ
 
-| 番号 | 名前   | 説明           |
+{: .labeled}
+| 番号 | 名前 | 説明 |
 | ---- | ------ | -------------- |
-| 0    | stdin  | 標準入力       |
-| 1    | stdout | 標準出力       |
-| 2    | stderr | 標準エラー出力 |
+| 0 | stdin | 標準入力 |
+| 1 | stdout | 標準出力 |
+| 2 | stderr | 標準エラー出力 |
 
-### maps
+### [maps](#proc-pid-maps) {#proc-pid-maps}
 
 メモリマップを表示します
 
@@ -251,9 +257,9 @@ cat /proc/self/maps
 
 プロセスのメモリ配置（テキスト、ヒープ、スタックなど）がわかります
 
-詳しくは [appendices/memory-layout.md](./memory-layout.md) を参照してください
+詳しくは [appendices/memory-layout.md](../memory-layout/) を参照してください
 
-### /proc/self
+### [/proc/self](#proc-self) {#proc-self}
 
 <strong>/proc/self</strong> は特別なシンボリックリンクで、「自分自身のプロセス」を指します
 
@@ -261,9 +267,9 @@ cat /proc/self/maps
 
 ---
 
-## 実用例
+## [実用例](#practical-examples) {#practical-examples}
 
-### メモリ使用量を確認する
+### [メモリ使用量を確認する](#checking-memory-usage) {#checking-memory-usage}
 
 ```bash
 grep -E '^(VmSize|VmRSS)' /proc/self/status
@@ -276,12 +282,13 @@ VmSize:    12345 kB
 VmRSS:      5678 kB
 ```
 
-| フィールド | 意味                                   |
+{: .labeled}
+| フィールド | 意味 |
 | ---------- | -------------------------------------- |
-| VmSize     | 仮想メモリサイズ（確保した総量）       |
-| VmRSS      | 物理メモリ使用量（実際に使っている量） |
+| VmSize | 仮想メモリサイズ（確保した総量） |
+| VmRSS | 物理メモリ使用量（実際に使っている量） |
 
-### 開いているファイルを確認する
+### [開いているファイルを確認する](#checking-open-files) {#checking-open-files}
 
 ```bash
 ls -la /proc/self/fd/
@@ -297,7 +304,7 @@ lrwx------ 1 user user 64 Jan  1 12:00 2 -> /dev/pts/0
 
 /dev/pts/0 は疑似ターミナルを表します
 
-### C 言語での読み取り
+### [C 言語での読み取り](#reading-in-c) {#reading-in-c}
 
 ```c
 #include <stdio.h>
@@ -326,45 +333,47 @@ int main(void) {
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
 <strong>/proc がファイルである理由</strong>
 
-| ポイント                     | 説明                                                       |
+{: .labeled}
+| ポイント | 説明 |
 | ---------------------------- | ---------------------------------------------------------- |
-| Unix哲学「すべてはファイル」 | 異なるリソースを統一的なインターフェースで扱う設計思想     |
-| 既存ツールの活用             | cat、grep、diff などのコマンドでカーネル情報にアクセス可能 |
-| 学習コストの削減             | ファイル操作を知っていれば、特別な API は不要              |
+| Unix哲学「すべてはファイル」 | 異なるリソースを統一的なインターフェースで扱う設計思想 |
+| 既存ツールの活用 | cat、grep、diff などのコマンドでカーネル情報にアクセス可能 |
+| 学習コストの削減 | ファイル操作を知っていれば、特別な API は不要 |
 
 <strong>覚えておくこと</strong>
 
-| ポイント                          | 説明                                                       |
+{: .labeled}
+| ポイント | 説明 |
 | --------------------------------- | ---------------------------------------------------------- |
-| /proc はディスク上に存在しない    | カーネルがリアルタイムで情報を生成する疑似ファイルシステム |
-| /proc/[pid]/ にプロセス情報がある | status、cmdline、fd/ などで詳細情報を確認可能              |
-| /proc/self は自分自身を指す       | 自分の PID を知らなくても自分の情報にアクセスできる        |
+| /proc はディスク上に存在しない | カーネルがリアルタイムで情報を生成する疑似ファイルシステム |
+| /proc/[pid]/ にプロセス情報がある | status、cmdline、fd/ などで詳細情報を確認可能 |
+| /proc/self は自分自身を指す | 自分の PID を知らなくても自分の情報にアクセスできる |
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [proc(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc.5.html)
+- [proc(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc.5.html){:target="\_blank"}
   - /proc ファイルシステムの全体説明
-- [proc_pid_status(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html)
+- [proc_pid_status(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_status.5.html){:target="\_blank"}
   - /proc/[pid]/status の詳細
-- [proc_pid_maps(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html)
+- [proc_pid_maps(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html){:target="\_blank"}
   - /proc/[pid]/maps の詳細
 
 <strong>Linux カーネルドキュメント</strong>
 
-- [The /proc Filesystem - Linux Kernel documentation](https://docs.kernel.org/filesystems/proc.html)
+- [The /proc Filesystem - Linux Kernel documentation](https://docs.kernel.org/filesystems/proc.html){:target="\_blank"}
   - カーネル視点からの /proc の説明
 
 <strong>本編との関連</strong>
 
-- [01-process](../01-process.md)
+- [01-process](../../01-process/)
   - /proc ファイルシステムの概要
-- [appendices/memory-layout.md](./memory-layout.md)
+- [appendices/memory-layout.md](../memory-layout/)
   - /proc/[pid]/maps の読み方

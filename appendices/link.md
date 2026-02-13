@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: リンクはなぜ2種類あるのか
+---
 
-# リンクはなぜ2種類あるのか
+# [リンクはなぜ2種類あるのか](#why-two-types-of-links) {#why-two-types-of-links}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[05-file-descriptor](../05-file-descriptor.md) で、ファイルディスクリプタの仕組みを学びました
+[05-file-descriptor](../../05-file-descriptor/) で、ファイルディスクリプタの仕組みを学びました
 
 その中で<strong>inode</strong>（ファイルの実体情報を持つデータ構造）が登場しました
 
@@ -28,21 +29,21 @@ rm file.txt       # ファイルを「削除」
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [2種類のリンク](#2種類のリンク)
-- [ハードリンク](#ハードリンク)
-- [シンボリックリンク](#シンボリックリンク)
-- [ハードリンクの制限](#ハードリンクの制限)
-- [使い分けの指針](#使い分けの指針)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [2種類のリンク](#two-types-of-links)
+- [ハードリンク](#hard-links)
+- [シンボリックリンク](#symbolic-links)
+- [ハードリンクの制限](#hard-link-restrictions)
+- [使い分けの指針](#guidelines-for-choosing)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## 2種類のリンク
+## [2種類のリンク](#two-types-of-links) {#two-types-of-links}
 
-### なぜ2種類のリンクが必要なのか
+### [なぜ2種類のリンクが必要なのか](#why-two-types-are-needed) {#why-two-types-are-needed}
 
 <strong>もしハードリンクだけだったら？</strong>
 
@@ -57,27 +58,29 @@ rm file.txt       # ファイルを「削除」
 
 2種類あることで、用途に応じて使い分けができます
 
-| 要件                                         | 適切なリンク       |
+{: .labeled}
+| 要件 | 適切なリンク |
 | -------------------------------------------- | ------------------ |
-| データの永続的な参照                         | ハードリンク       |
+| データの永続的な参照 | ハードリンク |
 | 柔軟な参照（ディレクトリ、別パーティション） | シンボリックリンク |
 
-### 基本的な違い
+### [基本的な違い](#basic-differences) {#basic-differences}
 
 Linux には2種類のリンクがあります
 
-| 項目         | ハードリンク   | シンボリックリンク                |
+{: .labeled}
+| 項目 | ハードリンク | シンボリックリンク |
 | ------------ | -------------- | --------------------------------- |
-| 作成コマンド | `ln file link` | `ln -s file link`                 |
-| 指すもの     | inode          | パス文字列                        |
-| 別名         | hard link      | symbolic link, symlink, soft link |
-| 原本削除時   | リンクは有効   | リンクは無効になる                |
+| 作成コマンド | `ln file link` | `ln -s file link` |
+| 指すもの | inode | パス文字列 |
+| 別名 | hard link | symbolic link, symlink, soft link |
+| 原本削除時 | リンクは有効 | リンクは無効になる |
 
 <strong>ハードリンク</strong>は、ファイルの inode を直接指します
 
 <strong>シンボリックリンク</strong>は、ファイルのパス（場所の文字列）を指します
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 ハードリンクは「同じ家に複数の住所がある」ようなものです
 
@@ -93,17 +96,17 @@ Linux には2種類のリンクがあります
 
 ---
 
-## ハードリンク
+## [ハードリンク](#hard-links) {#hard-links}
 
-### inodeとリンクカウント
+### [inodeとリンクカウント](#inode-and-link-count) {#inode-and-link-count}
 
-[05-file-descriptor](../05-file-descriptor.md) で学んだように、<strong>inode</strong> はファイルの実体情報を持つデータ構造です
+[05-file-descriptor](../../05-file-descriptor/) で学んだように、<strong>inode</strong> はファイルの実体情報を持つデータ構造です
 
 inode には<strong>リンクカウント（st_nlink）</strong>というフィールドがあります
 
 リンクカウントは、その inode を指しているディレクトリエントリの数です
 
-### ファイル作成時の動作
+### [ファイル作成時の動作](#behavior-on-file-creation) {#behavior-on-file-creation}
 
 ファイルを作成すると、以下のことが起きます
 
@@ -124,7 +127,7 @@ inode には<strong>リンクカウント（st_nlink）</strong>というフィ�
                           └─────────────────────┘
 ```
 
-### ハードリンク作成時の動作
+### [ハードリンク作成時の動作](#behavior-on-hard-link-creation) {#behavior-on-hard-link-creation}
 
 ハードリンクを作成すると、同じ inode を指す新しいディレクトリエントリが作成されます
 
@@ -147,7 +150,7 @@ ln file.txt hardlink.txt
 
 リンクカウントが 2 になりました
 
-### ファイル「削除」の仕組み
+### [ファイル「削除」の仕組み](#file-deletion-mechanism) {#file-deletion-mechanism}
 
 `rm` コマンドは、実際には `unlink()` システムコールを呼び出します
 
@@ -177,7 +180,7 @@ rm file.txt 実行後の状態
 
 hardlink.txt から、元のファイルの内容にアクセスできます
 
-### コード例
+### [コード例](#code-example) {#code-example}
 
 ハードリンクを作成し、リンクカウントを確認する例：
 
@@ -238,9 +241,9 @@ int main(void) {
 
 ---
 
-## シンボリックリンク
+## [シンボリックリンク](#symbolic-links) {#symbolic-links}
 
-### パスを指すリンク
+### [パスを指すリンク](#link-pointing-to-path) {#link-pointing-to-path}
 
 シンボリックリンクは、<strong>ファイルのパス（文字列）</strong>を格納した特殊なファイルです
 
@@ -265,7 +268,7 @@ ln -s /path/to/original.txt symlink.txt
 
 シンボリックリンク自体も inode を持ちますが、その内容は「パス文字列」です
 
-### シンボリックリンクの解決
+### [シンボリックリンクの解決](#symlink-resolution) {#symlink-resolution}
 
 プログラムがシンボリックリンクにアクセスすると、カーネルが<strong>自動的にリンクを辿ります</strong>
 
@@ -277,7 +280,7 @@ int fd = open("symlink.txt", O_RDONLY);
 
 この「リンクを辿る」処理を<strong>シンボリックリンクの解決</strong>といいます
 
-### ダングリングリンク
+### [ダングリングリンク](#dangling-link) {#dangling-link}
 
 原本ファイルが削除されると、シンボリックリンクは<strong>存在しないパス</strong>を指すことになります
 
@@ -292,7 +295,7 @@ cat symlink.txt   # エラー：No such file or directory
 
 ハードリンクでは、原本を削除してもリンクが有効なままであることと対照的です
 
-### ls -l での表示
+### [ls -l での表示](#ls-l-display) {#ls-l-display}
 
 シンボリックリンクは `ls -l` で確認できます
 
@@ -306,7 +309,7 @@ lrwxrwxrwx 1 user user   20 Jan 15 10:00 symlink.txt -> /path/to/original.txt
 - `->` の後にリンク先のパスが表示される
 - パーミッションは `rwxrwxrwx`（シンボリックリンク自体のパーミッションは通常無視される）
 
-### コード例
+### [コード例](#code-example-symlink) {#code-example-symlink}
 
 シンボリックリンクを作成し、リンク先を確認する例：
 
@@ -379,11 +382,11 @@ int main(void) {
 
 ---
 
-## ハードリンクの制限
+## [ハードリンクの制限](#hard-link-restrictions) {#hard-link-restrictions}
 
 ハードリンクには2つの重要な制限があります
 
-### 制限1：ディレクトリには作成できない
+### [制限1：ディレクトリには作成できない](#restriction-1-no-directory-links) {#restriction-1-no-directory-links}
 
 ハードリンクは<strong>通常ファイル</strong>にのみ作成できます
 
@@ -423,7 +426,7 @@ documents/ が /home/user/ へのハードリンクだったら...
 
 （ただし `.` と `..` は例外で、カーネルが管理する特殊なハードリンクです）
 
-### 制限2：異なるファイルシステムを跨げない
+### [制限2：異なるファイルシステムを跨げない](#restriction-2-no-cross-filesystem) {#restriction-2-no-cross-filesystem}
 
 ハードリンクは<strong>同じファイルシステム内</strong>でのみ作成できます
 
@@ -448,26 +451,28 @@ inode 番号は<strong>各ファイルシステム内でのみ一意</strong>で
 
 この制限に遭遇したときのエラーコードは <strong>EXDEV</strong>（cross-device link）です
 
-### シンボリックリンクには制限がない
+### [シンボリックリンクには制限がない](#symlink-has-no-restrictions) {#symlink-has-no-restrictions}
 
 シンボリックリンクは「パス文字列」を格納するだけなので、これらの制限がありません
 
-| 項目                             | ハードリンク | シンボリックリンク |
+{: .labeled}
+| 項目 | ハードリンク | シンボリックリンク |
 | -------------------------------- | ------------ | ------------------ |
-| ディレクトリへのリンク           | 不可         | 可能               |
-| 異なるファイルシステムへのリンク | 不可         | 可能               |
+| ディレクトリへのリンク | 不可 | 可能 |
+| 異なるファイルシステムへのリンク | 不可 | 可能 |
 
 ---
 
-## 使い分けの指針
+## [使い分けの指針](#guidelines-for-choosing) {#guidelines-for-choosing}
 
-### ハードリンクを使う場面
+### [ハードリンクを使う場面](#when-to-use-hard-links) {#when-to-use-hard-links}
 
-| 場面                                   | 理由                                                 |
+{: .labeled}
+| 場面 | 理由 |
 | -------------------------------------- | ---------------------------------------------------- |
-| バックアップ                           | 同じデータを複数の場所から参照でき、容量を節約できる |
-| 原本が移動・削除されてもアクセスしたい | inode を直接指すので、パスの変更に影響されない       |
-| ダングリングリンクを避けたい           | 最後のリンクが消えるまでデータは残る                 |
+| バックアップ | 同じデータを複数の場所から参照でき、容量を節約できる |
+| 原本が移動・削除されてもアクセスしたい | inode を直接指すので、パスの変更に影響されない |
+| ダングリングリンクを避けたい | 最後のリンクが消えるまでデータは残る |
 
 <strong>実用例：rsync --link-dest</strong>
 
@@ -475,14 +480,15 @@ inode 番号は<strong>各ファイルシステム内でのみ一意</strong>で
 
 変更のないファイルは前回のバックアップへのハードリンクとなり、ディスク容量を節約できます
 
-### シンボリックリンクを使う場面
+### [シンボリックリンクを使う場面](#when-to-use-symlinks) {#when-to-use-symlinks}
 
-| 場面                           | 理由                                                           |
+{: .labeled}
+| 場面 | 理由 |
 | ------------------------------ | -------------------------------------------------------------- |
-| ディレクトリへのリンク         | ハードリンクでは不可                                           |
-| 別のファイルシステムへのリンク | ハードリンクでは不可                                           |
-| 実行ファイルのバージョン管理   | `python -> python3.11` のように切り替えが簡単                  |
-| 設定ファイルの共有             | dotfiles を Git 管理し、ホームディレクトリにシンボリックリンク |
+| ディレクトリへのリンク | ハードリンクでは不可 |
+| 別のファイルシステムへのリンク | ハードリンクでは不可 |
+| 実行ファイルのバージョン管理 | `python -> python3.11` のように切り替えが簡単 |
+| 設定ファイルの共有 | dotfiles を Git 管理し、ホームディレクトリにシンボリックリンク |
 
 <strong>実用例：/usr/bin のコマンド</strong>
 
@@ -496,7 +502,7 @@ $ ls -l /usr/bin/vi
 lrwxrwxrwx 1 root root 20 Jan  1 00:00 /usr/bin/vi -> /etc/alternatives/vi
 ```
 
-### 判断フローチャート
+### [判断フローチャート](#decision-flowchart) {#decision-flowchart}
 
 ```
 リンクを作りたい
@@ -518,21 +524,22 @@ lrwxrwxrwx 1 root root 20 Jan  1 00:00 /usr/bin/vi -> /etc/alternatives/vi
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-### 2種類のリンクの比較
+### [2種類のリンクの比較](#comparison-of-two-link-types) {#comparison-of-two-link-types}
 
-| 項目                   | ハードリンク       | シンボリックリンク |
+{: .labeled}
+| 項目 | ハードリンク | シンボリックリンク |
 | ---------------------- | ------------------ | ------------------ |
-| 指すもの               | inode              | パス文字列         |
-| 作成コマンド           | `ln`               | `ln -s`            |
-| システムコール         | link()             | symlink()          |
-| ディレクトリへのリンク | 不可               | 可能               |
-| ファイルシステム跨ぎ   | 不可               | 可能               |
-| 原本削除時             | リンクは有効       | ダングリングリンク |
-| リンクの見分け方       | ls -l で見分け困難 | `->` で表示        |
+| 指すもの | inode | パス文字列 |
+| 作成コマンド | `ln` | `ln -s` |
+| システムコール | link() | symlink() |
+| ディレクトリへのリンク | 不可 | 可能 |
+| ファイルシステム跨ぎ | 不可 | 可能 |
+| 原本削除時 | リンクは有効 | ダングリングリンク |
+| リンクの見分け方 | ls -l で見分け困難 | `->` で表示 |
 
-### 覚えておくこと
+### [覚えておくこと](#things-to-remember) {#things-to-remember}
 
 - `rm` は実際には `unlink()` を呼んでいる
 - ファイルはリンクカウントが 0 になり、開いているプロセスがなくなったとき削除される
@@ -542,24 +549,24 @@ lrwxrwxrwx 1 root root 20 Jan  1 00:00 /usr/bin/vi -> /etc/alternatives/vi
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [ln(1) - Linux manual page](https://man7.org/linux/man-pages/man1/ln.1.html)
+- [ln(1) - Linux manual page](https://man7.org/linux/man-pages/man1/ln.1.html){:target="\_blank"}
   - ln コマンドの使い方、`-s` オプションでシンボリックリンク作成
-- [link(2) - Linux manual page](https://man7.org/linux/man-pages/man2/link.2.html)
+- [link(2) - Linux manual page](https://man7.org/linux/man-pages/man2/link.2.html){:target="\_blank"}
   - ハードリンクを作成するシステムコール
-- [symlink(2) - Linux manual page](https://man7.org/linux/man-pages/man2/symlink.2.html)
+- [symlink(2) - Linux manual page](https://man7.org/linux/man-pages/man2/symlink.2.html){:target="\_blank"}
   - シンボリックリンクを作成するシステムコール
-- [symlink(7) - Linux manual page](https://man7.org/linux/man-pages/man7/symlink.7.html)
+- [symlink(7) - Linux manual page](https://man7.org/linux/man-pages/man7/symlink.7.html){:target="\_blank"}
   - シンボリックリンクの扱いに関する詳細、リンクの解決ルール
-- [unlink(2) - Linux manual page](https://man7.org/linux/man-pages/man2/unlink.2.html)
+- [unlink(2) - Linux manual page](https://man7.org/linux/man-pages/man2/unlink.2.html){:target="\_blank"}
   - リンクを削除するシステムコール、rm の内部動作
-- [inode(7) - Linux manual page](https://man7.org/linux/man-pages/man7/inode.7.html)
+- [inode(7) - Linux manual page](https://man7.org/linux/man-pages/man7/inode.7.html){:target="\_blank"}
   - inode の構造、st_nlink（リンクカウント）の説明
 
 <strong>本編との関連</strong>
 
-- [05-file-descriptor](../05-file-descriptor.md)
+- [05-file-descriptor](../../05-file-descriptor/)
   - inode の概念、カーネルの 3 層構造

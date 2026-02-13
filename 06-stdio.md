@@ -1,16 +1,17 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: 標準入出力ライブラリ
+---
 
-# 06-stdio：標準入出力ライブラリ
+# [06-stdio：標準入出力ライブラリ](#what-is-stdio) {#what-is-stdio}
 
 ファイルディスクリプタを<strong>「便利に使う」</strong>ための仕組みを学びます
 
 ---
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-前のトピック（[05-file-descriptor](./05-file-descriptor.md)）では、OS がファイルを管理する仕組みを学びました
+前のトピック（[05-file-descriptor](../05-file-descriptor/)）では、OS がファイルを管理する仕組みを学びました
 
 - open() でファイルを開き、fd（ファイルディスクリプタ）を取得する
 - read() と write() でデータを読み書きする
@@ -28,7 +29,7 @@
 
 では、なぜ printf() という「別の関数」が存在するのでしょうか？
 
-### なぜ read()/write() だけでは不十分なのか
+### [なぜ read()/write() だけでは不十分なのか](#why-read-write-is-insufficient) {#why-read-write-is-insufficient}
 
 <strong>もし write() だけでプログラムを書いたら？</strong>
 
@@ -49,11 +50,12 @@ printf("%d", n);  /* これだけ */
 
 <strong>read()/write() だけの問題</strong>
 
-| 問題                   | 説明                                                 |
+{: .labeled}
+| 問題 | 説明 |
 | ---------------------- | ---------------------------------------------------- |
 | フォーマット変換がない | 数値→文字列、文字列→数値の変換を自分で書く必要がある |
-| バッファ管理が手動     | 1文字ずつ write() すると大量のシステムコールが発生   |
-| 行単位の読み取りが面倒 | 改行を探しながら read() を繰り返す必要がある         |
+| バッファ管理が手動 | 1文字ずつ write() すると大量のシステムコールが発生 |
+| 行単位の読み取りが面倒 | 改行を探しながら read() を繰り返す必要がある |
 
 答えは「便利だから」です
 
@@ -63,7 +65,7 @@ stdio は、fd を「より便利に使う」ための仕組みです
 
 ---
 
-## 日常の例え
+## [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 stdio の仕組みを、「水道」に例えてみましょう
 
@@ -89,7 +91,7 @@ stdio の仕組みを、「水道」に例えてみましょう
 
 ---
 
-## このページで学ぶこと
+## [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 - <strong>FILE 構造体</strong>
   - fd を包み込んで、より使いやすくしたもの
@@ -112,32 +114,32 @@ stdio の仕組みを、「水道」に例えてみましょう
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [FILE 構造体とは何か](#file-構造体とは何か)
-2. [標準ストリーム](#標準ストリーム)
-3. [fopen と open の違い](#fopen-と-open-の違い)
-4. [フォーマット付き入出力](#フォーマット付き入出力)
-5. [行単位の入出力](#行単位の入出力)
-6. [バイナリ入出力](#バイナリ入出力)
-7. [バッファリングの仕組み](#バッファリングの仕組み)
-8. [バッファリングの制御](#バッファリングの制御)
-9. [ファイル位置の制御](#ファイル位置の制御)
-10. [エラー処理と EOF](#エラー処理と-eof)
-11. [fd との相互変換](#fd-との相互変換)
-12. [用語集](#用語集)
-13. [参考資料](#参考資料)
-14. [次のステップ](#次のステップ)
+1. [FILE 構造体とは何か](#what-is-file-struct)
+2. [標準ストリーム](#standard-streams)
+3. [fopen と open の違い](#difference-between-fopen-and-open)
+4. [フォーマット付き入出力](#formatted-io)
+5. [行単位の入出力](#line-io)
+6. [バイナリ入出力](#binary-io)
+7. [バッファリングの仕組み](#how-buffering-works)
+8. [バッファリングの制御](#buffering-control)
+9. [ファイル位置の制御](#file-position-control)
+10. [エラー処理と EOF](#error-handling-and-eof)
+11. [fd との相互変換](#mutual-conversion-with-fd)
+12. [次のステップ](#next-steps)
+13. [用語集](#glossary)
+14. [参考資料](#references)
 
 ---
 
-## FILE 構造体とは何か
+## [FILE 構造体とは何か](#what-is-file-struct) {#what-is-file-struct}
 
 <strong>FILE</strong> は、stdio.h（標準入出力ライブラリのヘッダーファイル）で定義される<strong>構造体</strong>です
 
 <strong>構造体</strong>とは、複数の関連するデータをまとめて1つの型として扱うものです
 
-[05-file-descriptor](./05-file-descriptor.md) で学んだ fd は、単なる整数（0、1、2、3...）でした
+[05-file-descriptor](../05-file-descriptor/) で学んだ fd は、単なる整数（0、1、2、3...）でした
 
 FILE は、fd に加えて以下の情報を持っています
 
@@ -170,7 +172,7 @@ FILE *fp = fopen("example.txt", "r");
 
 ---
 
-## 標準ストリーム
+## [標準ストリーム](#standard-streams) {#standard-streams}
 
 <strong>ストリーム</strong>とは、データの流れを抽象化したものです
 
@@ -178,17 +180,18 @@ FILE *fp = fopen("example.txt", "r");
 
 プログラムが起動すると、3 つの FILE（ストリーム）が自動的に開かれます
 
-| 名前   | 対応する fd        | 説明                         |
+{: .labeled}
+| 名前 | 対応する fd | 説明 |
 | ------ | ------------------ | ---------------------------- |
-| stdin  | 0（STDIN_FILENO）  | 標準入力（通常はキーボード） |
-| stdout | 1（STDOUT_FILENO） | 標準出力（通常は画面）       |
+| stdin | 0（STDIN_FILENO） | 標準入力（通常はキーボード） |
+| stdout | 1（STDOUT_FILENO） | 標準出力（通常は画面） |
 | stderr | 2（STDERR_FILENO） | 標準エラー出力（通常は画面） |
 
 STDIN_FILENO、STDOUT_FILENO、STDERR_FILENO は、unistd.h で定義されている定数です
 
 これらは fd の値（0、1、2）を名前で表したものです
 
-[05-file-descriptor](./05-file-descriptor.md) で学んだ fd 0、1、2 が、FILE として使えるようになっています
+[05-file-descriptor](../05-file-descriptor/) で学んだ fd 0、1、2 が、FILE として使えるようになっています
 
 ```c
 printf("Hello");           /* stdout に出力 */
@@ -198,7 +201,7 @@ fprintf(stderr, "Error");  /* stderr に出力 */
 
 ---
 
-## fopen と open の違い
+## [fopen と open の違い](#difference-between-fopen-and-open) {#difference-between-fopen-and-open}
 
 ファイルを開く方法は 2 つあります
 
@@ -226,14 +229,15 @@ fopen() では、ファイルの開き方を<strong>モード文字列</strong>�
 
 <strong>モード文字列と open フラグの対応</strong>
 
-| fopen モード | open フラグ                     | 説明                   |
+{: .labeled}
+| fopen モード | open フラグ | 説明 |
 | ------------ | ------------------------------- | ---------------------- |
-| "r"          | O_RDONLY                        | 読み取り専用           |
-| "w"          | O_WRONLY \| O_CREAT \| O_TRUNC  | 書き込み専用（上書き） |
-| "a"          | O_WRONLY \| O_CREAT \| O_APPEND | 追記モード             |
-| "r+"         | O_RDWR                          | 読み書き両用           |
-| "w+"         | O_RDWR \| O_CREAT \| O_TRUNC    | 読み書き両用（上書き） |
-| "a+"         | O_RDWR \| O_CREAT \| O_APPEND   | 読み書き両用（追記）   |
+| "r" | O_RDONLY | 読み取り専用 |
+| "w" | O_WRONLY \| O_CREAT \| O_TRUNC | 書き込み専用（上書き） |
+| "a" | O_WRONLY \| O_CREAT \| O_APPEND | 追記モード |
+| "r+" | O_RDWR | 読み書き両用 |
+| "w+" | O_RDWR \| O_CREAT \| O_TRUNC | 読み書き両用（上書き） |
+| "a+" | O_RDWR \| O_CREAT \| O_APPEND | 読み書き両用（追記） |
 
 fopen の方が簡単に使えます
 
@@ -241,37 +245,39 @@ fopen の方が簡単に使えます
 
 細かい制御が必要な場合は open を使います
 
-### open() と fopen() の使い分け
+### [open() と fopen() の使い分け](#when-to-use-open-vs-fopen) {#when-to-use-open-vs-fopen}
 
 <strong>どちらを使うべきか迷ったときの指針</strong>を示します
 
-#### fopen() を使うべき場面
+#### [fopen() を使うべき場面](#when-to-use-fopen) {#when-to-use-fopen}
 
-| 場面                       | 理由                                               |
+{: .labeled}
+| 場面 | 理由 |
 | -------------------------- | -------------------------------------------------- |
-| テキストファイルの読み書き | printf、fprintf、fscanf が便利                     |
-| 設定ファイルの読み込み     | fgets で行単位の処理が簡単                         |
-| ログファイルへの出力       | fprintf のフォーマット機能が便利                   |
-| CSV ファイルの処理         | fscanf でパース、fprintf で出力                    |
-| 移植性が重要なコード       | stdio は C 標準なので<strong>移植性</strong>が高い |
+| テキストファイルの読み書き | printf、fprintf、fscanf が便利 |
+| 設定ファイルの読み込み | fgets で行単位の処理が簡単 |
+| ログファイルへの出力 | fprintf のフォーマット機能が便利 |
+| CSV ファイルの処理 | fscanf でパース、fprintf で出力 |
+| 移植性が重要なコード | stdio は C 標準なので<strong>移植性</strong>が高い |
 
 <strong>移植性</strong>とは、異なる OS やコンピュータでも同じように動作することです
 
-#### open() を使うべき場面
+#### [open() を使うべき場面](#when-to-use-open) {#when-to-use-open}
 
-| 場面                             | 理由                             |
+{: .labeled}
+| 場面 | 理由 |
 | -------------------------------- | -------------------------------- |
-| パイプやソケットの操作           | FILE は通常ファイル向けの設計    |
-| O_EXCL でファイルの排他作成      | fopen では指定できない           |
-| O_SYNC で同期書き込み            | OS がディスクに書き込むまで待つ  |
-| dup2() でリダイレクト            | fd が必要                        |
-| mmap() でメモリマップ            | ファイルをメモリに展開する       |
-| select() / poll() で多重化       | 複数の fd を同時に監視する       |
+| パイプやソケットの操作 | FILE は通常ファイル向けの設計 |
+| O_EXCL でファイルの排他作成 | fopen では指定できない |
+| O_SYNC で同期書き込み | OS がディスクに書き込むまで待つ |
+| dup2() でリダイレクト | fd が必要 |
+| mmap() でメモリマップ | ファイルをメモリに展開する |
+| select() / poll() で多重化 | 複数の fd を同時に監視する |
 | バッファリングを完全に制御したい | stdio のバッファが邪魔になる場合 |
 
 これらの高度な技法は、このトピックでは扱いません
 
-#### 一般的な推奨
+#### [一般的な推奨](#general-recommendation) {#general-recommendation}
 
 迷ったら fopen() を使ってください
 
@@ -284,7 +290,7 @@ fopen の方が簡単に使えます
 
 open() は、fopen() では実現できない場面でのみ使用してください
 
-#### 混在させる場合の注意
+#### [混在させる場合の注意](#caution-when-mixing) {#caution-when-mixing}
 
 同じファイルを open() と fopen() の両方で操作することは避けてください
 
@@ -294,24 +300,26 @@ open() は、fopen() では実現できない場面でのみ使用してくだ�
 
 ---
 
-## フォーマット付き入出力
+## [フォーマット付き入出力](#formatted-io) {#formatted-io}
 
 <strong>出力関数</strong>
 
-| 関数                             | 出力先 | 説明                         |
+{: .labeled}
+| 関数 | 出力先 | 説明 |
 | -------------------------------- | ------ | ---------------------------- |
-| printf(format, ...)              | stdout | 標準出力に出力               |
-| fprintf(fp, format, ...)         | FILE\* | 指定したファイルに出力       |
-| sprintf(str, format, ...)        | 文字列 | 文字列に出力                 |
+| printf(format, ...) | stdout | 標準出力に出力 |
+| fprintf(fp, format, ...) | FILE\* | 指定したファイルに出力 |
+| sprintf(str, format, ...) | 文字列 | 文字列に出力 |
 | snprintf(str, size, format, ...) | 文字列 | サイズを指定して文字列に出力 |
 
 <strong>入力関数</strong>
 
-| 関数                     | 入力元 | 説明                         |
+{: .labeled}
+| 関数 | 入力元 | 説明 |
 | ------------------------ | ------ | ---------------------------- |
-| scanf(format, ...)       | stdin  | 標準入力から読み取り         |
-| fscanf(fp, format, ...)  | FILE\* | 指定したファイルから読み取り |
-| sscanf(str, format, ...) | 文字列 | 文字列から読み取り           |
+| scanf(format, ...) | stdin | 標準入力から読み取り |
+| fscanf(fp, format, ...) | FILE\* | 指定したファイルから読み取り |
+| sscanf(str, format, ...) | 文字列 | 文字列から読み取り |
 
 <strong>主なフォーマット指定子</strong>
 
@@ -319,28 +327,30 @@ open() は、fopen() では実現できない場面でのみ使用してくだ�
 
 % から始まり、続く文字でデータの種類を表します
 
-| 指定子 | 型           | 説明               |
+{: .labeled}
+| 指定子 | 型 | 説明 |
 | ------ | ------------ | ------------------ |
-| %d     | int          | 10 進整数          |
-| %u     | unsigned int | 符号なし 10 進整数 |
-| %x     | unsigned int | 16 進整数          |
-| %f     | double       | 浮動小数点数       |
-| %s     | char\*       | 文字列             |
-| %c     | char         | 1 文字             |
-| %p     | void\*       | ポインタ           |
-| %zu    | size_t       | サイズ             |
-| %%     | -            | % 文字そのもの     |
+| %d | int | 10 進整数 |
+| %u | unsigned int | 符号なし 10 進整数 |
+| %x | unsigned int | 16 進整数 |
+| %f | double | 浮動小数点数 |
+| %s | char\* | 文字列 |
+| %c | char | 1 文字 |
+| %p | void\* | ポインタ |
+| %zu | size_t | サイズ |
+| %% | - | % 文字そのもの |
 
 ---
 
-## 行単位の入出力
+## [行単位の入出力](#line-io) {#line-io}
 
 <strong>入力関数</strong>
 
-| 関数                 | 説明                                                                          |
+{: .labeled}
+| 関数 | 説明 |
 | -------------------- | ----------------------------------------------------------------------------- |
-| fgets(buf, size, fp) | 改行または size-1 文字まで読み取り                                            |
-| gets(buf)            | <strong>使用禁止</strong>（バッファオーバーフローの危険、C11 で標準から削除） |
+| fgets(buf, size, fp) | 改行または size-1 文字まで読み取り |
+| gets(buf) | <strong>使用禁止</strong>（バッファオーバーフローの危険、C11 で標準から削除） |
 
 <strong>バッファオーバーフロー</strong>とは、用意した領域を超えてデータが書き込まれることです
 
@@ -362,14 +372,15 @@ C 言語の文字列は、必ず \0 で終わります
 
 <strong>出力関数</strong>
 
-| 関数           | 説明                                   |
+{: .labeled}
+| 関数 | 説明 |
 | -------------- | -------------------------------------- |
-| fputs(str, fp) | 文字列を出力（改行は付けない）         |
-| puts(str)      | 文字列を stdout に出力し、改行を付ける |
+| fputs(str, fp) | 文字列を出力（改行は付けない） |
+| puts(str) | 文字列を stdout に出力し、改行を付ける |
 
 ---
 
-## バイナリ入出力
+## [バイナリ入出力](#binary-io) {#binary-io}
 
 <strong>テキストデータ</strong>は、人間が読める文字で構成されたデータです（例：ソースコード、設定ファイル）
 
@@ -377,9 +388,10 @@ C 言語の文字列は、必ず \0 で終わります
 
 ここでは、バイナリデータを読み書きする関数を紹介します
 
-| 関数                         | 説明                     |
+{: .labeled}
+| 関数 | 説明 |
 | ---------------------------- | ------------------------ |
-| fread(buf, size, count, fp)  | バイナリデータを読み取り |
+| fread(buf, size, count, fp) | バイナリデータを読み取り |
 | fwrite(buf, size, count, fp) | バイナリデータを書き込み |
 
 <strong>引数の意味</strong>
@@ -408,7 +420,7 @@ fread(&p, sizeof(struct Person), 1, fp);
 
 ---
 
-## バッファリングの仕組み
+## [バッファリングの仕組み](#how-buffering-works) {#how-buffering-works}
 
 <strong>なぜバッファリングが必要か</strong>
 
@@ -416,7 +428,7 @@ fread(&p, sizeof(struct Person), 1, fp);
 
 <strong>ユーザー空間</strong>から<strong>カーネル空間</strong>への切り替えが発生するためです
 
-これらの空間については [01-process](./01-process.md) で詳しく説明しています
+これらの空間については [01-process](../01-process/) で詳しく説明しています
 
 <strong>もしバッファリングなしで "Hello" を出力したら？</strong>
 
@@ -440,18 +452,20 @@ stdio は、データをバッファに溜めてから、まとめてシステ�
 
 <strong>バッファリングの種類</strong>
 
-| 種類         | 定数    | 動作                                         | 典型的な使用場所 |
+{: .labeled}
+| 種類 | 定数 | 動作 | 典型的な使用場所 |
 | ------------ | ------- | -------------------------------------------- | ---------------- |
-| フルバッファ | \_IOFBF | バッファが一杯になったら出力                 | ファイル         |
-| 行バッファ   | \_IOLBF | 改行文字で出力、または端末からの入力時に出力 | 端末（stdout）   |
-| バッファなし | \_IONBF | 即座に出力                                   | stderr           |
+| フルバッファ | \_IOFBF | バッファが一杯になったら出力 | ファイル |
+| 行バッファ | \_IOLBF | 改行文字で出力、または端末からの入力時に出力 | 端末（stdout） |
+| バッファなし | \_IONBF | 即座に出力 | stderr |
 
 <strong>なぜ 3 種類必要なのか</strong>
 
-| モード       | なぜそのモードか                                                             |
+{: .labeled}
+| モード | なぜそのモードか |
 | ------------ | ---------------------------------------------------------------------------- |
-| フルバッファ | ファイルへの書き込みは効率が最優先。まとめて書くほど速い                     |
-| 行バッファ   | 対話的な端末では、改行ごとに出力を見たい。でも 1 文字ごとは遅すぎる          |
+| フルバッファ | ファイルへの書き込みは効率が最優先。まとめて書くほど速い |
+| 行バッファ | 対話的な端末では、改行ごとに出力を見たい。でも 1 文字ごとは遅すぎる |
 | バッファなし | エラーメッセージは即座に見たい。クラッシュ直前のエラーも表示される必要がある |
 
 <strong>stderr がバッファなしな理由</strong>
@@ -487,7 +501,7 @@ scanf("%s", name);       /* stdin からの読み取りで stdout がフラッ�
 
 ---
 
-## バッファリングの制御
+## [バッファリングの制御](#buffering-control) {#buffering-control}
 
 <strong>fflush()</strong>
 
@@ -502,7 +516,7 @@ printf("完了\n");
 
 fflush(NULL) を呼び出すと、すべての出力ストリームをフラッシュします
 
-### いつ fflush() が必要か
+### [いつ fflush() が必要か](#when-fflush-is-needed) {#when-fflush-is-needed}
 
 <strong>1. 改行なしの出力を即座に表示したいとき</strong>
 
@@ -557,40 +571,43 @@ setvbuf はストリームを開いた直後、最初の入出力操作の前に
 
 ---
 
-## ファイル位置の制御
+## [ファイル位置の制御](#file-position-control) {#file-position-control}
 
-| 関数                      | 説明                     |
+{: .labeled}
+| 関数 | 説明 |
 | ------------------------- | ------------------------ |
-| fseek(fp, offset, whence) | ファイル位置を移動       |
-| ftell(fp)                 | 現在位置を取得           |
-| rewind(fp)                | 先頭に戻る               |
-| fgetpos(fp, pos)          | 現在位置を取得（別形式） |
-| fsetpos(fp, pos)          | 位置を設定（別形式）     |
+| fseek(fp, offset, whence) | ファイル位置を移動 |
+| ftell(fp) | 現在位置を取得 |
+| rewind(fp) | 先頭に戻る |
+| fgetpos(fp, pos) | 現在位置を取得（別形式） |
+| fsetpos(fp, pos) | 位置を設定（別形式） |
 
 <strong>fseek の whence</strong>
 
 <strong>whence</strong> は「どこから」という意味の英語で、移動の基準位置を指定します
 
-| 定数     | 説明             |
+{: .labeled}
+| 定数 | 説明 |
 | -------- | ---------------- |
 | SEEK_SET | ファイル先頭から |
-| SEEK_CUR | 現在位置から     |
+| SEEK_CUR | 現在位置から |
 | SEEK_END | ファイル末尾から |
 
-[05-file-descriptor](./05-file-descriptor.md) で学んだ lseek と同じ考え方です
+[05-file-descriptor](../05-file-descriptor/) で学んだ lseek と同じ考え方です
 
 ---
 
-## エラー処理と EOF
+## [エラー処理と EOF](#error-handling-and-eof) {#error-handling-and-eof}
 
 <strong>エラーフラグと EOF フラグ</strong>
 
 FILE には、エラーフラグと EOF フラグがあります
 
-| 関数         | 説明                 |
+{: .labeled}
+| 関数 | 説明 |
 | ------------ | -------------------- |
-| ferror(fp)   | エラーフラグを確認   |
-| feof(fp)     | EOF フラグを確認     |
+| ferror(fp) | エラーフラグを確認 |
+| feof(fp) | EOF フラグを確認 |
 | clearerr(fp) | 両方のフラグをクリア |
 
 <strong>EOF の検出</strong>
@@ -615,7 +632,7 @@ if (feof(fp)) {
 
 ---
 
-## fd との相互変換
+## [fd との相互変換](#mutual-conversion-with-fd) {#mutual-conversion-with-fd}
 
 stdio と低レベル関数を組み合わせて使いたい場合があります
 
@@ -641,78 +658,7 @@ fd を別途 close する必要はありません（二重 close はエラーに
 
 ---
 
-## 用語集
-
-| 用語                   | 英語                | 説明                                             |
-| ---------------------- | ------------------- | ------------------------------------------------ |
-| ストリーム             | Stream              | データの流れを抽象化したもの                     |
-| 構造体                 | Struct              | 複数のデータをまとめて1つの型として扱うもの      |
-| 不透明な構造体         | Opaque Type         | 内部構造が隠されており、直接アクセスできないもの |
-| ポインタ               | Pointer             | メモリの場所（アドレス）を指し示す値             |
-| 低レベル関数           | Low-level Function  | OS に近い基本的な関数（write、read など）        |
-| 高レベル関数           | High-level Function | 低レベル関数を便利にした関数（printf など）      |
-| バッファ               | Buffer              | データを一時的に溜めておく領域                   |
-| バッファリング         | Buffering           | データをバッファに溜めてまとめて処理すること     |
-| フルバッファ           | Full Buffering      | バッファが一杯になったら出力するモード           |
-| 行バッファ             | Line Buffering      | 改行または端末入力時に出力するモード             |
-| フラッシュ             | Flush               | バッファの内容を強制的に出力すること             |
-| 移植性                 | Portability         | 異なる環境でも同じように動作すること             |
-| モード文字列           | Mode String         | fopen() でファイルの開き方を指定する文字列       |
-| フォーマット指定子     | Format Specifier    | printf 等で使う %d、%s など                      |
-| 改行文字               | Newline             | 行の終わりを示す文字（\n）                       |
-| NULL 文字              | Null Character      | 文字列の終端を示す文字（\0）                     |
-| バッファオーバーフロー | Buffer Overflow     | バッファの容量を超えてデータが書き込まれること   |
-| テキストデータ         | Text Data           | 人間が読める文字で構成されたデータ               |
-| バイナリデータ         | Binary Data         | 人間が直接読めない形式のデータ                   |
-| EOF                    | End Of File         | ファイルの終端                                   |
-| whence                 | Whence              | 「どこから」の意味、位置の基準を指定する引数名   |
-
----
-
-## 参考資料
-
-このページの内容は、以下のソースに基づいています
-
-- [stdio(3) - Linux manual page](https://man7.org/linux/man-pages/man3/stdio.3.html)
-  - 標準入出力ライブラリの概要
-- [fopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fopen.3.html)
-  - ファイルを開く
-- [fclose(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fclose.3.html)
-  - ファイルを閉じる
-- [printf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/printf.3.html)
-  - フォーマット付き出力
-- [scanf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/scanf.3.html)
-  - フォーマット付き入力
-- [fread(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fread.3.html)
-  - バイナリ読み取り
-- [fwrite(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fwrite.3.html)
-  - バイナリ書き込み
-- [fgets(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fgets.3.html)
-  - 行単位読み取り
-- [fputs(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fputs.3.html)
-  - 行単位書き込み
-- [fflush(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fflush.3.html)
-  - バッファをフラッシュ
-- [setvbuf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/setvbuf.3.html)
-  - バッファリングの制御
-- [setbuf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/setbuf.3.html)
-  - バッファリングの制御（行バッファの詳細動作）
-- [fseek(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fseek.3.html)
-  - ファイル位置の移動
-- [ftell(3) - Linux manual page](https://man7.org/linux/man-pages/man3/ftell.3.html)
-  - 現在位置の取得
-- [ferror(3) - Linux manual page](https://man7.org/linux/man-pages/man3/ferror.3.html)
-  - エラーフラグの確認
-- [feof(3) - Linux manual page](https://man7.org/linux/man-pages/man3/feof.3.html)
-  - EOF フラグの確認
-- [fileno(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fileno.3.html)
-  - FILE\* から fd を取得
-- [fdopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fdopen.3.html)
-  - fd から FILE\* を作成
-
----
-
-## 次のステップ
+## [次のステップ](#next-steps) {#next-steps}
 
 このトピックでは、「標準入出力ライブラリ」を学びました
 
@@ -720,8 +666,80 @@ fd を別途 close する必要はありません（二重 close はエラーに
 - fopen、printf、fread などの関数
 - バッファリングの仕組みと制御
 
-次の [07-ipc](./07-ipc.md) では、プロセス間通信を学びます
+次の [07-ipc](../07-ipc/) では、プロセス間通信を学びます
 
 - パイプは fd のペアで実現されている
 - 05-file-descriptor で学んだ fd の知識が活きる
 - 06-stdio で学んだバッファリングの注意点も重要
+
+---
+
+## [用語集](#glossary) {#glossary}
+
+{: .labeled}
+| 用語 | 英語 | 説明 |
+| ---------------------- | ------------------- | ------------------------------------------------ |
+| ストリーム | Stream | データの流れを抽象化したもの |
+| 構造体 | Struct | 複数のデータをまとめて1つの型として扱うもの |
+| 不透明な構造体 | Opaque Type | 内部構造が隠されており、直接アクセスできないもの |
+| ポインタ | Pointer | メモリの場所（アドレス）を指し示す値 |
+| 低レベル関数 | Low-level Function | OS に近い基本的な関数（write、read など） |
+| 高レベル関数 | High-level Function | 低レベル関数を便利にした関数（printf など） |
+| バッファ | Buffer | データを一時的に溜めておく領域 |
+| バッファリング | Buffering | データをバッファに溜めてまとめて処理すること |
+| フルバッファ | Full Buffering | バッファが一杯になったら出力するモード |
+| 行バッファ | Line Buffering | 改行または端末入力時に出力するモード |
+| フラッシュ | Flush | バッファの内容を強制的に出力すること |
+| 移植性 | Portability | 異なる環境でも同じように動作すること |
+| モード文字列 | Mode String | fopen() でファイルの開き方を指定する文字列 |
+| フォーマット指定子 | Format Specifier | printf 等で使う %d、%s など |
+| 改行文字 | Newline | 行の終わりを示す文字（\n） |
+| NULL 文字 | Null Character | 文字列の終端を示す文字（\0） |
+| バッファオーバーフロー | Buffer Overflow | バッファの容量を超えてデータが書き込まれること |
+| テキストデータ | Text Data | 人間が読める文字で構成されたデータ |
+| バイナリデータ | Binary Data | 人間が直接読めない形式のデータ |
+| EOF | End Of File | ファイルの終端 |
+| whence | Whence | 「どこから」の意味、位置の基準を指定する引数名 |
+
+---
+
+## [参考資料](#references) {#references}
+
+このページの内容は、以下のソースに基づいています
+
+- [stdio(3) - Linux manual page](https://man7.org/linux/man-pages/man3/stdio.3.html){:target="\_blank"}
+  - 標準入出力ライブラリの概要
+- [fopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fopen.3.html){:target="\_blank"}
+  - ファイルを開く
+- [fclose(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fclose.3.html){:target="\_blank"}
+  - ファイルを閉じる
+- [printf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/printf.3.html){:target="\_blank"}
+  - フォーマット付き出力
+- [scanf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/scanf.3.html){:target="\_blank"}
+  - フォーマット付き入力
+- [fread(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fread.3.html){:target="\_blank"}
+  - バイナリ読み取り
+- [fwrite(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fwrite.3.html){:target="\_blank"}
+  - バイナリ書き込み
+- [fgets(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fgets.3.html){:target="\_blank"}
+  - 行単位読み取り
+- [fputs(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fputs.3.html){:target="\_blank"}
+  - 行単位書き込み
+- [fflush(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fflush.3.html){:target="\_blank"}
+  - バッファをフラッシュ
+- [setvbuf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/setvbuf.3.html){:target="\_blank"}
+  - バッファリングの制御
+- [setbuf(3) - Linux manual page](https://man7.org/linux/man-pages/man3/setbuf.3.html){:target="\_blank"}
+  - バッファリングの制御（行バッファの詳細動作）
+- [fseek(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fseek.3.html){:target="\_blank"}
+  - ファイル位置の移動
+- [ftell(3) - Linux manual page](https://man7.org/linux/man-pages/man3/ftell.3.html){:target="\_blank"}
+  - 現在位置の取得
+- [ferror(3) - Linux manual page](https://man7.org/linux/man-pages/man3/ferror.3.html){:target="\_blank"}
+  - エラーフラグの確認
+- [feof(3) - Linux manual page](https://man7.org/linux/man-pages/man3/feof.3.html){:target="\_blank"}
+  - EOF フラグの確認
+- [fileno(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fileno.3.html){:target="\_blank"}
+  - FILE\* から fd を取得
+- [fdopen(3) - Linux manual page](https://man7.org/linux/man-pages/man3/fdopen.3.html){:target="\_blank"}
+  - fd から FILE\* を作成

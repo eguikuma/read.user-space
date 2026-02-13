@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: プロセス内で並行処理
+---
 
-# 04-thread：プロセス内で並行処理
+# [04-thread：プロセス内で並行処理](#concurrent-processing-in-process) {#concurrent-processing-in-process}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 前のトピック（03-signal）で、シグナルによるプロセス間の通知を学びました
 
@@ -20,7 +21,7 @@
 
 スレッドは、同じプロセス内で<strong>メモリを共有</strong>しながら複数の処理を並行して実行できます
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 プロセスを「1 つの家」、スレッドを「家に住む家族」と考えてみましょう
 
@@ -32,7 +33,7 @@ fork() は、隣に新しい家を建てて引っ越すようなものです
 
 でも、同時に冷蔵庫を開けようとすると困ることがあります（これが後で学ぶ「競合状態」です）
 
-### このページで学ぶこと
+### [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 <strong>pthread</strong>（POSIX Threads）は、スレッドを扱うための標準 API です
 
@@ -57,28 +58,29 @@ pthread を使えば、Linux でも macOS でも同じコードでスレッド�
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [スレッドとは何か](#スレッドとは何か)
-2. [スレッドとプロセスの違い](#スレッドとプロセスの違い)
-3. [pthread_create() によるスレッド作成](#pthread_create-によるスレッド作成)
-4. [pthread_join() による終了待ち](#pthread_join-による終了待ち)
-5. [pthread_exit() によるスレッド終了](#pthread_exit-によるスレッド終了)
-6. [メモリの共有](#メモリの共有)
-7. [競合状態（データ競合）](#競合状態データ競合)
-8. [ミューテックス（mutex）による排他制御](#ミューテックスmutexによる排他制御)
-9. [スレッドセーフな関数](#スレッドセーフな関数)
-10. [条件変数（condition variable）](#条件変数condition-variable)
-11. [スレッドとシグナル](#スレッドとシグナル)
-12. [pthread 関数のエラー処理](#pthread-関数のエラー処理)
-13. [用語集](#用語集)
-14. [参考資料](#参考資料)
+1. [スレッドとは何か](#what-is-a-thread)
+2. [スレッドとプロセスの違い](#difference-between-thread-and-process)
+3. [pthread_create() によるスレッド作成](#creating-threads-with-pthread-create)
+4. [pthread_join() による終了待ち](#waiting-for-threads-with-pthread-join)
+5. [pthread_exit() によるスレッド終了](#thread-termination-with-pthread-exit)
+6. [メモリの共有](#memory-sharing)
+7. [競合状態（データ競合）](#race-condition)
+8. [ミューテックス（mutex）による排他制御](#mutex-for-mutual-exclusion)
+9. [スレッドセーフな関数](#thread-safe-functions)
+10. [条件変数（condition variable）](#condition-variables)
+11. [スレッドとシグナル](#threads-and-signals)
+12. [pthread 関数のエラー処理](#pthread-error-handling)
+13. [次のステップ](#next-steps)
+14. [用語集](#glossary)
+15. [参考資料](#references)
 
 ---
 
-## スレッドとは何か
+## [スレッドとは何か](#what-is-a-thread) {#what-is-a-thread}
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>スレッド</strong>は、プロセス内で実行される「処理の流れ」です
 
@@ -92,13 +94,13 @@ Linux の公式マニュアルには、こう書かれています
 
 > 1 つのプロセスは複数のスレッドを含むことができ、それらはすべて同じプログラムを実行しています
 
-### スレッドが持つもの
+### [スレッドが持つもの](#what-a-thread-has) {#what-a-thread-has}
 
 各スレッドは、以下の要素を<strong>独自に</strong>持ちます
 
 - <strong>スタック</strong>
   - 局所変数を格納する領域です
-  - [01-process](./01-process.md) の「メモリの構造」で学習しました
+  - [01-process](../01-process/) の「メモリの構造」で学習しました
 - <strong>プログラムカウンタ</strong>
   - CPU が「今どの命令を実行しているか」を示す場所です
   - 各スレッドは独自の実行位置を持ちます
@@ -108,23 +110,23 @@ Linux の公式マニュアルには、こう書かれています
 - <strong>スレッド ID</strong>
   - そのスレッドを識別するための番号です
 
-### スレッドが共有するもの
+### [スレッドが共有するもの](#what-threads-share) {#what-threads-share}
 
 同じプロセス内のスレッドは、以下の要素を<strong>共有</strong>します
 
 - <strong>ヒープ</strong>
   - 動的に確保されるメモリ領域です
-  - [01-process](./01-process.md) の「メモリの構造」で学習しました
+  - [01-process](../01-process/) の「メモリの構造」で学習しました
 - <strong>グローバル変数</strong>
   - プログラム全体で使える変数です
 - <strong>静的変数</strong>
   - `static` キーワードで宣言された変数です
   - 関数内で宣言しても、プログラム終了まで値が保持されます
 - <strong>ファイルディスクリプタ</strong>
-  - [05-file-descriptor](./05-file-descriptor.md) で詳しく学習します
+  - [05-file-descriptor](../05-file-descriptor/) で詳しく学習します
 - <strong>プロセス ID</strong>
 
-### 「リソースを共有する」とは
+### [「リソースを共有する」とは](#what-sharing-resources-means) {#what-sharing-resources-means}
 
 スレッドについて「リソースを共有する」という説明をよく目にします
 
@@ -134,27 +136,29 @@ Linux の公式マニュアルには、こう書かれています
 
 <strong>スレッド間で共有されるリソース</strong>
 
-| リソース                  | 説明                                                                        |
+{: .labeled}
+| リソース | 説明 |
 | ------------------------- | --------------------------------------------------------------------------- |
-| 仮想アドレス空間          | プロセスに割り当てられたメモリの「見え方」（[01-process](./01-process.md)） |
-| ヒープ領域                | malloc() で確保したメモリ                                                   |
-| グローバル変数            | プログラム全体で使う変数                                                    |
-| 静的変数（static）        | 関数内でも値が保持される変数                                                |
-| ファイルディスクリプタ    | 開いているファイルの番号（[05-file-descriptor](./05-file-descriptor.md)）   |
-| シグナルハンドラ          | シグナル受信時の動作設定（[03-signal](./03-signal.md)）                     |
-| 作業ディレクトリ          | プロセスの「今いる場所」                                                    |
-| ユーザー ID / グループ ID | 権限情報                                                                    |
+| 仮想アドレス空間 | プロセスに割り当てられたメモリの「見え方」（[01-process](../01-process/)） |
+| ヒープ領域 | malloc() で確保したメモリ |
+| グローバル変数 | プログラム全体で使う変数 |
+| 静的変数（static） | 関数内でも値が保持される変数 |
+| ファイルディスクリプタ | 開いているファイルの番号（[05-file-descriptor](../05-file-descriptor/)） |
+| シグナルハンドラ | シグナル受信時の動作設定（[03-signal](../03-signal/)） |
+| 作業ディレクトリ | プロセスの「今いる場所」 |
+| ユーザー ID / グループ ID | 権限情報 |
 
 <strong>スレッドごとに独立しているリソース</strong>
 
-| リソース           | 説明                                                                                                                                                    |
+{: .labeled}
+| リソース | 説明 |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| スタック           | 関数の局所変数を格納する領域                                                                                                                            |
-| プログラムカウンタ | 今どの命令を実行しているか                                                                                                                              |
-| レジスタ           | CPU の一時的な作業領域                                                                                                                                  |
-| スレッド ID        | そのスレッドを識別する番号                                                                                                                              |
-| シグナルマスク     | どのシグナルを一時的にブロックするか（ブロック中のシグナルは無視されるのではなく保留され、ブロック解除時に配信されます）（[03-signal](./03-signal.md)） |
-| errno              | エラー番号を格納する変数（[01-process](./01-process.md) の「C 言語の読み方」で説明）                                                                    |
+| スタック | 関数の局所変数を格納する領域 |
+| プログラムカウンタ | 今どの命令を実行しているか |
+| レジスタ | CPU の一時的な作業領域 |
+| スレッド ID | そのスレッドを識別する番号 |
+| シグナルマスク | どのシグナルを一時的にブロックするか（ブロック中のシグナルは無視されるのではなく保留され、ブロック解除時に配信されます）（[03-signal](../03-signal/)） |
+| errno | エラー番号を格納する変数（[01-process](../01-process/) の「C 言語の読み方」で説明） |
 
 <strong>共有と独立の意味</strong>
 
@@ -165,9 +169,9 @@ Linux の公式マニュアルには、こう書かれています
 
 ---
 
-## スレッドとプロセスの違い
+## [スレッドとプロセスの違い](#difference-between-thread-and-process) {#difference-between-thread-and-process}
 
-### なぜスレッドが必要なのか
+### [なぜスレッドが必要なのか](#why-threads-are-needed) {#why-threads-are-needed}
 
 <strong>もしすべてを fork() で実現したら？</strong>
 
@@ -199,17 +203,18 @@ fork() はページテーブルのコピーや、プロセステーブルへの�
 - IPC の設定が不要
 - 作成コストが小さい
 
-### 比較表
+### [比較表](#comparison-table) {#comparison-table}
 
-| 項目               | プロセス（fork）                                   | スレッド（pthread）      |
+{: .labeled}
+| 項目 | プロセス（fork） | スレッド（pthread） |
 | ------------------ | -------------------------------------------------- | ------------------------ |
-| メモリ空間         | 独立（コピー）                                     | 共有                     |
-| 作成コスト         | 大きい                                             | 小さい                   |
-| 通信方法           | IPC（プロセス間通信、[07-ipc](./07-ipc.md)）が必要 | 変数を直接共有           |
-| 終了時の影響       | 他のプロセスに影響なし                             | 同じプロセス内に影響あり |
-| デバッグのしやすさ | 比較的しやすい                                     | 難しい（競合状態等）     |
+| メモリ空間 | 独立（コピー） | 共有 |
+| 作成コスト | 大きい | 小さい |
+| 通信方法 | IPC（プロセス間通信、[07-ipc](../07-ipc/)）が必要 | 変数を直接共有 |
+| 終了時の影響 | 他のプロセスに影響なし | 同じプロセス内に影響あり |
+| デバッグのしやすさ | 比較的しやすい | 難しい（競合状態等） |
 
-### fork() との対比
+### [fork() との対比](#comparison-with-fork) {#comparison-with-fork}
 
 fork() では、以下のような動作になります
 
@@ -221,7 +226,7 @@ fork() では、以下のような動作になります
 - あるスレッドがグローバル変数を変更すると、他のスレッドからも見える
 - これは、スレッドがメモリを共有しているから
 
-### いつスレッドを使うか
+### [いつスレッドを使うか](#when-to-use-threads) {#when-to-use-threads}
 
 スレッドが適しているケース
 
@@ -237,9 +242,9 @@ fork() が適しているケース
 
 ---
 
-## pthread_create() によるスレッド作成
+## [pthread_create() によるスレッド作成](#creating-threads-with-pthread-create) {#creating-threads-with-pthread-create}
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage) {#basic-usage}
 
 pthread_create() は、新しいスレッドを作成します
 
@@ -254,18 +259,19 @@ pthread_create(&thread, NULL, thread_function, argument);
 
 プロセス ID を格納する pid_t と同様に、スレッド ID を格納します
 
-### 引数の説明
+### [引数の説明](#argument-description) {#argument-description}
 
-| 引数      | 型                 | 説明                                          |
+{: .labeled}
+| 引数 | 型 | 説明 |
 | --------- | ------------------ | --------------------------------------------- |
-| 第 1 引数 | pthread_t \*       | スレッド ID を格納する変数                    |
-| 第 2 引数 | pthread_attr_t \*  | スレッドの属性（NULL でデフォルト設定を使用） |
-| 第 3 引数 | void _(_)(void \*) | スレッドで実行する関数                        |
-| 第 4 引数 | void \*            | 関数に渡す引数                                |
+| 第 1 引数 | pthread*t \* | スレッド ID を格納する変数 |
+| 第 2 引数 | pthread_attr_t \* | スレッドの属性（NULL でデフォルト設定を使用） |
+| 第 3 引数 | void *(\_)(void \*) | スレッドで実行する関数 |
+| 第 4 引数 | void \* | 関数に渡す引数 |
 
-<strong>void \*</strong> については [01-process](./01-process.md) の「C 言語の読み方」で説明しています
+<strong>void \*</strong> については [01-process](../01-process/) の「C 言語の読み方」で説明しています
 
-### スレッド関数の形式
+### [スレッド関数の形式](#thread-function-format) {#thread-function-format}
 
 ```c
 void *thread_function(void *argument) {
@@ -279,9 +285,9 @@ void *thread_function(void *argument) {
 
 ---
 
-## pthread_join() による終了待ち
+## [pthread_join() による終了待ち](#waiting-for-threads-with-pthread-join) {#waiting-for-threads-with-pthread-join}
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage-join) {#basic-usage-join}
 
 pthread_join() は、指定したスレッドが終了するまで待機します
 
@@ -293,18 +299,19 @@ pthread_create(&thread, NULL, thread_function, NULL);
 pthread_join(thread, &result);  /* スレッドの終了を待つ */
 ```
 
-### wait() との類似点
+### [wait() との類似点](#similarity-with-wait) {#similarity-with-wait}
 
 02-fork-exec で学んだ wait() は、子プロセスの終了を待ちました
 
 pthread_join() は、スレッド版の wait() のようなものです
 
-| 関数           | 対象       | 取得できるもの    |
+{: .labeled}
+| 関数 | 対象 | 取得できるもの |
 | -------------- | ---------- | ----------------- |
-| wait()         | 子プロセス | 終了ステータス    |
-| pthread_join() | スレッド   | 戻り値（void \*） |
+| wait() | 子プロセス | 終了ステータス |
+| pthread_join() | スレッド | 戻り値（void \*） |
 
-### join しないとどうなるか
+### [join しないとどうなるか](#what-happens-without-join) {#what-happens-without-join}
 
 main() が return や exit() で終了すると、プロセス全体が終了し、すべてのスレッドも終了します
 
@@ -320,9 +327,9 @@ pthread_detach() で設定できますが、詳細は省略します
 
 ---
 
-## pthread_exit() によるスレッド終了
+## [pthread_exit() によるスレッド終了](#thread-termination-with-pthread-exit) {#thread-termination-with-pthread-exit}
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage-exit) {#basic-usage-exit}
 
 pthread_exit() は、現在のスレッドを終了します
 
@@ -333,7 +340,7 @@ void *thread_function(void *argument) {
 }
 ```
 
-### return との違い
+### [return との違い](#difference-from-return) {#difference-from-return}
 
 スレッド関数では、return と pthread_exit() はほぼ同じです
 
@@ -344,7 +351,7 @@ pthread_exit(NULL); /* スレッドを終了（同じ効果） */
 
 ただし、pthread_exit() はスレッド関数以外からも呼べます
 
-### メインスレッドで pthread_exit() を呼ぶと
+### [メインスレッドで pthread_exit() を呼ぶと](#calling-pthread-exit-in-main) {#calling-pthread-exit-in-main}
 
 メインスレッドで pthread_exit() を呼ぶと、メインスレッドだけが終了します
 
@@ -358,7 +365,7 @@ int main() {
 }
 ```
 
-### main() で return すると
+### [main() で return すると](#returning-from-main) {#returning-from-main}
 
 main() 関数で return すると、暗黙的に exit() が呼ばれ、<strong>プロセス全体が終了</strong>します
 
@@ -372,11 +379,12 @@ int main() {
 }
 ```
 
-| 終了方法                 | 動作                                         |
+{: .labeled}
+| 終了方法 | 動作 |
 | ------------------------ | -------------------------------------------- |
-| return（main内）         | プロセス全体が終了（全スレッド終了）         |
+| return（main内） | プロセス全体が終了（全スレッド終了） |
 | pthread_exit()（main内） | メインスレッドだけ終了（他のスレッドは継続） |
-| exit()                   | プロセス全体が終了（全スレッド終了）         |
+| exit() | プロセス全体が終了（全スレッド終了） |
 
 <strong>他のスレッドの完了を待ちたい場合</strong>
 
@@ -387,9 +395,9 @@ int main() {
 
 ---
 
-## メモリの共有
+## [メモリの共有](#memory-sharing) {#memory-sharing}
 
-### 共有されるもの
+### [共有されるもの](#what-is-shared) {#what-is-shared}
 
 同じプロセス内のスレッドは、以下のメモリを共有します
 
@@ -397,7 +405,7 @@ int main() {
 - 静的変数（static）
 - ヒープ（malloc で確保した領域）
 
-### 共有されないもの
+### [共有されないもの](#what-is-not-shared) {#what-is-not-shared}
 
 各スレッドは独自のスタックを持ちます
 
@@ -407,7 +415,7 @@ int main() {
 
 ただし、ポインタを渡せば間接的にアクセスできます
 
-### fork() との対比
+### [fork() との対比](#comparison-with-fork-memory) {#comparison-with-fork-memory}
 
 fork() では、子プロセスが変数を変更しても親には見えません
 
@@ -427,13 +435,13 @@ global_counter = 100;  /* スレッドで変更 */
 
 ---
 
-## 競合状態（データ競合）
+## [競合状態（データ競合）](#race-condition) {#race-condition}
 
-### 競合状態とは
+### [競合状態とは](#what-is-race-condition) {#what-is-race-condition}
 
 <strong>競合状態（Race Condition）</strong>とは、複数のスレッドが同じデータに同時にアクセスし、実行順序によって結果が変わってしまう状態です
 
-### 具体例
+### [具体例](#concrete-examples) {#concrete-examples}
 
 ```c
 int counter = 0;
@@ -450,7 +458,7 @@ void *increment(void *arg) {
 
 しかし、実際は 200000 より少ない値になることがあります
 
-### なぜ起こるか
+### [なぜ起こるか](#why-it-occurs) {#why-it-occurs}
 
 `counter++` は、実際には 3 つの操作に分かれます
 
@@ -460,28 +468,29 @@ void *increment(void *arg) {
 
 2 つのスレッドがこれらの操作を交互に実行すると、以下のようなことが起こります
 
-| スレッド A        | スレッド B        | counter の値 |
+{: .labeled}
+| スレッド A | スレッド B | counter の値 |
 | ----------------- | ----------------- | ------------ |
-| 読み取り（0）     |                   | 0            |
-|                   | 読み取り（0）     | 0            |
-| 加算（0 + 1 = 1） |                   | 0            |
-|                   | 加算（0 + 1 = 1） | 0            |
-| 書き込み（1）     |                   | 1            |
-|                   | 書き込み（1）     | 1            |
+| 読み取り（0） | | 0 |
+| | 読み取り（0） | 0 |
+| 加算（0 + 1 = 1） | | 0 |
+| | 加算（0 + 1 = 1） | 0 |
+| 書き込み（1） | | 1 |
+| | 書き込み（1） | 1 |
 
 両方のスレッドが counter++ を実行したのに、counter は 1 しか増えていません
 
 ---
 
-## ミューテックス（mutex）による排他制御
+## [ミューテックス（mutex）による排他制御](#mutex-for-mutual-exclusion) {#mutex-for-mutual-exclusion}
 
-### ミューテックスとは
+### [ミューテックスとは](#what-is-mutex) {#what-is-mutex}
 
 <strong>ミューテックス（Mutex）</strong>は、Mutual Exclusion（相互排他）の略です
 
 一度に 1 つのスレッドだけがコードの特定部分を実行できるようにします
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage-mutex) {#basic-usage-mutex}
 
 ```c
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -495,13 +504,13 @@ void *thread_function(void *arg) {
 }
 ```
 
-### クリティカルセクション
+### [クリティカルセクション](#critical-section) {#critical-section}
 
 <strong>クリティカルセクション</strong>とは、同時に複数のスレッドが実行してはいけない区間です
 
 lock と unlock の間がクリティカルセクションになります
 
-### 競合状態の解決
+### [競合状態の解決](#resolving-race-condition) {#resolving-race-condition}
 
 ```c
 int counter = 0;
@@ -519,7 +528,7 @@ void *increment(void *arg) {
 
 これで counter は確実に 200000 になります
 
-### デッドロックに注意
+### [デッドロックに注意](#beware-of-deadlock) {#beware-of-deadlock}
 
 <strong>デッドロック</strong>とは、複数のスレッドが互いにロックを待ち続けて、どちらも進めなくなる状態です
 
@@ -535,16 +544,17 @@ pthread_mutex_lock(&mutex1);  /* mutex1 を待つ */
 
 上記の場合、スレッド A は mutex2 を、スレッド B は mutex1 を待ち続け、永遠に進みません
 
-### なぜデッドロック防止は難しいのか
+### [なぜデッドロック防止は難しいのか](#why-deadlock-prevention-is-difficult) {#why-deadlock-prevention-is-difficult}
 
 デッドロックが発生する 4 つの条件（<strong>Coffman 条件</strong>）は知られています
 
-| 条件       | 説明                                        |
+{: .labeled}
+| 条件 | 説明 |
 | ---------- | ------------------------------------------- |
-| 相互排他   | リソースは一度に 1 つのスレッドしか使えない |
-| 保持と待機 | リソースを保持したまま、他のリソースを待つ  |
-| 横取り不可 | 保持中のリソースを強制的に奪えない          |
-| 循環待ち   | 待ちの連鎖が循環している                    |
+| 相互排他 | リソースは一度に 1 つのスレッドしか使えない |
+| 保持と待機 | リソースを保持したまま、他のリソースを待つ |
+| 横取り不可 | 保持中のリソースを強制的に奪えない |
+| 循環待ち | 待ちの連鎖が循環している |
 
 <strong>理論的には</strong>、これらの条件を 1 つでも崩せばデッドロックは発生しません
 
@@ -559,13 +569,13 @@ pthread_mutex_lock(&mutex1);  /* mutex1 を待つ */
 
 ---
 
-## スレッドセーフな関数
+## [スレッドセーフな関数](#thread-safe-functions) {#thread-safe-functions}
 
-### スレッドセーフとは
+### [スレッドセーフとは](#what-is-thread-safe) {#what-is-thread-safe}
 
 <strong>スレッドセーフ</strong>とは、複数のスレッドから同時に呼び出しても安全に動作することです
 
-### なぜ同じ関数が安全でないことがあるのか
+### [なぜ同じ関数が安全でないことがあるのか](#why-same-function-can-be-unsafe) {#why-same-function-can-be-unsafe}
 
 一部の関数は<strong>内部状態</strong>を保持しています
 
@@ -610,9 +620,9 @@ char *token3 = strtok_r(NULL, ",", &saveptr1);  /* saveptr1 を使うので安�
 
 ---
 
-## 条件変数（condition variable）
+## [条件変数（condition variable）](#condition-variables) {#condition-variables}
 
-### なぜミューテックスだけでは不十分なのか
+### [なぜミューテックスだけでは不十分なのか](#why-mutex-alone-is-insufficient) {#why-mutex-alone-is-insufficient}
 
 「データが準備できたら処理を始める」というシナリオを考えてみましょう
 
@@ -634,11 +644,12 @@ while (1) {
 
 <strong>この方法の問題点</strong>
 
-| 問題     | 説明                                           |
+{: .labeled}
+| 問題 | 説明 |
 | -------- | ---------------------------------------------- |
-| CPU 消費 | 何度もロック・アンロックを繰り返す             |
-| 応答遅延 | sleep() の間は条件の変化に気づけない           |
-| 非効率   | データが準備されていなくても何度もチェックする |
+| CPU 消費 | 何度もロック・アンロックを繰り返す |
+| 応答遅延 | sleep() の間は条件の変化に気づけない |
+| 非効率 | データが準備されていなくても何度もチェックする |
 
 <strong>条件変数による解決</strong>
 
@@ -648,13 +659,13 @@ while (1) {
 - 条件が満たされた瞬間に起きる
 - ポーリングの無駄がない
 
-### 条件変数とは
+### [条件変数とは](#what-is-condition-variable) {#what-is-condition-variable}
 
 <strong>条件変数</strong>は、ある条件が満たされるまでスレッドを待機させる仕組みです
 
 ミューテックスと組み合わせて使います
 
-### 基本的な使い方
+### [基本的な使い方](#basic-usage-cond) {#basic-usage-cond}
 
 ```c
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -682,13 +693,13 @@ void *producer(void *arg) {
 }
 ```
 
-### pthread_cond_wait() の動作
+### [pthread_cond_wait() の動作](#pthread-cond-wait-behavior) {#pthread-cond-wait-behavior}
 
 1. mutex のロックを解放する
 2. 条件変数で待機する
 3. シグナルを受け取ったら mutex を再取得する
 
-### なぜ while でチェックするか
+### [なぜ while でチェックするか](#why-check-with-while) {#why-check-with-while}
 
 ```c
 while (!data_ready) {  /* if ではなく while */
@@ -711,25 +722,25 @@ while でループすることで、本当に条件が満たされているか�
 
 ---
 
-## スレッドとシグナル
+## [スレッドとシグナル](#threads-and-signals) {#threads-and-signals}
 
-### 境界トピックとして
+### [境界トピックとして](#as-boundary-topic) {#as-boundary-topic}
 
 スレッドとシグナルの組み合わせは複雑です
 
 ここでは基本的な注意点のみ説明します
 
-### どのスレッドがシグナルを受け取るか
+### [どのスレッドがシグナルを受け取るか](#which-thread-receives-signals) {#which-thread-receives-signals}
 
 プロセス宛てのシグナル（kill コマンドで送られるものなど）は、どのスレッドが受け取るか不定です
 
-kill コマンドについては [03-signal](./03-signal.md) で学びました
+kill コマンドについては [03-signal](../03-signal/) で学びました
 
 特定のスレッドにシグナルを送るには pthread_kill() を使います
 
 <strong>pthread_kill()</strong> は、指定したスレッドにシグナルを送る関数です
 
-### 推奨されるパターン
+### [推奨されるパターン](#recommended-pattern) {#recommended-pattern}
 
 マルチスレッドプログラムでは、以下のパターンが推奨されます
 
@@ -752,21 +763,21 @@ int sig;
 sigwait(&set, &sig);  /* シグナルを同期的に待つ */
 ```
 
-### 03-signal で学んだ注意点
+### [03-signal で学んだ注意点](#notes-learned-in-signal) {#notes-learned-in-signal}
 
 シグナルハンドラ内では、<strong>非同期シグナル安全</strong>な関数しか呼べません
 
 <strong>非同期シグナル安全</strong>とは、シグナルハンドラ内で安全に呼び出せることを意味します
 
-詳しくは [03-signal](./03-signal.md) を参照してください
+詳しくは [03-signal](../03-signal/) を参照してください
 
 スレッドを使う場合も同様です
 
 ---
 
-## pthread 関数のエラー処理
+## [pthread 関数のエラー処理](#pthread-error-handling) {#pthread-error-handling}
 
-### 通常のシステムコールとの違い
+### [通常のシステムコールとの違い](#difference-from-regular-syscalls) {#difference-from-regular-syscalls}
 
 pthread 関数のエラー処理は、通常のシステムコールとは異なる重要な特徴があります
 
@@ -789,7 +800,7 @@ Linux の公式マニュアル（pthreads(7)）には、こう書かれていま
 >
 > pthread 関数は errno を設定しないことに注意してください
 
-### 正しいエラー処理の例
+### [正しいエラー処理の例](#correct-error-handling-example) {#correct-error-handling-example}
 
 ```c
 int result = pthread_create(&thread, NULL, thread_function, NULL);
@@ -801,7 +812,7 @@ if (result != 0) {
 }
 ```
 
-### なぜ errno を使わないのか
+### [なぜ errno を使わないのか](#why-not-using-errno) {#why-not-using-errno}
 
 pthread 関数が errno を使わない理由は、スレッドセーフであるためです
 
@@ -809,7 +820,7 @@ errno はスレッドごとに独立していますが、pthread 関数が errno
 
 戻り値で直接エラー番号を返すことで、この問題を回避しています
 
-### よくある間違い
+### [よくある間違い](#common-mistakes) {#common-mistakes}
 
 ```c
 /* 間違った例：errno を使っている */
@@ -828,62 +839,7 @@ if (result != 0) {
 
 ---
 
-## 用語集
-
-| 用語                     | 英語                                | 説明                                                           |
-| ------------------------ | ----------------------------------- | -------------------------------------------------------------- |
-| スレッド                 | Thread                              | プロセス内の実行の流れ                                         |
-| メインスレッド           | Main Thread                         | プロセス開始時に作られる最初のスレッド                         |
-| POSIX スレッド           | POSIX Threads                       | pthread ライブラリの正式名称                                   |
-| API                      | Application Programming Interface   | プログラムが特定の機能を使うための窓口                         |
-| POSIX                    | Portable Operating System Interface | UNIX 系 OS の標準規格                                          |
-| 並行処理                 | Concurrent Processing               | 複数の処理を同時期に進めること                                 |
-| 排他制御                 | Mutual Exclusion                    | 同時アクセスを防ぐ仕組み                                       |
-| ミューテックス           | Mutex                               | 排他制御を実現するためのロック機構                             |
-| クリティカルセクション   | Critical Section                    | 同時実行を許さないコード区間                                   |
-| 競合状態                 | Race Condition                      | 実行順序によって結果が変わる状態                               |
-| デッドロック             | Deadlock                            | 互いにロックを待ち続けて進めなくなる状態                       |
-| 条件変数                 | Condition Variable                  | 条件を待つための同期機構                                       |
-| スプリアスウェイクアップ | Spurious Wakeup                     | 条件を満たさずに待機から復帰すること                           |
-| スレッドセーフ           | Thread-Safe                         | 複数スレッドから安全に呼べること                               |
-| プログラムカウンタ       | Program Counter                     | CPU が実行中の命令の位置を示すもの                             |
-| レジスタ                 | Register                            | CPU 内部の高速な一時記憶領域                                   |
-| 仮想アドレス空間         | Virtual Address Space               | プロセスに割り当てられたメモリの見え方                         |
-| 静的変数                 | Static Variable                     | static キーワードで宣言された変数                              |
-| 自動変数                 | Automatic Variable                  | 局所変数の別名、スタックに格納される                           |
-| IPC                      | Inter-Process Communication         | プロセス間通信                                                 |
-| バックグラウンド処理     | Background Processing               | ユーザー操作を妨げない裏での処理                               |
-| デタッチ                 | Detach                              | スレッドの終了を待たない設定にすること                         |
-| シグナルハンドラ         | Signal Handler                      | シグナル受信時に実行される関数                                 |
-| シグナルマスク           | Signal Mask                         | ブロックするシグナルの設定（ブロック中は保留され後で配信）     |
-| 非同期シグナル安全       | Async-Signal-Safe                   | シグナルハンドラ内で安全に呼び出せること                       |
-| pthread_t                | -                                   | スレッド ID を格納する型                                       |
-| errno                    | -                                   | エラー番号を格納するスレッドごとの変数（pthread は使用しない） |
-
----
-
-## 参考資料
-
-このページの内容は、以下のソースに基づいています
-
-- [pthreads(7) - Linux manual page](https://man7.org/linux/man-pages/man7/pthreads.7.html)
-  - POSIX スレッドの概要
-- [pthread_create(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_create.3.html)
-  - スレッドの作成
-- [pthread_join(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_join.3.html)
-  - スレッドの終了待ち
-- [pthread_exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_exit.3.html)
-  - スレッドの終了
-- [pthread_mutex_lock(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3.html)
-  - ミューテックスのロック
-- [pthread_cond_wait(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_cond_wait.3.html)
-  - 条件変数での待機
-- [pthread_cancel(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_cancel.3.html)
-  - スレッドのキャンセル
-
----
-
-## 次のステップ
+## [次のステップ](#next-steps) {#next-steps}
 
 このトピックでは、「プロセス内で並行処理を行う方法」を学びました
 
@@ -892,10 +848,66 @@ if (result != 0) {
 - 競合状態とその解決方法（ミューテックス）
 - 条件変数による同期
 
-次の [05-file-descriptor](./05-file-descriptor.md) では、OS のファイル管理機構を学びます
+次の [05-file-descriptor](../05-file-descriptor/) では、OS のファイル管理機構を学びます
 
 - ファイルディスクリプタとは何か
 - 01-process で観察した fd の仕組みを詳しく理解
 - リダイレクトの実装原理
 
 これらの疑問に答えます
+
+---
+
+## [用語集](#glossary) {#glossary}
+
+{: .labeled}
+| 用語 | 英語 | 説明 |
+| ------------------------ | ----------------------------------- | -------------------------------------------------------------- |
+| スレッド | Thread | プロセス内の実行の流れ |
+| メインスレッド | Main Thread | プロセス開始時に作られる最初のスレッド |
+| POSIX スレッド | POSIX Threads | pthread ライブラリの正式名称 |
+| API | Application Programming Interface | プログラムが特定の機能を使うための窓口 |
+| POSIX | Portable Operating System Interface | UNIX 系 OS の標準規格 |
+| 並行処理 | Concurrent Processing | 複数の処理を同時期に進めること |
+| 排他制御 | Mutual Exclusion | 同時アクセスを防ぐ仕組み |
+| ミューテックス | Mutex | 排他制御を実現するためのロック機構 |
+| クリティカルセクション | Critical Section | 同時実行を許さないコード区間 |
+| 競合状態 | Race Condition | 実行順序によって結果が変わる状態 |
+| デッドロック | Deadlock | 互いにロックを待ち続けて進めなくなる状態 |
+| 条件変数 | Condition Variable | 条件を待つための同期機構 |
+| スプリアスウェイクアップ | Spurious Wakeup | 条件を満たさずに待機から復帰すること |
+| スレッドセーフ | Thread-Safe | 複数スレッドから安全に呼べること |
+| プログラムカウンタ | Program Counter | CPU が実行中の命令の位置を示すもの |
+| レジスタ | Register | CPU 内部の高速な一時記憶領域 |
+| 仮想アドレス空間 | Virtual Address Space | プロセスに割り当てられたメモリの見え方 |
+| 静的変数 | Static Variable | static キーワードで宣言された変数 |
+| 自動変数 | Automatic Variable | 局所変数の別名、スタックに格納される |
+| IPC | Inter-Process Communication | プロセス間通信 |
+| バックグラウンド処理 | Background Processing | ユーザー操作を妨げない裏での処理 |
+| デタッチ | Detach | スレッドの終了を待たない設定にすること |
+| シグナルハンドラ | Signal Handler | シグナル受信時に実行される関数 |
+| シグナルマスク | Signal Mask | ブロックするシグナルの設定（ブロック中は保留され後で配信） |
+| 非同期シグナル安全 | Async-Signal-Safe | シグナルハンドラ内で安全に呼び出せること |
+| pthread_t | - | スレッド ID を格納する型 |
+| errno | - | エラー番号を格納するスレッドごとの変数（pthread は使用しない） |
+
+---
+
+## [参考資料](#references) {#references}
+
+このページの内容は、以下のソースに基づいています
+
+- [pthreads(7) - Linux manual page](https://man7.org/linux/man-pages/man7/pthreads.7.html){:target="\_blank"}
+  - POSIX スレッドの概要
+- [pthread_create(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_create.3.html){:target="\_blank"}
+  - スレッドの作成
+- [pthread_join(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_join.3.html){:target="\_blank"}
+  - スレッドの終了待ち
+- [pthread_exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_exit.3.html){:target="\_blank"}
+  - スレッドの終了
+- [pthread_mutex_lock(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_mutex_lock.3.html){:target="\_blank"}
+  - ミューテックスのロック
+- [pthread_cond_wait(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_cond_wait.3.html){:target="\_blank"}
+  - 条件変数での待機
+- [pthread_cancel(3) - Linux manual page](https://man7.org/linux/man-pages/man3/pthread_cancel.3.html){:target="\_blank"}
+  - スレッドのキャンセル

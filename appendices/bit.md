@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜビット演算を使うのか
+---
 
-# なぜビット演算を使うのか
+# [なぜビット演算を使うのか](#why-use-bitwise-operations) {#why-use-bitwise-operations}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 <strong>ビット演算</strong>とは、数値を「ビット（0 と 1 の並び）」として操作する演算です
 
@@ -14,7 +15,7 @@ C 言語やシステムプログラミングでは、複数のオプション（
 int fd = open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 ```
 
-### なぜシステムプログラミングでビット演算が必須なのか
+### [なぜシステムプログラミングでビット演算が必須なのか](#why-bitwise-is-essential-in-system-programming) {#why-bitwise-is-essential-in-system-programming}
 
 <strong>もし bool 配列でフラグを渡すとしたら？</strong>
 
@@ -29,11 +30,12 @@ struct OpenFlags {
 open("file.txt", &flags, 0644);
 ```
 
-| 問題         | 説明                                                              |
+{: .labeled}
+| 問題 | 説明 |
 | ------------ | ----------------------------------------------------------------- |
-| メモリ効率   | bool 1 つに 1 バイト使う vs ビットなら 32 フラグを 4 バイトに格納 |
-| API の複雑さ | フラグが増えるたびに構造体が肥大化                                |
-| 互換性       | 古い API との後方互換性が困難                                     |
+| メモリ効率 | bool 1 つに 1 バイト使う vs ビットなら 32 フラグを 4 バイトに格納 |
+| API の複雑さ | フラグが増えるたびに構造体が肥大化 |
+| 互換性 | 古い API との後方互換性が困難 |
 
 ビット演算を使えば、1 つの整数で多くのオプションを効率よく表現できます
 
@@ -41,17 +43,17 @@ open("file.txt", &flags, 0644);
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [スイッチで理解するビット演算](#スイッチで理解するビット演算)
-- [よくある疑問](#よくある疑問)
-- [実践パターン](#実践パターン)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [スイッチで理解するビット演算](#understanding-bitwise-with-switches)
+- [よくある疑問](#frequently-asked-questions)
+- [実践パターン](#practical-patterns)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## スイッチで理解するビット演算
+## [スイッチで理解するビット演算](#understanding-bitwise-with-switches) {#understanding-bitwise-with-switches}
 
 4つのスイッチがある部屋を想像してください
 
@@ -62,7 +64,7 @@ open("file.txt", &flags, 0644);
 
 ---
 
-### AND（`&`）
+### [AND（`&`）](#and-operator) {#and-operator}
 
 <strong>スイッチの例：特定のスイッチが ON か確認する</strong>
 
@@ -93,7 +95,7 @@ if (flags & O_CREAT) {
 
 ---
 
-### OR（`|`）
+### [OR（`|`）](#or-operator) {#or-operator}
 
 <strong>スイッチの例：スイッチを ON にする</strong>
 
@@ -121,7 +123,7 @@ open("file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
 
 ---
 
-### NOT（`~`）
+### [NOT（`~`）](#not-operator) {#not-operator}
 
 <strong>スイッチの例：全部のスイッチを反転する</strong>
 
@@ -149,7 +151,7 @@ flags &= ~O_CREAT;
 
 ---
 
-### XOR（`^`）
+### [XOR（`^`）](#xor-operator) {#xor-operator}
 
 <strong>スイッチの例：押すたびに ON/OFF が切り替わる</strong>
 
@@ -185,7 +187,7 @@ flags ^= O_CREAT;
 
 ---
 
-### 左シフト（`<<`）
+### [左シフト（`<<`）](#left-shift) {#left-shift}
 
 <strong>スイッチの例：スイッチを左にずらす</strong>
 
@@ -227,7 +229,7 @@ flags ^= O_CREAT;
 
 ---
 
-### 右シフト（`>>`）
+### [右シフト（`>>`）](#right-shift) {#right-shift}
 
 <strong>スイッチの例：スイッチを右にずらす</strong>
 
@@ -264,9 +266,9 @@ flags ^= O_CREAT;
 
 ---
 
-## よくある疑問
+## [よくある疑問](#frequently-asked-questions) {#frequently-asked-questions}
 
-### なぜフラグは OR で組み合わせるのか
+### [なぜフラグは OR で組み合わせるのか](#why-combine-flags-with-or) {#why-combine-flags-with-or}
 
 `open()` の第2引数では、複数のフラグを `|` で組み合わせます
 
@@ -324,7 +326,7 @@ O_CREAT | O_CREAT = O_CREAT
 
 ---
 
-### 0x1F とは何をしているのか
+### [0x1F とは何をしているのか](#what-does-0x1f-do) {#what-does-0x1f-do}
 
 `0x1F` のような値を見たら、<strong>マスク</strong>だと思ってください
 
@@ -355,13 +357,14 @@ result:  00010110  （下位5ビットだけ取り出した）
 
 <strong>よく使うマスク</strong>
 
-| マスク | 2進数    | 取り出すビット |
+{: .labeled}
+| マスク | 2進数 | 取り出すビット |
 | ------ | -------- | -------------- |
-| `0x0F` | 00001111 | 下位4ビット    |
-| `0x1F` | 00011111 | 下位5ビット    |
-| `0x3F` | 00111111 | 下位6ビット    |
-| `0x7F` | 01111111 | 下位7ビット    |
-| `0xFF` | 11111111 | 下位8ビット    |
+| `0x0F` | 00001111 | 下位4ビット |
+| `0x1F` | 00011111 | 下位5ビット |
+| `0x3F` | 00111111 | 下位6ビット |
+| `0x7F` | 01111111 | 下位7ビット |
+| `0xFF` | 11111111 | 下位8ビット |
 
 <strong>マスクの作り方</strong>
 
@@ -376,27 +379,29 @@ result:  00010110  （下位5ビットだけ取り出した）
 
 ---
 
-## 実践パターン
+## [実践パターン](#practical-patterns) {#practical-patterns}
 
-| やりたいこと     | 演算      | コード                 |
+{: .labeled}
+| やりたいこと | 演算 | コード |
 | ---------------- | --------- | ---------------------- |
-| フラグを ON      | OR        | `flags \|= O_CREAT;`   |
-| フラグを OFF     | NOT + AND | `flags &= ~O_CREAT;`   |
-| フラグを切り替え | XOR       | `flags ^= O_CREAT;`    |
-| フラグを確認     | AND       | `if (flags & O_CREAT)` |
+| フラグを ON | OR | `flags \|= O_CREAT;` |
+| フラグを OFF | NOT + AND | `flags &= ~O_CREAT;` |
+| フラグを切り替え | XOR | `flags ^= O_CREAT;` |
+| フラグを確認 | AND | `if (flags & O_CREAT)` |
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-| 演算     | 記号 | 計算イメージ     | スイッチのイメージ | グループ |
+{: .labeled}
+| 演算 | 記号 | 計算イメージ | スイッチのイメージ | グループ |
 | -------- | ---- | ---------------- | ------------------ | -------- |
-| AND      | `&`  | 掛け算           | ON か確認する      | 適用系   |
-| OR       | `\|` | 足し算（上限 1） | ON にする          | 適用系   |
-| NOT      | `~`  | 反転             | 全部反転する       | 変換系   |
-| XOR      | `^`  | 違ったら 1       | 切り替える         | 適用系   |
-| 左シフト | `<<` | 2 倍             | 左にずらす         | 変換系   |
-| 右シフト | `>>` | 半分             | 右にずらす         | 変換系   |
+| AND | `&` | 掛け算 | ON か確認する | 適用系 |
+| OR | `\|` | 足し算（上限 1） | ON にする | 適用系 |
+| NOT | `~` | 反転 | 全部反転する | 変換系 |
+| XOR | `^` | 違ったら 1 | 切り替える | 適用系 |
+| 左シフト | `<<` | 2 倍 | 左にずらす | 変換系 |
+| 右シフト | `>>` | 半分 | 右にずらす | 変換系 |
 
 <strong>グループの違い</strong>
 
@@ -405,19 +410,19 @@ result:  00010110  （下位5ビットだけ取り出した）
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>C 言語規格</strong>
 
-- [Bitwise Operators - cppreference](https://en.cppreference.com/w/c/language/operator_arithmetic#Bitwise_logic_operators)
+- [Bitwise Operators - cppreference](https://en.cppreference.com/w/c/language/operator_arithmetic#Bitwise_logic_operators){:target="\_blank"}
   - C 言語のビット演算子（&, |, ^, ~）の定義
 
 <strong>Linux マニュアル</strong>
 
-- [open(2) - Linux manual page](https://man7.org/linux/man-pages/man2/open.2.html)
+- [open(2) - Linux manual page](https://man7.org/linux/man-pages/man2/open.2.html){:target="\_blank"}
   - O_CREAT, O_TRUNC などのフラグ定義
 
 <strong>本編との関連</strong>
 
-- [05-file-descriptor](../05-file-descriptor.md)
+- [05-file-descriptor](../../05-file-descriptor/)
   - open() のフラグを使った実践例

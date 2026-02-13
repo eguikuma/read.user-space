@@ -1,10 +1,11 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: プロセスを作る
+---
 
-# 02-fork-exec：プロセスを作る
+# [02-fork-exec：プロセスを作る](#creating-processes) {#creating-processes}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
 前のトピック（01-process）で、「プロセスとは実行中のプログラムである」ことを学びました
 
@@ -20,13 +21,13 @@
 
 bash や zsh がシェルの例です
 
-詳しくは [01-process](./01-process.md) の用語集を参照してください
+詳しくは [01-process](../01-process/) の用語集を参照してください
 
 シェルは、コマンドを実行するために新しいプロセスを作ります
 
 このページでは、プロセスを作る仕組み（fork と exec）を学びます
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 fork() と exec() を「分身と変身」と考えてみましょう
 
@@ -36,7 +37,7 @@ exec() は、その分身が別人に変身することです
 
 シェルがコマンドを実行するとき、まず自分の分身を作り（fork）、分身が別のプログラムに変身します（exec）
 
-### このページで学ぶこと
+### [このページで学ぶこと](#what-you-will-learn) {#what-you-will-learn}
 
 <strong>システムコール</strong>とは、プログラムが OS に「これをやって」とお願いする仕組みです
 
@@ -59,25 +60,26 @@ exec() は、その分身が別人に変身することです
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-1. [fork() とは何か](#fork-とは何か)
-2. [fork() の戻り値](#fork-の戻り値)
-3. [fork() 後のメモリ](#fork-後のメモリ)
-4. [exec() とは何か](#exec-とは何か)
-5. [exec() ファミリー](#exec-ファミリー)
-6. [fork() + exec() パターン](#fork--exec-パターン)
-7. [親プロセスの責任：wait()](#親プロセスの責任wait)
-8. [ゾンビプロセス](#ゾンビプロセス)
-9. [孤児プロセス](#孤児プロセス)
-10. [用語集](#用語集)
-11. [参考資料](#参考資料)
+1. [fork() とは何か](#what-is-fork)
+2. [fork() の戻り値](#fork-return-value)
+3. [fork() 後のメモリ](#memory-after-fork)
+4. [exec() とは何か](#what-is-exec)
+5. [exec() ファミリー](#exec-family)
+6. [fork() + exec() パターン](#fork-exec-pattern)
+7. [親プロセスの責任：wait()](#parent-responsibility-wait)
+8. [ゾンビプロセス](#zombie-process)
+9. [孤児プロセス](#orphan-process)
+10. [次のステップ](#next-steps)
+11. [用語集](#glossary)
+12. [参考資料](#references)
 
 ---
 
-## fork() とは何か
+## [fork() とは何か](#what-is-fork) {#what-is-fork}
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>fork()</strong> は、プロセスが自分のコピーを作るシステムコールです
 
@@ -87,7 +89,7 @@ Linux の公式マニュアルには、こう書かれています
 
 > fork() は、呼び出したプロセスを複製することで新しいプロセスを作成します
 
-### fork() で何が起きるか
+### [fork() で何が起きるか](#what-happens-with-fork) {#what-happens-with-fork}
 
 fork() を呼び出すと、以下のことが起きます
 
@@ -95,7 +97,7 @@ fork() を呼び出すと、以下のことが起きます
 2. コピー（子プロセス）は、fork() の直後から実行を開始します
 3. 親プロセスと子プロセスは、同時に動き続けます
 
-### 「同時に」とはどういう意味か
+### [「同時に」とはどういう意味か](#what-does-simultaneously-mean) {#what-does-simultaneously-mean}
 
 「同時に動き続ける」とは、<strong>両方のプロセスが実行可能な状態になる</strong>ということです
 
@@ -103,7 +105,7 @@ fork() を呼び出すと、以下のことが起きます
 
 スケジューラとは、「どのプロセスを、どの順番で、どれくらいの時間実行するか」を決める OS の機能です
 
-#### シングルコアの場合
+#### [シングルコアの場合](#single-core) {#single-core}
 
 CPU が 1 つしかないため、本当の意味で「同時に」は実行されません
 
@@ -117,7 +119,7 @@ CPU が 1 つしかないため、本当の意味で「同時に」は実行さ�
 
 切り替えが非常に高速なので、人間には「同時に動いている」ように見えます
 
-#### マルチコアの場合
+#### [マルチコアの場合](#multi-core) {#multi-core}
 
 複数の CPU コアがあれば、親と子が本当に同時に（<strong>並列</strong>に）実行される可能性があります
 
@@ -129,7 +131,7 @@ CPU が 1 つしかないため、本当の意味で「同時に」は実行さ�
 
 どのコアでどのプロセスを実行するかは、やはりスケジューラが決めます
 
-#### 親と子、どちらが先に実行されるか
+#### [親と子、どちらが先に実行されるか](#which-runs-first) {#which-runs-first}
 
 <strong>答えは「わからない」</strong>です
 
@@ -156,7 +158,7 @@ if (pid == 0) {
 }
 ```
 
-### なぜ「コピー」なのか
+### [なぜ「コピー」なのか](#why-copy) {#why-copy}
 
 <strong>もしゼロから新しいプロセスを作る設計だったら？</strong>
 
@@ -187,25 +189,26 @@ fork() は「自分のコピーを作る」という単純な操作です
 
 ---
 
-## fork() の戻り値
+## [fork() の戻り値](#fork-return-value) {#fork-return-value}
 
 fork() は、親プロセスと子プロセスに異なる値を返します
 
 これにより、自分が親なのか子なのかを区別できます
 
-### 戻り値の意味
+### [戻り値の意味](#meaning-of-return-value) {#meaning-of-return-value}
 
-| 戻り値             | 意味                 |
+{: .labeled}
+| 戻り値 | 意味 |
 | ------------------ | -------------------- |
 | 正の数（子の PID） | 親プロセスに返される |
-| 0                  | 子プロセスに返される |
-| -1                 | エラー（fork 失敗）  |
+| 0 | 子プロセスに返される |
+| -1 | エラー（fork 失敗） |
 
-### コード例
+### [コード例](#code-example) {#code-example}
 
 <strong>pid_t</strong> は、プロセス ID を格納するための型です
 
-詳しくは [01-process](./01-process.md) の「C 言語の読み方」を参照してください
+詳しくは [01-process](../01-process/) の「C 言語の読み方」を参照してください
 
 ```c
 pid_t pid = fork();
@@ -221,7 +224,7 @@ if (pid < 0) {
 
 ---
 
-## fork() 後のメモリ
+## [fork() 後のメモリ](#memory-after-fork) {#memory-after-fork}
 
 fork() でコピーされたプロセスは、<strong>別々のメモリ空間</strong>を持ちます
 
@@ -231,15 +234,15 @@ OS は各プロセスに独立したメモリ空間を与えます
 
 これにより、あるプロセスが他のプロセスのメモリを壊すことを防ぎます
 
-詳しくは [01-process](./01-process.md) の「メモリの構造」を参照してください
+詳しくは [01-process](../01-process/) の「メモリの構造」を参照してください
 
-### メモリが分離される
+### [メモリが分離される](#memory-separation) {#memory-separation}
 
 親プロセスと子プロセスは、同じ変数名を持っていても、別々の変数です
 
 子で変数を変更しても、親の変数には影響しません
 
-### Copy-on-Write
+### [Copy-on-Write](#copy-on-write) {#copy-on-write}
 
 実際には、fork() 直後は親子で物理メモリページを共有しています
 
@@ -249,7 +252,7 @@ OS は各プロセスに独立したメモリ空間を与えます
 
 これを<strong>Copy-on-Write（CoW）</strong>と呼びます
 
-#### なぜ効率的なのか
+#### [なぜ効率的なのか](#why-efficient) {#why-efficient}
 
 fork() の後、すぐに exec() を呼ぶ場合を考えてみましょう
 
@@ -259,7 +262,7 @@ exec() はプロセスのメモリを新しいプログラムで完全に置き�
 
 Copy-on-Write なら、実際に使われるメモリだけをコピーするので、無駄がありません
 
-#### 具体例
+#### [具体例](#concrete-examples) {#concrete-examples}
 
 ```
 親プロセス：100MB のメモリを使用
@@ -277,9 +280,9 @@ exec() → 子のメモリを新プログラムで上書き（無駄なし）
 
 ---
 
-## exec() とは何か
+## [exec() とは何か](#what-is-exec) {#what-is-exec}
 
-### 基本的な説明
+### [基本的な説明](#basic-explanation) {#basic-explanation}
 
 <strong>exec()</strong> は、プロセスが自分自身を別のプログラムに置き換えるシステムコールです
 
@@ -293,7 +296,7 @@ Linux の公式マニュアルには、こう書かれています
 
 コード（命令）、データ、スタックなど、プロセスを構成するすべてのメモリ内容を指します
 
-### exec() で何が起きるか
+### [exec() で何が起きるか](#what-happens-with-exec) {#what-happens-with-exec}
 
 exec() を呼び出すと、以下のことが起きます
 
@@ -301,13 +304,13 @@ exec() を呼び出すと、以下のことが起きます
 2. <strong>PID は変わりません</strong>（同じプロセスのまま）
 3. 成功すると、exec() 以降のコードは実行されません（別のプログラムになるから）
 
-### 「置き換え」であって「新規作成」ではない
+### [「置き換え」であって「新規作成」ではない](#replacement-not-creation) {#replacement-not-creation}
 
 exec() は新しいプロセスを作りません
 
 自分自身が別のプログラムに「なる」のです
 
-### なぜ「新規作成」ではなく「置き換え」なのか
+### [なぜ「新規作成」ではなく「置き換え」なのか](#why-replacement-not-creation) {#why-replacement-not-creation}
 
 <strong>もし exec() が新しいプロセスを作る設計だったら？</strong>
 
@@ -327,17 +330,18 @@ fork() と exec() の組み合わせにより、「親から継承」→「必�
 
 ---
 
-## exec() ファミリー
+## [exec() ファミリー](#exec-family) {#exec-family}
 
 exec() には複数のバリエーションがあります
 
-### 名前の規則
+### [名前の規則](#naming-convention) {#naming-convention}
 
-| 文字             | 意味                                                                 |
+{: .labeled}
+| 文字 | 意味 |
 | ---------------- | -------------------------------------------------------------------- |
-| l（list）        | 引数をリスト形式で渡す                                               |
-| v（vector）      | 引数を配列形式で渡す                                                 |
-| p（PATH）        | ファイル名にスラッシュがない場合、PATH を検索する                    |
+| l（list） | 引数をリスト形式で渡す |
+| v（vector） | 引数を配列形式で渡す |
+| p（PATH） | ファイル名にスラッシュがない場合、PATH を検索する |
 | e（environment） | 環境変数を明示的に指定する（指定しない関数は親の環境変数を継承する） |
 
 <strong>リスト形式</strong>とは、引数を関数に直接カンマ区切りで渡す方法です
@@ -355,24 +359,25 @@ execvp("ls", args);  /* 配列で渡す */
 
 <strong>PATH</strong> とは、コマンドを探す場所の一覧を保持する環境変数です
 
-詳しくは [01-process](./01-process.md) の「環境変数」を参照してください
+詳しくは [01-process](../01-process/) の「環境変数」を参照してください
 
 <strong>環境変数</strong>とは、プロセスに渡される「名前=値」形式の設定情報です
 
-詳しくは [01-process](./01-process.md) の「環境変数」を参照してください
+詳しくは [01-process](../01-process/) の「環境変数」を参照してください
 
-### よく使う関数
+### [よく使う関数](#commonly-used-functions) {#commonly-used-functions}
 
-| 関数   | 引数形式 | PATH 検索 | 用途                                             |
+{: .labeled}
+| 関数 | 引数形式 | PATH 検索 | 用途 |
 | ------ | -------- | --------- | ------------------------------------------------ |
-| execl  | リスト   | なし      | 引数が固定で、完全な場所がわかっている場合       |
-| execv  | 配列     | なし      | 引数が可変で、完全な場所がわかっている場合       |
-| execlp | リスト   | あり      | 引数が固定で、コマンド名だけわかっている場合     |
-| execvp | 配列     | あり      | 引数が可変で、コマンド名だけわかっている場合     |
-| execle | リスト   | なし      | 環境変数を指定したい場合                         |
-| execve | 配列     | なし      | 唯一のシステムコール（他の関数はこれのラッパー） |
+| execl | リスト | なし | 引数が固定で、完全な場所がわかっている場合 |
+| execv | 配列 | なし | 引数が可変で、完全な場所がわかっている場合 |
+| execlp | リスト | あり | 引数が固定で、コマンド名だけわかっている場合 |
+| execvp | 配列 | あり | 引数が可変で、コマンド名だけわかっている場合 |
+| execle | リスト | なし | 環境変数を指定したい場合 |
+| execve | 配列 | なし | 唯一のシステムコール（他の関数はこれのラッパー） |
 
-### 使い分けのポイント
+### [使い分けのポイント](#usage-guide) {#usage-guide}
 
 - <strong>よく使うのは execlp() と execvp()</strong>です
 - PATH を検索してくれるので便利です
@@ -380,9 +385,9 @@ execvp("ls", args);  /* 配列で渡す */
 
 ---
 
-## fork() + exec() パターン
+## [fork() + exec() パターン](#fork-exec-pattern) {#fork-exec-pattern}
 
-### なぜ「コピーしてから置き換える」のか
+### [なぜ「コピーしてから置き換える」のか](#why-copy-then-replace) {#why-copy-then-replace}
 
 シェルがコマンドを実行するとき、以下のステップを踏みます
 
@@ -394,7 +399,7 @@ execvp("ls", args);  /* 配列で渡す */
 
 fork() することで、親（シェル）は生き続け、子だけが別のプログラムになります
 
-### なぜ 2 段階に分けるのか
+### [なぜ 2 段階に分けるのか](#why-two-steps) {#why-two-steps}
 
 <strong>もし「fork と exec が一体化した spawn()」のような関数だったら？</strong>
 
@@ -434,7 +439,7 @@ if (pid == 0) {
 
 fork() と exec() を分離したことで、UNIX はシンプルな部品の組み合わせで複雑な動作を実現できます
 
-### シェルの動作原理
+### [シェルの動作原理](#shell-operation-principle) {#shell-operation-principle}
 
 シェルは、以下のループを繰り返しています
 
@@ -446,9 +451,9 @@ fork() と exec() を分離したことで、UNIX はシンプルな部品の組
 
 ---
 
-## 親プロセスの責任：wait()
+## [親プロセスの責任：wait()](#parent-responsibility-wait) {#parent-responsibility-wait}
 
-### wait() とは
+### [wait() とは](#what-is-wait) {#what-is-wait}
 
 <strong>wait()</strong> は、子プロセスの終了を待つシステムコールです
 
@@ -458,7 +463,7 @@ Linux の公式マニュアルには、こう書かれています
 
 > wait() と waitpid() は、呼び出したプロセスの子の状態変化を待つために使用されます
 
-### なぜ wait() が必要なのか
+### [なぜ wait() が必要なのか](#why-wait-is-needed) {#why-wait-is-needed}
 
 1. <strong>子の終了ステータスを取得するため</strong>
    - 子がどのように終了したか（正常終了、シグナルで終了など）を知る
@@ -468,7 +473,7 @@ Linux の公式マニュアルには、こう書かれています
    - wait() しないと、子はゾンビになる
    - ゾンビについては次のセクションで説明
 
-### 終了ステータスの解析
+### [終了ステータスの解析](#analyzing-exit-status) {#analyzing-exit-status}
 
 wait() で取得したステータスは、以下の<strong>マクロ</strong>で解析します
 
@@ -476,24 +481,25 @@ wait() で取得したステータスは、以下の<strong>マクロ</strong>�
 
 ここで使うマクロは、ステータス値を解析するための便利な関数のように使えます
 
-| マクロ              | 説明                       |
+{: .labeled}
+| マクロ | 説明 |
 | ------------------- | -------------------------- |
-| WIFEXITED(status)   | 正常終了したかどうか       |
-| WEXITSTATUS(status) | 終了コード（0〜255）       |
+| WIFEXITED(status) | 正常終了したかどうか |
+| WEXITSTATUS(status) | 終了コード（0〜255） |
 | WIFSIGNALED(status) | シグナルで終了したかどうか |
-| WTERMSIG(status)    | 終了させたシグナル番号     |
+| WTERMSIG(status) | 終了させたシグナル番号 |
 
 ---
 
-## ゾンビプロセス
+## [ゾンビプロセス](#zombie-process) {#zombie-process}
 
-### ゾンビプロセスとは
+### [ゾンビプロセスとは](#what-is-zombie) {#what-is-zombie}
 
 <strong>ゾンビプロセス</strong>は、子プロセスが終了したが、親が wait() していない状態です
 
-[01-process](./01-process.md) で「プロセスの状態」として触れましたが、ここでは「なぜ生まれるか」を学びます
+[01-process](../01-process/) で「プロセスの状態」として触れましたが、ここでは「なぜ生まれるか」を学びます
 
-### なぜゾンビが生まれるのか
+### [なぜゾンビが生まれるのか](#why-zombie-occurs) {#why-zombie-occurs}
 
 <strong>もし子プロセスが終了と同時に完全に消えたら？</strong>
 
@@ -521,7 +527,7 @@ echo $?   # 2（エラーを示す終了コード）
 
 ゾンビは「親が終了情報を取得するのを待っている」状態です
 
-### ゾンビを消す方法
+### [ゾンビを消す方法](#how-to-eliminate-zombie) {#how-to-eliminate-zombie}
 
 - 親が wait() を呼ぶ
 - 親が終了すると、子は init（PID 1）に引き取られ、init が wait() する
@@ -532,13 +538,13 @@ PID 1 を持ち、すべてのプロセスの「先祖」となります
 
 現在のほとんどの Linux ディストリビューションでは、<strong>systemd</strong> が init の役割を担っています
 
-### ゾンビが占有するリソース
+### [ゾンビが占有するリソース](#zombie-resources) {#zombie-resources}
 
 ゾンビプロセスは、すでに終了しているため CPU やメモリはほとんど使いません
 
 しかし、以下のリソースを占有し続けます
 
-#### プロセステーブルのエントリ
+#### [プロセステーブルのエントリ](#process-table-entry) {#process-table-entry}
 
 OS は、実行中のすべてのプロセスを<strong>プロセステーブル</strong>という表で管理しています
 
@@ -554,7 +560,7 @@ OS は、実行中のすべてのプロセスを<strong>プロセステーブル
 - 終了ステータス
 - 使用した CPU 時間などの統計情報
 
-#### PID の枯渇
+#### [PID の枯渇](#pid-exhaustion) {#pid-exhaustion}
 
 Linux では、PID は有限の数値です（通常、最大 32768 または 4194304）
 
@@ -565,7 +571,7 @@ $ cat /proc/sys/kernel/pid_max
 32768
 ```
 
-#### 具体的なシナリオ
+#### [具体的なシナリオ](#concrete-scenario) {#concrete-scenario}
 
 以下のようなサーバプログラムを考えてみましょう
 
@@ -588,7 +594,7 @@ while (1) {
 
 数日で PID が枯渇し、サーバは新しいプロセスを作成できなくなります
 
-#### 正しい実装
+#### [正しい実装](#correct-implementation) {#correct-implementation}
 
 ```c
 /* 正しいサーバコード */
@@ -607,83 +613,36 @@ while (1) {
 
 ---
 
-## 孤児プロセス
+## [孤児プロセス](#orphan-process) {#orphan-process}
 
-### 孤児プロセスとは
+### [孤児プロセスとは](#what-is-orphan) {#what-is-orphan}
 
 <strong>孤児プロセス</strong>は、親プロセスが先に終了した子プロセスです
 
-### 孤児は init に引き取られる
+### [孤児は init に引き取られる](#orphan-adopted-by-init) {#orphan-adopted-by-init}
 
 親が終了すると、子の PPID は 1 になります
 
 これは init（または systemd）に引き取られたことを意味します
 
-### 孤児はゾンビにならない
+### [孤児はゾンビにならない](#orphan-not-zombie) {#orphan-not-zombie}
 
 init は孤児が終了した際に wait() を呼び出します
 
 そのため、孤児が終了しても init が適切に回収するので、ゾンビにはなりません
 
-### ゾンビと孤児の違い
+### [ゾンビと孤児の違い](#difference-zombie-orphan) {#difference-zombie-orphan}
 
-| 状態               | ゾンビ                | 孤児                        |
+{: .labeled}
+| 状態 | ゾンビ | 孤児 |
 | ------------------ | --------------------- | --------------------------- |
-| 何が先に終了したか | 子が先に終了          | 親が先に終了                |
-| 子の状態           | 終了済み（回収待ち）  | まだ動いている              |
-| 問題               | wait() されるまで残る | 問題なし（init が引き取る） |
+| 何が先に終了したか | 子が先に終了 | 親が先に終了 |
+| 子の状態 | 終了済み（回収待ち） | まだ動いている |
+| 問題 | wait() されるまで残る | 問題なし（init が引き取る） |
 
 ---
 
-## 用語集
-
-| 用語             | 英語                 | 説明                                                                                               |
-| ---------------- | -------------------- | -------------------------------------------------------------------------------------------------- |
-| フォーク         | fork                 | プロセスが自分のコピーを作ること                                                                   |
-| エグゼック       | exec                 | プロセスが自分を別のプログラムに置き換えること（PID は変わらず、成功すると呼び出し元には戻らない） |
-| 親プロセス       | Parent Process       | fork() を呼び出したプロセス                                                                        |
-| 子プロセス       | Child Process        | fork() によって生まれた新しいプロセス                                                              |
-| ゾンビプロセス   | Zombie Process       | 終了したが親が wait() していないプロセス                                                           |
-| 孤児プロセス     | Orphan Process       | 親が先に終了したプロセス                                                                           |
-| 終了ステータス   | Exit Status          | プロセスが終了時に返す数値（0 は成功を意味する）                                                   |
-| 終了コード       | Exit Code            | 終了ステータスの別名                                                                               |
-| ブロッキング     | Blocking             | 処理が完了するまで次に進まない動作                                                                 |
-| システムコール   | System Call          | プログラムが OS の機能を呼び出す仕組み                                                             |
-| Copy-on-Write    | Copy-on-Write（CoW） | 変更が発生するまで物理メモリを共有する最適化                                                       |
-| スケジューラ     | Scheduler            | どのプロセスを実行するか決定する OS の機能                                                         |
-| 時分割           | Time Sharing         | CPU 時間を細かく区切って複数プロセスを交互に実行する方式                                           |
-| 並行             | Concurrent           | 複数の処理が同時に進んでいるように見えること                                                       |
-| 並列             | Parallel             | 複数の処理が物理的に同時に実行されること                                                           |
-| メモリ空間       | Memory Space         | プロセスが使用できるメモリの範囲                                                                   |
-| プロセスイメージ | Process Image        | メモリ上に展開されたプログラムの内容                                                               |
-| マクロ           | Macro                | C 言語で名前に値や処理を割り当てる仕組み                                                           |
-| init             | init                 | Linux 起動時に最初に実行されるプロセス（PID 1）                                                    |
-| systemd          | systemd              | 現在のほとんどの Linux で init の役割を担うプロセス管理システム                                    |
-| プロセステーブル | Process Table        | OS がすべてのプロセスを管理するための表                                                            |
-| エントリ         | Entry                | テーブル（表）の中の 1 行分のデータ                                                                |
-| 低レベル         | Low-level            | ハードウェアや OS に近い操作                                                                       |
-| 高レベル         | High-level           | 人間にとって分かりやすく抽象化された操作                                                           |
-
----
-
-## 参考資料
-
-このページの内容は、以下のソースに基づいています
-
-- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html)
-  - プロセスの複製
-- [execve(2) - Linux manual page](https://man7.org/linux/man-pages/man2/execve.2.html)
-  - プログラムの実行（exec ファミリーの基盤）
-- [exec(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exec.3.html)
-  - exec ファミリーのフロントエンド
-- [wait(2) - Linux manual page](https://man7.org/linux/man-pages/man2/wait.2.html)
-  - 子プロセスの状態変化を待つ
-- [exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exit.3.html)
-  - プロセスの正常終了
-
----
-
-## 次のステップ
+## [次のステップ](#next-steps) {#next-steps}
 
 このトピックでは、「プロセスを作る方法」を実践的に学びました
 
@@ -692,10 +651,59 @@ init は孤児が終了した際に wait() を呼び出します
 - wait() で子の終了を待つ
 - ゾンビと孤児の違い
 
-次の [03-signal](./03-signal.md) では、プロセスに「通知」を送る方法を学びます
+次の [03-signal](../03-signal/) では、プロセスに「通知」を送る方法を学びます
 
 - `Ctrl+C` を押すとプログラムが止まるのはなぜか
 - 子プロセスが終了したことを、親はどうやって知るのか
 - プロセスに「終了しろ」と伝える方法は何か
 
 これらの疑問に答えます
+
+---
+
+## [用語集](#glossary) {#glossary}
+
+{: .labeled}
+| 用語 | 英語 | 説明 |
+| ---------------- | -------------------- | -------------------------------------------------------------------------------------------------- |
+| フォーク | fork | プロセスが自分のコピーを作ること |
+| エグゼック | exec | プロセスが自分を別のプログラムに置き換えること（PID は変わらず、成功すると呼び出し元には戻らない） |
+| 親プロセス | Parent Process | fork() を呼び出したプロセス |
+| 子プロセス | Child Process | fork() によって生まれた新しいプロセス |
+| ゾンビプロセス | Zombie Process | 終了したが親が wait() していないプロセス |
+| 孤児プロセス | Orphan Process | 親が先に終了したプロセス |
+| 終了ステータス | Exit Status | プロセスが終了時に返す数値（0 は成功を意味する） |
+| 終了コード | Exit Code | 終了ステータスの別名 |
+| ブロッキング | Blocking | 処理が完了するまで次に進まない動作 |
+| システムコール | System Call | プログラムが OS の機能を呼び出す仕組み |
+| Copy-on-Write | Copy-on-Write（CoW） | 変更が発生するまで物理メモリを共有する最適化 |
+| スケジューラ | Scheduler | どのプロセスを実行するか決定する OS の機能 |
+| 時分割 | Time Sharing | CPU 時間を細かく区切って複数プロセスを交互に実行する方式 |
+| 並行 | Concurrent | 複数の処理が同時に進んでいるように見えること |
+| 並列 | Parallel | 複数の処理が物理的に同時に実行されること |
+| メモリ空間 | Memory Space | プロセスが使用できるメモリの範囲 |
+| プロセスイメージ | Process Image | メモリ上に展開されたプログラムの内容 |
+| マクロ | Macro | C 言語で名前に値や処理を割り当てる仕組み |
+| init | init | Linux 起動時に最初に実行されるプロセス（PID 1） |
+| systemd | systemd | 現在のほとんどの Linux で init の役割を担うプロセス管理システム |
+| プロセステーブル | Process Table | OS がすべてのプロセスを管理するための表 |
+| エントリ | Entry | テーブル（表）の中の 1 行分のデータ |
+| 低レベル | Low-level | ハードウェアや OS に近い操作 |
+| 高レベル | High-level | 人間にとって分かりやすく抽象化された操作 |
+
+---
+
+## [参考資料](#references) {#references}
+
+このページの内容は、以下のソースに基づいています
+
+- [fork(2) - Linux manual page](https://man7.org/linux/man-pages/man2/fork.2.html){:target="\_blank"}
+  - プロセスの複製
+- [execve(2) - Linux manual page](https://man7.org/linux/man-pages/man2/execve.2.html){:target="\_blank"}
+  - プログラムの実行（exec ファミリーの基盤）
+- [exec(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exec.3.html){:target="\_blank"}
+  - exec ファミリーのフロントエンド
+- [wait(2) - Linux manual page](https://man7.org/linux/man-pages/man2/wait.2.html){:target="\_blank"}
+  - 子プロセスの状態変化を待つ
+- [exit(3) - Linux manual page](https://man7.org/linux/man-pages/man3/exit.3.html){:target="\_blank"}
+  - プロセスの正常終了

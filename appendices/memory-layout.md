@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: ヒープとスタックは何が違うのか
+---
 
-# ヒープとスタックは何が違うのか
+# [ヒープとスタックは何が違うのか](#heap-vs-stack) {#heap-vs-stack}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[01-process](../01-process.md) の「メモリの構造」で、プロセスのメモリが 5 つの領域に分かれていることを学びました
+[01-process](../../01-process/) の「メモリの構造」で、プロセスのメモリが 5 つの領域に分かれていることを学びました
 
 ```c
 int global = 100;           /* データセグメント */
@@ -33,42 +34,44 @@ int main(void) {
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [全体像](#全体像)
-- [スタック](#スタック)
-- [ヒープ](#ヒープ)
-- [スタックとヒープの比較](#スタックとヒープの比較)
-- [よくある問題](#よくある問題)
-- [確認方法](#確認方法)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [全体像](#overall-picture)
+- [スタック](#stack)
+- [ヒープ](#heap)
+- [スタックとヒープの比較](#stack-vs-heap-comparison)
+- [よくある問題](#common-problems)
+- [確認方法](#confirmation-methods)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## 全体像
+## [全体像](#overall-picture) {#overall-picture}
 
 プロセスのメモリは、低いアドレスから高いアドレスに向かって以下のように配置されます
 
-| アドレス | 領域               | 成長方向   | 内容                               |
+{: .labeled}
+| アドレス | 領域 | 成長方向 | 内容 |
 | -------- | ------------------ | ---------- | ---------------------------------- |
-| 低       | テキストセグメント | 固定       | プログラムのコード（読み取り専用） |
-| ↓        | データセグメント   | 固定       | 初期値ありのグローバル変数         |
-| ↓        | BSS セグメント     | 固定       | 初期値なしのグローバル変数         |
-| ↓        | ヒープ             | ↓ 下へ成長 | malloc() で動的に確保              |
-| ↓        | （空き領域）       |            |                                    |
-| ↓        | スタック           | ↑ 上へ成長 | ローカル変数、関数呼び出し情報     |
-| 高       |                    |            |                                    |
+| 低 | テキストセグメント | 固定 | プログラムのコード（読み取り専用） |
+| ↓ | データセグメント | 固定 | 初期値ありのグローバル変数 |
+| ↓ | BSS セグメント | 固定 | 初期値なしのグローバル変数 |
+| ↓ | ヒープ | ↓ 下へ成長 | malloc() で動的に確保 |
+| ↓ | （空き領域） | | |
+| ↓ | スタック | ↑ 上へ成長 | ローカル変数、関数呼び出し情報 |
+| 高 | | | |
 
-### なぜ 5 つの領域に分けるのか
+### [なぜ 5 つの領域に分けるのか](#why-five-memory-regions) {#why-five-memory-regions}
 
 <strong>もし全てのデータを 1 つの領域に混ぜたら？</strong>
 
-| 問題         | 説明                                                 |
+{: .labeled}
+| 問題 | 説明 |
 | ------------ | ---------------------------------------------------- |
 | セキュリティ | コードを書き換えて任意のプログラムを実行される可能性 |
-| 効率         | 変わらないデータも毎回コピーする無駄                 |
-| 安定性       | 意図しない上書きでプログラムが壊れる                 |
+| 効率 | 変わらないデータも毎回コピーする無駄 |
+| 安定性 | 意図しない上書きでプログラムが壊れる |
 
 各領域には分離する明確な理由があります
 
@@ -111,19 +114,19 @@ int uninitialized;      /* BSS セグメント：初期値なし */
 
 ヒープ専用・スタック専用に領域を固定しなくて済むため、メモリを柔軟に使えます
 
-詳しい概要は [01-process](../01-process.md#メモリの構造) を参照してください
+詳しい概要は [01-process](../../01-process/#メモリの構造) を参照してください
 
 ---
 
-## スタック
+## [スタック](#stack) {#stack}
 
-### スタックとは
+### [スタックとは](#what-is-stack) {#what-is-stack}
 
 <strong>スタック（Stack）</strong>は、関数呼び出しで自動的に確保され、関数終了時に自動的に解放されるメモリ領域です
 
 LIFO（Last In, First Out：後入れ先出し、「ライフォ」と読みます）構造で管理されます
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 カフェテリアのトレーを想像してください
 
@@ -139,16 +142,17 @@ LIFO（Last In, First Out：後入れ先出し、「ライフォ」と読みま�
 
 最後に呼び出した関数が、最初に終了します
 
-### スタックに置かれるもの
+### [スタックに置かれるもの](#what-is-on-the-stack) {#what-is-on-the-stack}
 
-| 種類               | 説明                     |
+{: .labeled}
+| 種類 | 説明 |
 | ------------------ | ------------------------ |
-| ローカル変数       | 関数内で宣言した変数     |
-| 関数の引数         | 関数に渡されたパラメータ |
-| 戻りアドレス       | 関数終了後に戻る場所     |
-| 保存されたレジスタ | 呼び出し元の状態         |
+| ローカル変数 | 関数内で宣言した変数 |
+| 関数の引数 | 関数に渡されたパラメータ |
+| 戻りアドレス | 関数終了後に戻る場所 |
+| 保存されたレジスタ | 呼び出し元の状態 |
 
-### スタックフレーム
+### [スタックフレーム](#stack-frame) {#stack-frame}
 
 関数が呼び出されるたびに、<strong>スタックフレーム</strong>という単位でメモリが確保されます
 
@@ -173,7 +177,7 @@ main() が func_a() を呼び、func_a() が func_b() を呼んだ場合
 
 func_b() が終了すると、そのスタックフレームは自動的に解放されます
 
-### 自動的な管理
+### [自動的な管理](#automatic-management) {#automatic-management}
 
 ```c
 void function(void) {
@@ -188,15 +192,15 @@ void function(void) {
 
 ---
 
-## ヒープ
+## [ヒープ](#heap) {#heap}
 
-### ヒープとは
+### [ヒープとは](#what-is-heap) {#what-is-heap}
 
 <strong>ヒープ（Heap）</strong>は、プログラマが明示的に確保・解放するメモリ領域です
 
 `malloc()` で確保し、`free()` で解放します
 
-### 日常の例え
+### [日常の例え](#everyday-analogy) {#everyday-analogy}
 
 月極駐車場を想像してください
 
@@ -210,7 +214,7 @@ void function(void) {
 
 解約しないと、ずっと料金がかかります（メモリを占有し続けます）
 
-### malloc() と free()
+### [malloc() と free()](#malloc-and-free) {#malloc-and-free}
 
 ```c
 #include <stdlib.h>
@@ -235,21 +239,23 @@ int main(void) {
 
 <strong>malloc() の戻り値</strong>
 
-| 戻り値    | 意味                         |
+{: .labeled}
+| 戻り値 | 意味 |
 | --------- | ---------------------------- |
-| NULL 以外 | 確保したメモリへのポインタ   |
-| NULL      | 確保に失敗（メモリ不足など） |
+| NULL 以外 | 確保したメモリへのポインタ |
+| NULL | 確保に失敗（メモリ不足など） |
 
 必ず戻り値を確認してから使用します
 
-### 内部の仕組み（概要）
+### [内部の仕組み（概要）](#internal-mechanism) {#internal-mechanism}
 
 malloc() は、内部で 2 つのシステムコールを使い分けています
 
-| システムコール | 使われる場面               | 特徴                     |
+{: .labeled}
+| システムコール | 使われる場面 | 特徴 |
 | -------------- | -------------------------- | ------------------------ |
-| brk / sbrk     | 小さなメモリ（128KB 未満） | ヒープ領域を拡張         |
-| mmap           | 大きなメモリ（128KB 以上） | 新しいメモリ領域をマップ |
+| brk / sbrk | 小さなメモリ（128KB 未満） | ヒープ領域を拡張 |
+| mmap | 大きなメモリ（128KB 以上） | 新しいメモリ領域をマップ |
 
 閾値（MMAP_THRESHOLD）は環境によって異なりますが、glibc のデフォルトは 128KB です
 
@@ -263,7 +269,7 @@ mmap で別の領域に確保すれば、解放時に OS に返却できます
 
 詳細は [brk(2)](https://man7.org/linux/man-pages/man2/brk.2.html) と [mmap(2)](https://man7.org/linux/man-pages/man2/mmap.2.html) を参照してください
 
-### 確保と解放の責任
+### [確保と解放の責任](#allocation-deallocation-responsibility) {#allocation-deallocation-responsibility}
 
 malloc() したメモリは、必ず free() で解放する責任があります
 
@@ -273,33 +279,35 @@ malloc() したメモリは、必ず free() で解放する責任があります
 
 ---
 
-## スタックとヒープの比較
+## [スタックとヒープの比較](#stack-vs-heap-comparison) {#stack-vs-heap-comparison}
 
-| 項目                 | スタック                      | ヒープ                         |
+{: .labeled}
+| 項目 | スタック | ヒープ |
 | -------------------- | ----------------------------- | ------------------------------ |
-| 確保のタイミング     | 関数呼び出し時（自動）        | malloc() 呼び出し時（明示的）  |
-| 解放のタイミング     | 関数終了時（自動）            | free() 呼び出し時（明示的）    |
-| 成長方向             | 高アドレス → 低アドレス       | 低アドレス → 高アドレス        |
-| サイズ制限           | 比較的小さい（通常 8MB 程度） | 比較的大きい（物理メモリまで） |
-| 速度                 | 高速（ポインタ移動のみ）      | 比較的遅い（空き領域を検索）   |
-| フラグメンテーション | 発生しない                    | 発生する可能性がある           |
+| 確保のタイミング | 関数呼び出し時（自動） | malloc() 呼び出し時（明示的） |
+| 解放のタイミング | 関数終了時（自動） | free() 呼び出し時（明示的） |
+| 成長方向 | 高アドレス → 低アドレス | 低アドレス → 高アドレス |
+| サイズ制限 | 比較的小さい（通常 8MB 程度） | 比較的大きい（物理メモリまで） |
+| 速度 | 高速（ポインタ移動のみ） | 比較的遅い（空き領域を検索） |
+| フラグメンテーション | 発生しない | 発生する可能性がある |
 
 ※ フラグメンテーション（断片化）：メモリの確保と解放を繰り返すことで、使えない小さな空き領域が増える現象
 
 <strong>使い分けの指針</strong>
 
-| 状況                                   | 適切な選択 |
+{: .labeled}
+| 状況 | 適切な選択 |
 | -------------------------------------- | ---------- |
-| サイズが小さく、関数内で完結するデータ | スタック   |
-| サイズが大きいデータ                   | ヒープ     |
-| 寿命が関数を超えるデータ               | ヒープ     |
-| サイズが実行時まで決まらないデータ     | ヒープ     |
+| サイズが小さく、関数内で完結するデータ | スタック |
+| サイズが大きいデータ | ヒープ |
+| 寿命が関数を超えるデータ | ヒープ |
+| サイズが実行時まで決まらないデータ | ヒープ |
 
 ---
 
-## よくある問題
+## [よくある問題](#common-problems) {#common-problems}
 
-### スタックオーバーフロー
+### [スタックオーバーフロー](#stack-overflow) {#stack-overflow}
 
 スタック領域を使い果たすと、<strong>スタックオーバーフロー</strong>が発生します
 
@@ -326,7 +334,7 @@ void infinite_recursion(void) {
 - 深い再帰をループに書き換える
 - 大きな配列はヒープに確保する
 
-### メモリリーク
+### [メモリリーク](#memory-leak) {#memory-leak}
 
 malloc() で確保したメモリを free() し忘れると、<strong>メモリリーク</strong>が発生します
 
@@ -352,7 +360,7 @@ void leak_memory(void) {
 - 確保した場所の近くで解放する設計
 - Valgrind などのツールで定期的にチェック
 
-### ダブルフリー
+### [ダブルフリー](#double-free) {#double-free}
 
 同じポインタを 2 回 free() すると、<strong>ダブルフリー</strong>が発生します
 
@@ -375,7 +383,7 @@ ptr = NULL;  /* 次の free(ptr) は何もしない */
 
 free(NULL) は安全で、何も起こりません
 
-### 解放済みメモリへのアクセス
+### [解放済みメモリへのアクセス](#use-after-free) {#use-after-free}
 
 free() したメモリにアクセスすると、<strong>Use After Free</strong>（解放後使用）が発生します
 
@@ -394,9 +402,9 @@ printf("%d\n", *ptr);  /* 未定義動作 */
 
 ---
 
-## 確認方法
+## [確認方法](#confirmation-methods) {#confirmation-methods}
 
-### /proc/[pid]/maps
+### [/proc/\[pid\]/maps](#proc-pid-maps) {#proc-pid-maps}
 
 実行中のプロセスのメモリマップを確認できます
 
@@ -413,16 +421,17 @@ cat /proc/self/maps
 7fff12345000-7fff12366000 rw-p 00000000 00:00 0      [stack]
 ```
 
-| フィールド     | 説明                                                       |
+{: .labeled}
+| フィールド | 説明 |
 | -------------- | ---------------------------------------------------------- |
-| アドレス範囲   | メモリ領域の開始-終了アドレス                              |
+| アドレス範囲 | メモリ領域の開始-終了アドレス |
 | パーミッション | r（読み取り）、w（書き込み）、x（実行）、p（プライベート） |
-| [heap]         | ヒープ領域                                                 |
-| [stack]        | スタック領域                                               |
+| [heap] | ヒープ領域 |
+| [stack] | スタック領域 |
 
 詳細は [proc_pid_maps(5)](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html) を参照してください
 
-### Valgrind によるメモリリーク検出
+### [Valgrind によるメモリリーク検出](#valgrind-memory-leak-detection) {#valgrind-memory-leak-detection}
 
 Valgrind はメモリエラーを検出するツールです
 
@@ -441,16 +450,17 @@ valgrind --leak-check=full ./program
 ==12345==         suppressed: 0 bytes in 0 blocks
 ```
 
-| カテゴリ        | 意味                                   |
+{: .labeled}
+| カテゴリ | 意味 |
 | --------------- | -------------------------------------- |
-| definitely lost | 確実にリークしている                   |
-| indirectly lost | リークしたメモリから参照されている     |
-| possibly lost   | リークの可能性がある                   |
+| definitely lost | 確実にリークしている |
+| indirectly lost | リークしたメモリから参照されている |
+| possibly lost | リークの可能性がある |
 | still reachable | 終了時にまだ参照可能（通常は問題なし） |
 
 詳細は [Valgrind Memcheck Manual](https://valgrind.org/docs/manual/mc-manual.html) を参照してください
 
-### スタックサイズの確認と変更
+### [スタックサイズの確認と変更](#checking-and-changing-stack-size) {#checking-and-changing-stack-size}
 
 現在のスタックサイズ制限を確認します
 
@@ -474,49 +484,51 @@ ulimit -s 16384  # 16MB に変更
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
 <strong>スタックとヒープの違い</strong>
 
-| 項目         | スタック               | ヒープ                |
+{: .labeled}
+| 項目 | スタック | ヒープ |
 | ------------ | ---------------------- | --------------------- |
-| 管理方法     | 自動                   | 手動（malloc / free） |
-| 確保関数     | なし（自動）           | malloc()              |
-| 解放関数     | なし（自動）           | free()                |
-| よくある問題 | スタックオーバーフロー | メモリリーク          |
+| 管理方法 | 自動 | 手動（malloc / free） |
+| 確保関数 | なし（自動） | malloc() |
+| 解放関数 | なし（自動） | free() |
+| よくある問題 | スタックオーバーフロー | メモリリーク |
 
 <strong>覚えておくこと</strong>
 
-| ポイント                    | 理由                                 |
+{: .labeled}
+| ポイント | 理由 |
 | --------------------------- | ------------------------------------ |
-| malloc() したら必ず free()  | メモリリークを防ぐ                   |
-| 大きなデータはヒープに      | スタックオーバーフローを防ぐ         |
-| free() 後は NULL を代入     | ダブルフリーと Use After Free を防ぐ |
-| Valgrind で定期的にチェック | メモリリークを早期発見               |
+| malloc() したら必ず free() | メモリリークを防ぐ |
+| 大きなデータはヒープに | スタックオーバーフローを防ぐ |
+| free() 後は NULL を代入 | ダブルフリーと Use After Free を防ぐ |
+| Valgrind で定期的にチェック | メモリリークを早期発見 |
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [malloc(3) - Linux manual page](https://www.man7.org/linux/man-pages/man3/malloc.3.html)
+- [malloc(3) - Linux manual page](https://www.man7.org/linux/man-pages/man3/malloc.3.html){:target="\_blank"}
   - malloc()、free()、calloc()、realloc() の使い方
-- [brk(2) - Linux manual page](https://man7.org/linux/man-pages/man2/brk.2.html)
+- [brk(2) - Linux manual page](https://man7.org/linux/man-pages/man2/brk.2.html){:target="\_blank"}
   - ヒープ領域を拡張するシステムコール
-- [mmap(2) - Linux manual page](https://man7.org/linux/man-pages/man2/mmap.2.html)
+- [mmap(2) - Linux manual page](https://man7.org/linux/man-pages/man2/mmap.2.html){:target="\_blank"}
   - 大きなメモリ確保で使われるシステムコール
-- [proc_pid_maps(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html)
+- [proc_pid_maps(5) - Linux manual page](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html){:target="\_blank"}
   - /proc/[pid]/maps の読み方
 
 <strong>ツール</strong>
 
-- [Valgrind Memcheck Manual](https://valgrind.org/docs/manual/mc-manual.html)
+- [Valgrind Memcheck Manual](https://valgrind.org/docs/manual/mc-manual.html){:target="\_blank"}
   - メモリリーク検出ツールの使い方
 
 <strong>本編との関連</strong>
 
-- [01-process](../01-process.md)
+- [01-process](../../01-process/)
   - メモリの構造の概要
-- [04-thread](../04-thread.md)
+- [04-thread](../../04-thread/)
   - スレッドごとのスタック

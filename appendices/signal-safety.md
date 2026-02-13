@@ -1,12 +1,13 @@
-<div align="right">
-<img src="https://img.shields.io/badge/AI-ASSISTED_STUDY-3b82f6?style=for-the-badge&labelColor=1e293b&logo=bookstack&logoColor=white" alt="AI Assisted Study" />
-</div>
+---
+layout: default
+title: なぜシグナルハンドラには制限があるのか
+---
 
-# なぜシグナルハンドラには制限があるのか
+# [なぜシグナルハンドラには制限があるのか](#why-signal-handler-has-restrictions) {#why-signal-handler-has-restrictions}
 
-## はじめに
+## [はじめに](#introduction) {#introduction}
 
-[03-signal](../03-signal.md) で、シグナルハンドラを使ってプロセスに通知を受け取る方法を学びました
+[03-signal](../../03-signal/) で、シグナルハンドラを使ってプロセスに通知を受け取る方法を学びました
 
 ハンドラの中で `printf()` を呼んだり、`malloc()` でメモリを確保したくなることがあるかもしれません
 
@@ -16,36 +17,37 @@
 
 ---
 
-## 目次
+## [目次](#table-of-contents) {#table-of-contents}
 
-- [制限とは](#制限とは)
-- [なぜ危険なのか](#なぜ危険なのか)
-- [安全な関数（async-signal-safe）](#安全な関数async-signal-safe)
-- [対処法](#対処法)
-- [volatile と sig_atomic_t](#volatile-と-sig_atomic_t)
-- [まとめ](#まとめ)
-- [参考資料](#参考資料)
+- [制限とは](#what-are-the-restrictions)
+- [なぜ危険なのか](#why-dangerous)
+- [安全な関数（async-signal-safe）](#async-signal-safe-functions)
+- [対処法](#countermeasures)
+- [volatile と sig_atomic_t](#volatile-and-sig-atomic-t)
+- [まとめ](#summary)
+- [参考資料](#references)
 
 ---
 
-## 制限とは
+## [制限とは](#what-are-the-restrictions) {#what-are-the-restrictions}
 
 シグナルハンドラ内では、<strong>呼び出せる関数に制限</strong>があります
 
-### 呼び出してはいけない関数
+### [呼び出してはいけない関数](#functions-not-to-call) {#functions-not-to-call}
 
 以下の関数はシグナルハンドラ内で呼び出すと危険です
 
-| 関数                | 理由                             |
+{: .labeled}
+| 関数 | 理由 |
 | ------------------- | -------------------------------- |
-| printf(), fprintf() | 内部バッファを使用している       |
-| malloc(), free()    | ヒープの管理データ構造を操作する |
-| fopen(), fclose()   | 内部状態を持つ                   |
-| exit()              | atexit() ハンドラを呼び出す      |
+| printf(), fprintf() | 内部バッファを使用している |
+| malloc(), free() | ヒープの管理データ構造を操作する |
+| fopen(), fclose() | 内部状態を持つ |
+| exit() | atexit() ハンドラを呼び出す |
 
 これらの関数を<strong>非同期シグナル安全でない</strong>（async-signal-unsafe）関数と呼びます
 
-### シグナルハンドラ内でやってよいこと
+### [シグナルハンドラ内でやってよいこと](#what-is-safe-in-signal-handler) {#what-is-safe-in-signal-handler}
 
 - `volatile sig_atomic_t` 型の変数への読み書き
 - 非同期シグナル安全な関数の呼び出し
@@ -54,9 +56,9 @@
 
 ---
 
-## なぜ危険なのか
+## [なぜ危険なのか](#why-is-it-dangerous) {#why-is-it-dangerous}
 
-### 非同期に割り込む
+### [非同期に割り込む](#asynchronous-interruption) {#asynchronous-interruption}
 
 シグナルは<strong>いつでも</strong>プログラムに割り込む可能性があります
 
@@ -81,7 +83,7 @@
 
 この状態でハンドラ内から `malloc()` を呼ぶと、ヒープが破壊される可能性があります
 
-### グローバル状態の破壊
+### [グローバル状態の破壊](#global-state-corruption) {#global-state-corruption}
 
 多くのライブラリ関数は<strong>グローバルな状態</strong>を内部に持っています
 
@@ -105,7 +107,7 @@ printf("Hello, ") を呼んだ
 結果：出力が壊れる、またはクラッシュ
 ```
 
-### デッドロックの可能性
+### [デッドロックの可能性](#deadlock-possibility) {#deadlock-possibility}
 
 `printf()` など多くの関数は、マルチスレッド環境で安全に動作するために<strong>ロック</strong>を使っています
 
@@ -130,9 +132,9 @@ printf("Hello, ") を呼んだ
 
 ---
 
-## 安全な関数（async-signal-safe）
+## [安全な関数（async-signal-safe）](#async-signal-safe-functions) {#async-signal-safe-functions}
 
-### async-signal-safe とは
+### [async-signal-safe とは](#what-is-async-signal-safe) {#what-is-async-signal-safe}
 
 <strong>非同期シグナル安全</strong>（async-signal-safe）な関数とは、シグナルハンドラ内から安全に呼び出せる関数のことです
 
@@ -142,17 +144,18 @@ printf("Hello, ") を呼んだ
 - グローバルな状態を変更しない
 - ロックを使用しない
 
-### 再入可能（reentrant）とは
+### [再入可能（reentrant）とは](#what-is-reentrant) {#what-is-reentrant}
 
 <strong>再入可能</strong>とは、「関数の実行中に割り込まれて、同じ関数が再度呼ばれても正しく動作する」性質です
 
 <strong>再入可能な関数の条件</strong>
 
-| 条件                       | 理由                             |
+{: .labeled}
+| 条件 | 理由 |
 | -------------------------- | -------------------------------- |
-| 静的変数を使わない         | 前回の呼び出しの状態が残らない   |
+| 静的変数を使わない | 前回の呼び出しの状態が残らない |
 | グローバル変数を変更しない | 他の実行コンテキストに影響しない |
-| ロックを取得しない         | デッドロックが起きない           |
+| ロックを取得しない | デッドロックが起きない |
 
 <strong>なぜ strtok() は再入不可能か</strong>
 
@@ -179,40 +182,43 @@ char *strtok_r(char *str, const char *delim, char **saveptr);
 /* saveptr に状態を保存するため、再入可能 */
 ```
 
-### 安全な関数の例
+### [安全な関数の例](#examples-of-safe-functions) {#examples-of-safe-functions}
 
 POSIX で定義されている主な async-signal-safe 関数：
 
 <strong>システムコール（ファイル操作）</strong>
 
-| 関数    | 説明                           |
+{: .labeled}
+| 関数 | 説明 |
 | ------- | ------------------------------ |
-| read()  | ファイルからデータを読み取る   |
-| write() | ファイルにデータを書き込む     |
-| open()  | ファイルを開く                 |
+| read() | ファイルからデータを読み取る |
+| write() | ファイルにデータを書き込む |
+| open() | ファイルを開く |
 | close() | ファイルディスクリプタを閉じる |
-| lseek() | ファイル位置を移動する         |
+| lseek() | ファイル位置を移動する |
 
 <strong>システムコール（プロセス操作）</strong>
 
-| 関数     | 説明                                    |
+{: .labeled}
+| 関数 | 説明 |
 | -------- | --------------------------------------- |
 | \_exit() | プロセスを終了する（atexit は呼ばない） |
-| fork()   | プロセスを複製する                      |
-| execve() | プログラムを実行する                    |
-| kill()   | シグナルを送信する                      |
-| getpid() | プロセス ID を取得する                  |
+| fork() | プロセスを複製する |
+| execve() | プログラムを実行する |
+| kill() | シグナルを送信する |
+| getpid() | プロセス ID を取得する |
 
 <strong>シグナル関連</strong>
 
-| 関数          | 説明                               |
+{: .labeled}
+| 関数 | 説明 |
 | ------------- | ---------------------------------- |
-| signal()      | シグナルハンドラを設定する         |
-| sigaction()   | シグナルハンドラを設定する（推奨） |
-| sigprocmask() | シグナルマスクを操作する           |
-| raise()       | 自分自身にシグナルを送る           |
+| signal() | シグナルハンドラを設定する |
+| sigaction() | シグナルハンドラを設定する（推奨） |
+| sigprocmask() | シグナルマスクを操作する |
+| raise() | 自分自身にシグナルを送る |
 
-### なぜ write() は安全なのか
+### [なぜ write() は安全なのか](#why-write-is-safe) {#why-write-is-safe}
 
 `write()` はシステムコールであり、カーネルに直接要求を送ります
 
@@ -231,7 +237,7 @@ void handler(int signum) {
 
 <strong>注意</strong>：`printf()` の代わりに `write()` を使いますが、フォーマット機能はありません
 
-### 完全な一覧の確認方法
+### [完全な一覧の確認方法](#how-to-check-complete-list) {#how-to-check-complete-list}
 
 async-signal-safe な関数の完全なリストは `signal-safety(7)` man ページで確認できます
 
@@ -245,9 +251,9 @@ man 7 signal-safety
 
 ---
 
-## 対処法
+## [対処法](#countermeasures) {#countermeasures}
 
-### パターン1：フラグを立てるだけ
+### [パターン1：フラグを立てるだけ](#pattern-1-set-flag-only) {#pattern-1-set-flag-only}
 
 最も安全な方法は、シグナルハンドラでは<strong>フラグを立てるだけ</strong>にすることです
 
@@ -309,7 +315,7 @@ int main(void) {
 }
 ```
 
-### パターン2：write() でメッセージを出力
+### [パターン2：write() でメッセージを出力](#pattern-2-write-message) {#pattern-2-write-message}
 
 デバッグ目的でハンドラ内からメッセージを出力したい場合は、`write()` を使います
 
@@ -329,7 +335,7 @@ void handler(int signum) {
 }
 ```
 
-### パターン3：self-pipe trick（発展）
+### [パターン3：self-pipe trick（発展）](#pattern-3-self-pipe-trick) {#pattern-3-self-pipe-trick}
 
 より高度なパターンとして、<strong>self-pipe trick</strong>があります
 
@@ -359,13 +365,13 @@ int main(void) {
 }
 ```
 
-この方法は [07-ipc](../07-ipc.md) のパイプの知識が前提となります
+この方法は [07-ipc](../../07-ipc/) のパイプの知識が前提となります
 
 ---
 
-## volatile と sig_atomic_t
+## [volatile と sig_atomic_t](#volatile-and-sig-atomic-t) {#volatile-and-sig-atomic-t}
 
-### volatile とは
+### [volatile とは](#what-is-volatile) {#what-is-volatile}
 
 `volatile` はコンパイラに「この変数は外部から変更される可能性がある」と伝える修飾子です
 
@@ -393,7 +399,7 @@ while (!flag) {
 }
 ```
 
-### sig_atomic_t とは
+### [sig_atomic_t とは](#what-is-sig-atomic-t) {#what-is-sig-atomic-t}
 
 `sig_atomic_t` は、シグナルハンドラとメインプログラムの間で安全にやり取りできることが保証された整数型です
 
@@ -409,12 +415,13 @@ while (!flag) {
 volatile sig_atomic_t flag = 0;
 ```
 
-### なぜ両方必要か
+### [なぜ両方必要か](#why-both-are-needed) {#why-both-are-needed}
 
-| 修飾子/型    | 役割                                               |
+{: .labeled}
+| 修飾子/型 | 役割 |
 | ------------ | -------------------------------------------------- |
-| volatile     | コンパイラの最適化を抑制し、毎回メモリから読み直す |
-| sig_atomic_t | 読み書きがアトミックであることを保証する           |
+| volatile | コンパイラの最適化を抑制し、毎回メモリから読み直す |
+| sig_atomic_t | 読み書きがアトミックであることを保証する |
 
 両方を組み合わせて使用します
 
@@ -424,29 +431,30 @@ static volatile sig_atomic_t signal_received = 0;
 
 ---
 
-## まとめ
+## [まとめ](#summary) {#summary}
 
-### シグナルハンドラでの制限
+### [シグナルハンドラでの制限](#restrictions-in-signal-handler) {#restrictions-in-signal-handler}
 
-| できること                         | できないこと                           |
+{: .labeled}
+| できること | できないこと |
 | ---------------------------------- | -------------------------------------- |
-| volatile sig_atomic_t への読み書き | printf(), malloc() などの呼び出し      |
-| async-signal-safe 関数の呼び出し   | 非同期シグナル安全でない関数の呼び出し |
-| フラグを立てる                     | 複雑な処理                             |
+| volatile sig_atomic_t への読み書き | printf(), malloc() などの呼び出し |
+| async-signal-safe 関数の呼び出し | 非同期シグナル安全でない関数の呼び出し |
+| フラグを立てる | 複雑な処理 |
 
-### なぜ危険なのか
+### [なぜ危険なのか](#why-dangerous) {#why-dangerous}
 
 - シグナルは<strong>いつでも</strong>割り込む可能性がある
 - 関数の<strong>内部状態</strong>が中途半端な状態で呼ばれる可能性がある
 - <strong>デッドロック</strong>が発生する可能性がある
 
-### 推奨される対処法
+### [推奨される対処法](#recommended-countermeasures) {#recommended-countermeasures}
 
 1. シグナルハンドラでは<strong>フラグを立てるだけ</strong>
 2. 実際の処理は<strong>メインループ</strong>で行う
 3. どうしてもハンドラ内で出力したい場合は <strong>write()</strong> を使う
 
-### 覚えておくこと
+### [覚えておくこと](#things-to-remember) {#things-to-remember}
 
 - `printf()` はシグナルハンドラ内で呼んではいけない
 - `write()` はシグナルハンドラ内から安全に呼べる
@@ -455,23 +463,23 @@ static volatile sig_atomic_t signal_received = 0;
 
 ---
 
-## 参考資料
+## [参考資料](#references) {#references}
 
 <strong>Linux マニュアル</strong>
 
-- [signal-safety(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal-safety.7.html)
+- [signal-safety(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal-safety.7.html){:target="\_blank"}
   - 非同期シグナル安全な関数の一覧と、シグナルハンドラ内で安全に呼べる関数についての詳細な解説
-- [signal(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal.7.html)
+- [signal(7) - Linux manual page](https://man7.org/linux/man-pages/man7/signal.7.html){:target="\_blank"}
   - シグナルの概要、シグナル一覧、デフォルト動作
 
 <strong>POSIX 標準</strong>
 
-- [POSIX.1-2017 Signal Concepts](https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html#tag_15_04)
+- [POSIX.1-2017 Signal Concepts](https://pubs.opengroup.org/onlinepubs/9699919799/functions/V2_chap02.html#tag_15_04){:target="\_blank"}
   - POSIX におけるシグナルの概念と非同期シグナル安全関数の一覧
 
 <strong>本編との関連</strong>
 
-- [03-signal](../03-signal.md)
+- [03-signal](../../03-signal/)
   - シグナルの基本概念、ハンドラの登録方法
-- [signal-list.md](./signal-list.md)
+- [signal-list.md](../signal-list/)
   - よく使うシグナルの一覧と使い分け
